@@ -120,7 +120,7 @@ namespace MicroServiceInstaller3
 
         private void BnConfig_Click(object sender, RoutedEventArgs e)
         {
-
+            LvConfigSettings.ItemsSource = "Test";
             string temporaryFolder = LbTemporaryFolder.Content.ToString();
             foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
             {
