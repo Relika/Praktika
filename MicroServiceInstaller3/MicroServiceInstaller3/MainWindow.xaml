@@ -1,0 +1,60 @@
+﻿<Window x:Class="MicroServiceInstaller3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MicroServiceInstaller3"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="650" Width="1800">
+    <Grid x:Name="grid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="409*" />
+            <RowDefinition Height="400*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.8*" />
+            <ColumnDefinition Width="0.5*" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+            <Button x:Name="BSelectFolder" Content="Select folder"  Width="100" Margin="5" Click="BSelectFolder_Click"/>
+            <Button x:Name="BnConfig" Content="Config settings"  Width="100" Margin="5" Click="BnConfig_Click" />
+            <Button x:Name="BnZip" Content="Zip files"  Width="100" Margin="5" Click="BnZip_Click"/>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+            <Button x:Name="BnSaveChanges" Content="Save changes" Width="100" Margin="5" Height="26" VerticalAlignment="Top"   Click="BnSaveChanges_Click"/>
+            <Button x:Name="BnFinishandZip" Content="Finish and Zip" Width="100"  Margin="5" Click="BnFinishandZip_Click" Height="26" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.615,4.673" />
+            <Label x:Name="Test" Content="Label" Height="70" Margin="0,195,0,0" VerticalAlignment="Top" Width="443"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,153">
+
+            <Label x:Name="LbSelectedFolder" Content=""  Margin="5" />
+
+            <ListBox x:Name="ListFiles"  Height="200">
+
+            </ListBox>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="0">
+            <ListBox x:Name="ListZipFiles" Margin="5" Height="100"/>
+            <Label x:Name="LbStatus" Content="" Margin="5"/>
+        </StackPanel>
+        
+        <Label x:Name="LbTemporaryFolder" Grid.Column="1" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+
+
+        <ListView x:Name="LvConfigSettings"   Grid.Column="1"  Margin="3,36,0,0" Grid.Row="1">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBlock x:Name="Key" Text="{Binding Key}" FontWeight="Bold" Margin="10" Width="180"/>
+                        <TextBox x:Name="Value" Text="{Binding Value}"/>
+
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        
+    </Grid>
+</Window>
