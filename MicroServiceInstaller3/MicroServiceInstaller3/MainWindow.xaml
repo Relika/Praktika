@@ -21,11 +21,13 @@
             <Button x:Name="BnConfig" Content="Config settings"  Width="100" Margin="5" Click="BnConfig_Click" />
             <Button x:Name="BnZip" Content="Zip files"  Width="100" Margin="5" Click="BnZip_Click"/>
         </StackPanel>
-        
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal">
+
+        </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+            <Label x:Name="LbAppSettingsFilePath" Content="Label" />
             <Button x:Name="BnSaveChanges" Content="Save changes" Width="100" Margin="5" Height="26" VerticalAlignment="Top"   Click="BnSaveChanges_Click"/>
             <Button x:Name="BnFinishandZip" Content="Finish and Zip" Width="100"  Margin="5" Click="BnFinishandZip_Click" Height="26" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.615,4.673" />
-            <Label x:Name="Test" Content="Label" Height="70" Margin="0,195,0,0" VerticalAlignment="Top" Width="443"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,153">
 
@@ -39,7 +41,7 @@
             <ListBox x:Name="ListZipFiles" Margin="5" Height="100"/>
             <Label x:Name="LbStatus" Content="" Margin="5"/>
         </StackPanel>
-        
+
         <Label x:Name="LbTemporaryFolder" Grid.Column="1" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
 
 
@@ -55,6 +57,6 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        
+
     </Grid>
 </Window>

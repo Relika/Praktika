@@ -39,14 +39,19 @@ namespace MicroServiceInstaller3
         private void BSelectFolder_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            folderBrowserDialog1.Description = "Select directory";
+            folderBrowserDialog1.ShowNewFolderButton = false;
             DialogResult result = folderBrowserDialog1.ShowDialog();
+
             if (result == System.Windows.Forms.DialogResult.OK)
             {
+
+
                 string selectedPath = ChooseFolder(folderBrowserDialog1);
 
                 string temporaryFolder = CreateTemopraryFolder(selectedPath);
 
-                DirectoryCopy(selectedPath, temporaryFolder, true);
+                DirectoryCopy(selectedPath, temporaryFolder,copySubDirs: true);
 
                 IEnumerable<string> unFilteredFileList = CreateUnFilteredFileList(temporaryFolder);
 
@@ -120,21 +125,24 @@ namespace MicroServiceInstaller3
 
         private void BnConfig_Click(object sender, RoutedEventArgs e)
         {
-            LvConfigSettings.ItemsSource = "Test";
+
             string temporaryFolder = LbTemporaryFolder.Content.ToString();
             foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
             {
                 if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
 
-                bool endsIn = (fileSystemEntry.EndsWith(".exe.config")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
+                bool endsIn = (fileSystemEntry.EndsWith(".exe.config"));
+
+                //string appConfigPath = System.IO.Path.GetFileName(fileSystemEntry.EndsWith(".exe.config"));
                 if (endsIn)
                 {
+                   
+                    LbAppSettingsFilePath.Content = fileSystemEntry;
                     ObservableCollection<AppSettingsConfig> appSettingsDictionary = FindConfSettings(fileSystemEntry);
                     LvConfigSettings.ItemsSource = appSettingsDictionary;
                 }
             }
         }
-
 
         private ObservableCollection<AppSettingsConfig> FindConfSettings(string fileSystemEntry)
         {
@@ -150,39 +158,33 @@ namespace MicroServiceInstaller3
                     appSetting.Key = (string)item.Attribute("key");
                     appSetting.Value = (string)item.Attribute("value");
                     appSettingsCollection.Add(appSetting);
-
                 }
-
             }
             catch (Exception error)
             {
-
-
             }
             return appSettingsCollection;
-    }
+        }
 
         public class AppSettingsConfig
         {
             public string Key { get; set; }
-
             public string Value { get; set; }
-        
         }
 
         private void BnSaveChanges_Click(object sender, RoutedEventArgs e)
         {
-           //bool ObservableAppSettings = LvConfigSettings.HasItems();
-           ObservableCollection<AppSettingsConfig> ModifiedAppSettings = new ObservableCollection<AppSettingsConfig>(LvConfigSettings.ItemsSource as List<AppSettingsConfig>);
+            ////bool ObservableAppSettings = LvConfigSettings.HasItems();
+            //ObservableCollection<AppSettingsConfig> ModifiedAppSettings = new ObservableCollection<AppSettingsConfig>(LvConfigSettings.ItemsSource as List<AppSettingsConfig>);
 
-            foreach (var appSetting in LvConfigSettings.ItemsSource)
-            {
-                Dictionary<string, string> appSettingsDic = ObservableCollection < AppSettingsConfig > (ModifiedAppSettings);
-                LvConfigSettings.ItemsSource = null;
-                Test.Content = appSettingsDic;
-            }
+            // foreach (var appSetting in LvConfigSettings.ItemsSource)
+            // {
+            //     Dictionary<string, string> appSettingsDic = ObservableCollection < AppSettingsConfig > (ModifiedAppSettings);
+            //     LvConfigSettings.ItemsSource = null;
+            //     Test.Content = appSettingsDic;
+            // }
 
-              ///  Dictionary<string, string> appSettingsDictionary = appSettings.Add($"{appSettings}");
+            ///  Dictionary<string, string> appSettingsDictionary = appSettings.Add($"{appSettings}");
             //bool appSettingsCollection = false;
             //Dictionary<string, string> appSettingsDictionary = new Dictionary<string, string>();
             //foreach (System.Windows.Controls.ListView item in LvConfigSettings.Items) ;
@@ -198,14 +200,23 @@ namespace MicroServiceInstaller3
             //appSetting.Key = (string)item.Attribute("key");
             //appSetting.Value = (string)item.Attribute("value");
             //appSettingsCollection.Add(appSetting);
+            var ModifiedAppSettings = LvConfigSettings.ItemsSource;
+            Dictionary<string, string> appSettingsDictionary = new Dictionary<string, string>();
 
+            foreach (var item in ModifiedAppSettings)
+            {
+                AppSettingsConfig appSetting = item as AppSettingsConfig;
+                appSettingsDictionary.Add(appSetting.Key, appSetting.Value);
+
+            }
+            string appConfigPath = LbAppSettingsFilePath.Content.ToString();
+            WriteSettingsToConfFile(appConfigPath, appSettingsDic:appSettingsDictionary);
         }
 
-        private static void WriteSettingsToConfFile(string appConfigPath, Dictionary<string, string> appSettingsDic)
+        private void WriteSettingsToConfFile(string appConfigPath, Dictionary<string, string> appSettingsDic)
         {
             try
             {
-
                 var doc = XDocument.Load(appConfigPath);
                 var elements = doc.Descendants("appSettings").Elements();
 
@@ -215,18 +226,18 @@ namespace MicroServiceInstaller3
 
                     if (appSettingsDic.ContainsKey(key))
                     {
-
                         item.Attribute("value").Value = appSettingsDic[key];
                     }
-
                 }
                 doc.Save(appConfigPath);
-
+                LbAppSettingsFilePath.Content = "Changes saved";
+               
             }
             catch (Exception error)
             {
-
+                LbAppSettingsFilePath.Content = error.Message;
             }
+            
         }
 
         private void BnZip_Click(object sender, RoutedEventArgs e)
