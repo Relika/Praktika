@@ -230,12 +230,12 @@ namespace MicroServiceInstaller3
                     }
                 }
                 doc.Save(appConfigPath);
-                LbAppSettingsFilePath.Content = "Changes saved";
+                LbProcessStatus.Content = "Changes saved";
                
             }
             catch (Exception error)
             {
-                LbAppSettingsFilePath.Content = error.Message;
+                LbProcessStatus.Content = error.Message;
             }
             
         }
