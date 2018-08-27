@@ -36,6 +36,38 @@ namespace MicroServiceInstaller3
         string RandomFileName = "";
         //string strings = "";
 
+        //public string LblText
+        //{
+        //    get { return _lblText; }
+
+        //    set
+        //    {
+        //        _lblText = value;
+
+        //        if (string.isnullorempty(_lblText)
+        //       {
+        //            BtnVisible = false;
+        //        }
+        //        else
+        //        {
+        //            BtnVisible = true;
+        //        }
+
+        //    }
+        //}
+        //private void ButtonController(System.Windows.Controls.Button button, System.Windows.Controls.Label label)
+        //{
+        //    button1 = button;
+        //    if(System.Windows.Controls.Label label() == "")
+        //    {
+        //        button1.disabled = true;
+        //    }
+        //    else
+        //    {
+        //        Button button1.disalbled = false;
+        //    }
+        //}
+
         private void BSelectFolder_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
@@ -118,30 +150,37 @@ namespace MicroServiceInstaller3
         private string ChooseFolder(FolderBrowserDialog folderBrowserDialog1)
         {
             string selectedPath = folderBrowserDialog1.SelectedPath; // Loob muutuja, mis vastab valitud kaustale
-            LbSelectedFolder.Content = selectedPath; // M''rab, kuhu kuvatakse valitud kausta sisu
+            LbSelectedFolder.Content = "Selected folder: "+selectedPath; // M''rab, kuhu kuvatakse valitud kausta sisu
             //SelectedFolder = SelectedPath;
             return selectedPath;
         }
 
         private void BnConfig_Click(object sender, RoutedEventArgs e)
         {
-
-            string temporaryFolder = LbTemporaryFolder.Content.ToString();
-            foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
-            {
-                if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
-
-                bool endsIn = (fileSystemEntry.EndsWith(".exe.config"));
-
-                //string appConfigPath = System.IO.Path.GetFileName(fileSystemEntry.EndsWith(".exe.config"));
-                if (endsIn)
+            //if (LbSelectedFolder.HasContent{true})
+            //{
+                string temporaryFolder = LbTemporaryFolder.Content.ToString();
+                foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
                 {
-                   
-                    LbAppSettingsFilePath.Content = fileSystemEntry;
-                    ObservableCollection<AppSettingsConfig> appSettingsDictionary = FindConfSettings(fileSystemEntry);
-                    LvConfigSettings.ItemsSource = appSettingsDictionary;
+                    if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
+
+                    bool endsIn = (fileSystemEntry.EndsWith(".exe.config"));
+
+                    //string appConfigPath = System.IO.Path.GetFileName(fileSystemEntry.EndsWith(".exe.config"));
+                    if (endsIn)
+                    {
+
+                        LbAppSettingsFilePath.Content = fileSystemEntry;
+                        ObservableCollection<AppSettingsConfig> appSettingsDictionary = FindConfSettings(fileSystemEntry);
+                        LvConfigSettings.ItemsSource = appSettingsDictionary;
+                    }
                 }
-            }
+            //}
+            //else
+            //{
+            //    lbselectedfolder.content = "to config settings you need to select folder at first!";
+            //}
+
         }
 
         private ObservableCollection<AppSettingsConfig> FindConfSettings(string fileSystemEntry)
@@ -174,32 +213,7 @@ namespace MicroServiceInstaller3
 
         private void BnSaveChanges_Click(object sender, RoutedEventArgs e)
         {
-            ////bool ObservableAppSettings = LvConfigSettings.HasItems();
-            //ObservableCollection<AppSettingsConfig> ModifiedAppSettings = new ObservableCollection<AppSettingsConfig>(LvConfigSettings.ItemsSource as List<AppSettingsConfig>);
 
-            // foreach (var appSetting in LvConfigSettings.ItemsSource)
-            // {
-            //     Dictionary<string, string> appSettingsDic = ObservableCollection < AppSettingsConfig > (ModifiedAppSettings);
-            //     LvConfigSettings.ItemsSource = null;
-            //     Test.Content = appSettingsDic;
-            // }
-
-            ///  Dictionary<string, string> appSettingsDictionary = appSettings.Add($"{appSettings}");
-            //bool appSettingsCollection = false;
-            //Dictionary<string, string> appSettingsDictionary = new Dictionary<string, string>();
-            //foreach (System.Windows.Controls.ListView item in LvConfigSettings.Items) ;
-            //{
-            //appSettingDictionary.Key = (string)item.Attribute("key");
-            //string value = (string)item.Attribute("value");
-            //
-
-
-            //return ModifiedAppSettings;
-
-            //AppSettingsConfig appSetting = new AppSettingsConfig();
-            //appSetting.Key = (string)item.Attribute("key");
-            //appSetting.Value = (string)item.Attribute("value");
-            //appSettingsCollection.Add(appSetting);
             var ModifiedAppSettings = LvConfigSettings.ItemsSource;
             Dictionary<string, string> appSettingsDictionary = new Dictionary<string, string>();
 
@@ -271,8 +285,12 @@ namespace MicroServiceInstaller3
 
                 ListFiles.Items.Clear(); // eemaldab listis olevad asukohakirjed
                 LbSelectedFolder.Content = "" ; // eemaldab valitud algse kataloogi asukoha kirje.
+                LbAppSettingsFilePath.Content = "";
+                LbProcessStatus.Content = "";
+
                 scope.Complete();
             }
+            //LvConfigSettings.Items.Clear();
         }
 
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
