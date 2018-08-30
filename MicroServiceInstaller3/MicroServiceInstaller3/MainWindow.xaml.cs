@@ -318,5 +318,153 @@ namespace MicroServiceInstaller3
                 scope.Complete();
             }
         }
+
+        private void BSelectZipFile_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog zipFileBrowserDialog1 = new OpenFileDialog();
+
+            zipFileBrowserDialog1.DefaultExt = ".zip";
+
+            DialogResult result = zipFileBrowserDialog1.ShowDialog();
+
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                string zipPath = zipFileBrowserDialog1.FileName;
+                LbSelectedZipFile.Content = zipPath;
+                if (LbSelectedZipFile.HasContent)
+                {
+                    BnConfigDownloadedAppSettings.IsEnabled = true;
+                }
+                string extractPath = CreateExtractFolder1(zipPath);
+                ZipFile.ExtractToDirectory(zipPath, extractPath);
+
+                //string selectedPath = ChooseFolder(folderBrowserDialog1);
+                ////string extractFolder = CreateExtractFolder1(selectedPath);
+
+                // DirectoryCopy(selectedPath, temporaryFolder, copySubDirs: true);
+                IEnumerable<string> ZipFileList = CreateZipFileList(extractPath);
+                //FilterFileList(unFilteredFileList);
+                //CreateMetaDataFile(selectedPath, temporaryFolder);
+            }
+        }
+
+        private IEnumerable<string> CreateZipFileList(string extractPath)
+        {
+            IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(extractPath,"*", SearchOption.AllDirectories); // Otsib ajutisest kaustast ja alamkaustadest faile
+            ListUnPackedZipFiles.ItemsSource = Files; // Paigutab failid faililisti
+            IEnumerable<string> ZipFileList = (IEnumerable<string>)ListUnPackedZipFiles.ItemsSource; //muudab valitud faili asukohanimetuse tekstiks
+            //ListUnPackedZipFiles.ItemsSource = null; // m''rab, et alguses on faililist t[hi
+            return ZipFileList;
+        }
+
+        private string CreateExtractFolder1(string zipPath)
+        {
+            //string temporaryRepository = System.IO.Path.GetTempPath(); //Otsib temp folderi.
+            string extractFolderName = Guid.NewGuid().ToString();
+            string extractPath = System.IO.Path.Combine("C:\\", "Downloaded zip files" , extractFolderName);
+            LbSelectedZipFile.Content = extractPath;
+         
+            return extractPath;
+        }
+
+        private void BnConfigDownloadedAppSettings_Click(object sender, RoutedEventArgs e)
+        {
+            string temporaryFolder = LbSelectedZipFile.Content.ToString();
+            foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
+            {
+                if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
+
+                bool endsIn = (fileSystemEntry.EndsWith(".exe.config"));
+
+                if (endsIn)
+                {
+                    LbDownloadedAppSettingsFilePath.Content = fileSystemEntry;
+                    ObservableCollection<AppSettingsConfig> appSettingsDictionary = FindConfSettings(fileSystemEntry);
+                    LvDowloadedConfigSettings.ItemsSource = appSettingsDictionary;
+                    if (LbDownloadedAppSettingsFilePath.HasContent)
+                    {
+                        BnSaveChanges.IsEnabled = true;
+                    }
+                }
+            }
+        }
+
+        //private ObservableCollection<AppSettingsConfig> FindConfSettings(string fileSystemEntry)
+        //{
+        //    ObservableCollection<AppSettingsConfig> appSettingsCollection = new ObservableCollection<AppSettingsConfig>();
+        //    try
+        //    {
+        //        var doc = XDocument.Load(fileSystemEntry);
+        //        var elements = doc.Descendants("appSettings").Elements();
+
+        //        foreach (var item in elements)
+        //        {
+        //            AppSettingsConfig appSetting = new AppSettingsConfig();
+        //            appSetting.Key = (string)item.Attribute("key");
+        //            appSetting.Value = (string)item.Attribute("value");
+        //            appSettingsCollection.Add(appSetting);
+        //        }
+        //    }
+        //    catch (Exception error)
+        //    {
+        //        LbProcessStatus.Content = error.Message;
+        //    }
+        //    return appSettingsCollection;
+        //}
+
+
+
+        private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        //public class AppSettingsConfig
+        //{
+        //    public string Key { get; set; }
+        //    public string Value { get; set; }
+        //}
+
+        //private void BnSaveChanges_Click(object sender, RoutedEventArgs e)
+        //{
+
+        //    var ModifiedAppSettings = LvConfigSettings.ItemsSource;
+        //    Dictionary<string, string> appSettingsDictionary = new Dictionary<string, string>();
+
+        //    foreach (var item in ModifiedAppSettings)
+        //    {
+        //        AppSettingsConfig appSetting = item as AppSettingsConfig;
+        //        appSettingsDictionary.Add(appSetting.Key, appSetting.Value);
+        //    }
+        //    string appConfigPath = LbAppSettingsFilePath.Content.ToString();
+
+        //    WriteSettingsToConfFile(appConfigPath, appSettingsDic: appSettingsDictionary);
+        //}
+
+        //private void WriteSettingsToConfFile(string appConfigPath, Dictionary<string, string> appSettingsDic)
+        //{
+        //    try
+        //    {
+        //        var doc = XDocument.Load(appConfigPath);
+        //        var elements = doc.Descendants("appSettings").Elements();
+
+        //        foreach (var item in elements)
+        //        {
+        //            string key = (string)item.Attribute("key");
+
+        //            if (appSettingsDic.ContainsKey(key))
+        //            {
+        //                item.Attribute("value").Value = appSettingsDic[key];
+        //            }
+        //        }
+        //        doc.Save(appConfigPath);
+        //        LbProcessStatus.Content = "Changes saved";
+        //    }
+        //    catch (Exception error)
+        //    {
+        //        LbProcessStatus.Content = error.Message;
+        //    }
+
+        //}
     }
 }
