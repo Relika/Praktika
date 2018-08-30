@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MicroServiceInstaller3"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="1000">
+        Title="Service Installer" Height="800" Width="1000">
     <Grid x:Name="grid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -50,7 +50,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="2" Grid.Column="0" Background="GhostWhite" >
-            <ListBox x:Name="ListZipFiles" Margin="5" Height="80"/>
+            <ListBox x:Name="ListZipFiles" Margin="3,3,3,3" Height="80"/>
         </StackPanel>
 
         <StackPanel Grid.Row="2" Grid.Column="1" Background="GhostWhite" >
@@ -58,7 +58,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="3" Grid.Column="0">
-            <Label x:Name="LbStatus" Content="" Height="25" VerticalAlignment="Top" Margin="5"/>
+            <Label x:Name="LbStatus" Content="" Height="25"    FontWeight="Bold" VerticalAlignment="Top" Margin="5"/>
         </StackPanel>
 
         <StackPanel Grid.Row="3" Grid.Column="1">

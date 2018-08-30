@@ -29,11 +29,9 @@ namespace MicroServiceInstaller3
         public MainWindow()
         {
             InitializeComponent();
-
         }
 
         string RandomFileName = "";
-
 
         private void BSelectFolder_Click(object sender, RoutedEventArgs e)
         {
@@ -44,22 +42,14 @@ namespace MicroServiceInstaller3
 
             if (result == System.Windows.Forms.DialogResult.OK)
             {
-
-
                 string selectedPath = ChooseFolder(folderBrowserDialog1);
-
                 string temporaryFolder = CreateTemopraryFolder(selectedPath);
 
                 DirectoryCopy(selectedPath, temporaryFolder,copySubDirs: true);
-
                 IEnumerable<string> unFilteredFileList = CreateUnFilteredFileList(temporaryFolder);
-
                 FilterFileList(unFilteredFileList);
-
                 CreateMetaDataFile(selectedPath, temporaryFolder);
-            }
-
-            
+            }         
         }
 
         private void CreateMetaDataFile(string SelectedPath, string temporaryFolder)
@@ -88,7 +78,7 @@ namespace MicroServiceInstaller3
                 {
                     File.Delete(value); // kustutab faili
                 }
-                //delete
+                
                 if (!endsIn)
                 {
                     ListFiles.Items.Add($"{value}");
@@ -110,8 +100,6 @@ namespace MicroServiceInstaller3
             string temporaryRepository = System.IO.Path.GetTempPath(); //Otsib temp folderi.
             string temporaryFolder = System.IO.Path.Combine(temporaryRepository, "tempDirectory");
 
-
-
             LbTemporaryFolder.Content = temporaryFolder;
             return temporaryFolder;
         }
@@ -130,34 +118,24 @@ namespace MicroServiceInstaller3
 
         private void BnConfig_Click(object sender, RoutedEventArgs e)
         {
-            //if (LbSelectedFolder.HasContent{true})
-            //{
-                string temporaryFolder = LbTemporaryFolder.Content.ToString();
-                foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
+            string temporaryFolder = LbTemporaryFolder.Content.ToString();
+            foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
+            {
+                if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
+
+                bool endsIn = (fileSystemEntry.EndsWith(".exe.config"));
+
+                if (endsIn)
                 {
-                    if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
-
-                    bool endsIn = (fileSystemEntry.EndsWith(".exe.config"));
-
-                    //string appConfigPath = System.IO.Path.GetFileName(fileSystemEntry.EndsWith(".exe.config"));
-                    if (endsIn)
-                    {
-
-                        LbAppSettingsFilePath.Content = fileSystemEntry;
-                        ObservableCollection<AppSettingsConfig> appSettingsDictionary = FindConfSettings(fileSystemEntry);
-                        LvConfigSettings.ItemsSource = appSettingsDictionary;
+                    LbAppSettingsFilePath.Content = fileSystemEntry;
+                    ObservableCollection<AppSettingsConfig> appSettingsDictionary = FindConfSettings(fileSystemEntry);
+                    LvConfigSettings.ItemsSource = appSettingsDictionary;
                     if (LbAppSettingsFilePath.HasContent)
                     {
                         BnSaveChanges.IsEnabled = true;
                     }
-                    }
                 }
-            //}
-            //else
-            //{
-            //    lbselectedfolder.content = "to config settings you need to select folder at first!";
-            //}
-
+            }
         }
 
         private ObservableCollection<AppSettingsConfig> FindConfSettings(string fileSystemEntry)
@@ -178,6 +156,7 @@ namespace MicroServiceInstaller3
             }
             catch (Exception error)
             {
+                LbProcessStatus.Content = error.Message;
             }
             return appSettingsCollection;
         }
@@ -198,9 +177,9 @@ namespace MicroServiceInstaller3
             {
                 AppSettingsConfig appSetting = item as AppSettingsConfig;
                 appSettingsDictionary.Add(appSetting.Key, appSetting.Value);
-
             }
             string appConfigPath = LbAppSettingsFilePath.Content.ToString();
+
             WriteSettingsToConfFile(appConfigPath, appSettingsDic:appSettingsDictionary);
         }
 
@@ -221,8 +200,7 @@ namespace MicroServiceInstaller3
                     }
                 }
                 doc.Save(appConfigPath);
-                LbProcessStatus.Content = "Changes saved";
-               
+                LbProcessStatus.Content = "Changes saved";             
             }
             catch (Exception error)
             {
@@ -233,8 +211,6 @@ namespace MicroServiceInstaller3
 
         private void BnZip_Click(object sender, RoutedEventArgs e)
         {
-            //ItemCollection Files = ListFiles.Items;
-           // string startPath = (string) LbSelectedFolder.Content;
             string temporaryFolder = LbTemporaryFolder.Content.ToString();
             string zipPath = System.IO.Path.Combine(temporaryFolder,"..", RandomFileName+".zip"); // M''rab zip faili asukoha ja nime
 
@@ -256,23 +232,23 @@ namespace MicroServiceInstaller3
                     }
                 }
 
-               if (!existItem)
+                if (!existItem)
                 {
                     ListZipFiles.Items.Add($"{zipPath}");
-
                 }
 
                 ListFiles.Items.Clear(); // eemaldab listis olevad asukohakirjed
-                LbSelectedFolder.Content = "" ; // eemaldab valitud algse kataloogi asukoha kirje.
+                LbSelectedFolder.Content = ""; // eemaldab valitud algse kataloogi asukoha kirje.
                 LbAppSettingsFilePath.Content = "";
+                LvConfigSettings.ItemsSource = "";
                 LbProcessStatus.Content = "";
+
                 if (ListZipFiles.HasItems)
                 {
                     BnFinishandZip.IsEnabled = true;
                 }
                 scope.Complete();
             }
-            //LvConfigSettings.Items.Clear();
         }
 
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
@@ -319,16 +295,9 @@ namespace MicroServiceInstaller3
 
         private void BnFinishandZip_Click(object sender, RoutedEventArgs e)
         {
-            //string startPath = (string)ListZipFiles.Items. ; //siia tuleb valida erinevate zip failide alguskohad listist ListZipFiles
-
-            //string finalZipPath = System.IO.Path.Combine(@"Downloads", "finalpackage.zip"); // M''rata asukoht, kuhu ja mis nimega zip file luuakse
-            //BnFinishandZip.Enabled = true;
             BnZip.IsEnabled = false;
             using (var scope = new TransactionScope())
             {
-
-                //File.Delete(finalZipPath); // kustutab faili, mis asub sellel aadressil
-
                 string finalZipLocation = System.IO.Path.Combine("C:\\", "finalZip");
                 Directory.CreateDirectory(finalZipLocation);
 
@@ -337,22 +306,17 @@ namespace MicroServiceInstaller3
                 {
                     string ZipFilePath = entry.ToString();
                     string zipFileName = System.IO.Path.GetFileName(ZipFilePath);
-                    // TODO: leidma zip faili nime jaoks muutuja ja asendan ZipfilePath uue muutujaga
 
                     finalLocation = System.IO.Path.Combine(finalZipLocation, zipFileName);
 
                     File.Copy(ZipFilePath, finalLocation);
                 }
 
-                // TODO: teen zip faili
-               // ZipFile.CreateFromDirectory(startPath, finalZipPath); // loob zip faili
-                LbStatus.Content = "Zip file is created successfully:" + finalLocation;
+                LbStatus.Content = "Zip file is created successfully: " + finalLocation;
 
                 ListZipFiles.Items.Clear(); // eemaldab listis olevad valitud zip failide asukohakirjed
                 scope.Complete();
             }
         }
-
-
     }
 }
