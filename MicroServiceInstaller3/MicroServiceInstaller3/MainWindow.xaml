@@ -44,8 +44,8 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="1">
-            <Button x:Name="BnConfig" Content="Config settings"  FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnConfig_Click" />
-            <Button x:Name="BnSaveChanges" Content="Save changes" FontSize="20" Width="200" Height="50" Margin="5,20,5,5"   Click="BnSaveChanges_Click"/>
+            <Button x:Name="BnConfig" IsEnabled="False" Content="Config settings"  FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnConfig_Click" />
+            <Button x:Name="BnSaveChanges" IsEnabled="False" Content="Save changes" FontSize="20" Width="200" Height="50" Margin="5,20,5,5"   Click="BnSaveChanges_Click"/>
             <Label x:Name="LbProcessStatus"  Content="" Margin="5,20,5,5" HorizontalAlignment="Center"/>
         </StackPanel>
 
@@ -54,7 +54,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="2" Grid.Column="1" Background="GhostWhite" >
-            <Button x:Name="BnZip" Content="Zip files"  FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnZip_Click"/>
+            <Button x:Name="BnZip" IsEnabled="False" Content="Zip files"  FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnZip_Click"/>
         </StackPanel>
 
         <StackPanel Grid.Row="3" Grid.Column="0">
@@ -62,7 +62,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="3" Grid.Column="1">
-            <Button x:Name="BnFinishandZip" Content="Finish and Zip" FontSize="20" Width="200"  Height="50" Margin="5,20,5,5"  Click="BnFinishandZip_Click" />
+            <Button x:Name="BnFinishandZip" Content="Finish and Zip" FontSize="20" Width="200"  Height="50" Margin="5,20,5,5"  Click="BnFinishandZip_Click" IsEnabled="false" />
         </StackPanel>
 
         <Label x:Name="LbTemporaryFolder" Grid.Column="1" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>

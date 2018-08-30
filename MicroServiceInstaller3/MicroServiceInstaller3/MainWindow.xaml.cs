@@ -32,41 +32,8 @@ namespace MicroServiceInstaller3
 
         }
 
-        //string SelectedFolder = "";
         string RandomFileName = "";
-        //string strings = "";
 
-        //public string LblText
-        //{
-        //    get { return _lblText; }
-
-        //    set
-        //    {
-        //        _lblText = value;
-
-        //        if (string.isnullorempty(_lblText)
-        //       {
-        //            BtnVisible = false;
-        //        }
-        //        else
-        //        {
-        //            BtnVisible = true;
-        //        }
-
-        //    }
-        //}
-        //private void ButtonController(System.Windows.Controls.Button button, System.Windows.Controls.Label label)
-        //{
-        //    button1 = button;
-        //    if(System.Windows.Controls.Label label() == "")
-        //    {
-        //        button1.disabled = true;
-        //    }
-        //    else
-        //    {
-        //        Button button1.disalbled = false;
-        //    }
-        //}
 
         private void BSelectFolder_Click(object sender, RoutedEventArgs e)
         {
@@ -91,6 +58,8 @@ namespace MicroServiceInstaller3
 
                 CreateMetaDataFile(selectedPath, temporaryFolder);
             }
+
+            
         }
 
         private void CreateMetaDataFile(string SelectedPath, string temporaryFolder)
@@ -150,8 +119,12 @@ namespace MicroServiceInstaller3
         private string ChooseFolder(FolderBrowserDialog folderBrowserDialog1)
         {
             string selectedPath = folderBrowserDialog1.SelectedPath; // Loob muutuja, mis vastab valitud kaustale
-            LbSelectedFolder.Content = "Selected folder: "+selectedPath; // M''rab, kuhu kuvatakse valitud kausta sisu
-            //SelectedFolder = SelectedPath;
+            LbSelectedFolder.Content = "Selected folder: "+selectedPath;// M''rab, kuhu kuvatakse valitud kausta sisu
+            if (LbSelectedFolder.HasContent)
+            {
+                BnConfig.IsEnabled = true;
+                BnZip.IsEnabled = true;
+            }
             return selectedPath;
         }
 
@@ -173,6 +146,10 @@ namespace MicroServiceInstaller3
                         LbAppSettingsFilePath.Content = fileSystemEntry;
                         ObservableCollection<AppSettingsConfig> appSettingsDictionary = FindConfSettings(fileSystemEntry);
                         LvConfigSettings.ItemsSource = appSettingsDictionary;
+                    if (LbAppSettingsFilePath.HasContent)
+                    {
+                        BnSaveChanges.IsEnabled = true;
+                    }
                     }
                 }
             //}
@@ -261,6 +238,7 @@ namespace MicroServiceInstaller3
             string temporaryFolder = LbTemporaryFolder.Content.ToString();
             string zipPath = System.IO.Path.Combine(temporaryFolder,"..", RandomFileName+".zip"); // M''rab zip faili asukoha ja nime
 
+            BnConfig.IsEnabled = false;
             using (var scope = new TransactionScope())
             {
                 File.Delete(zipPath); // kustutab faili, mis asub sellel aadressil
@@ -281,13 +259,17 @@ namespace MicroServiceInstaller3
                if (!existItem)
                 {
                     ListZipFiles.Items.Add($"{zipPath}");
+
                 }
 
                 ListFiles.Items.Clear(); // eemaldab listis olevad asukohakirjed
                 LbSelectedFolder.Content = "" ; // eemaldab valitud algse kataloogi asukoha kirje.
                 LbAppSettingsFilePath.Content = "";
                 LbProcessStatus.Content = "";
-
+                if (ListZipFiles.HasItems)
+                {
+                    BnFinishandZip.IsEnabled = true;
+                }
                 scope.Complete();
             }
             //LvConfigSettings.Items.Clear();
@@ -340,7 +322,8 @@ namespace MicroServiceInstaller3
             //string startPath = (string)ListZipFiles.Items. ; //siia tuleb valida erinevate zip failide alguskohad listist ListZipFiles
 
             //string finalZipPath = System.IO.Path.Combine(@"Downloads", "finalpackage.zip"); // M''rata asukoht, kuhu ja mis nimega zip file luuakse
-
+            //BnFinishandZip.Enabled = true;
+            BnZip.IsEnabled = false;
             using (var scope = new TransactionScope())
             {
 
