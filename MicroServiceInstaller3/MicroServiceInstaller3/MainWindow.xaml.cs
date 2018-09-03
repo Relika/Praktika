@@ -101,7 +101,7 @@ namespace MicroServiceInstaller3
             string temporaryRepository = System.IO.Path.GetTempPath(); //Otsib temp folderi.
             string temporaryFolder = System.IO.Path.Combine(temporaryRepository, directoryName);
 
-            LbTemporaryFolder.Content = temporaryFolder;
+            this.selectedPath.Content = temporaryFolder;
             return temporaryFolder;
         }
 
@@ -119,7 +119,7 @@ namespace MicroServiceInstaller3
 
         private void BnConfig_Click(object sender, RoutedEventArgs e)
         {
-            string confFilePath = FindAppSettingsFile(LbTemporaryFolder);
+            string confFilePath = FindAppSettingsFile(selectedPath);
             ListAppSettings(confFilePath, appSettingsPath: LbappSettingsPath, configSettings: LvUploadedConfigSettings, saveChanges: BnSaveChanges);
         }
         private void ListAppSettings(string fileSystemEntry, System.Windows.Controls.Label appSettingsPath, System.Windows.Controls.ListView configSettings, System.Windows.Controls.Button saveChanges)
@@ -147,6 +147,17 @@ namespace MicroServiceInstaller3
 
             //string temporaryFolder = handlePropertyChanged(sender, e);
             string temporaryFolder = temporaryfolderLabel.Content.ToString();
+           
+            return FindAppSettingsFile(temporaryFolder);
+        }
+
+
+
+        private string FindAppSettingsFile(string temporaryFolder)
+        {
+
+            //string temporaryFolder = handlePropertyChanged(sender, e);
+           
             foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
             {
                 if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
@@ -235,7 +246,7 @@ namespace MicroServiceInstaller3
 
         private void BnZip_Click(object sender, RoutedEventArgs e)
         {
-            string temporaryFolder = LbTemporaryFolder.Content.ToString();
+            string temporaryFolder = selectedPath.Content.ToString();
             string zipPath = System.IO.Path.Combine(temporaryFolder, "..", RandomFileName + ".zip"); // M''rab zip faili asukoha ja nime
 
             BnConfig.IsEnabled = false;
@@ -322,15 +333,15 @@ namespace MicroServiceInstaller3
             BnZip.IsEnabled = false;
             using (var scope = new TransactionScope())
             {
-                string finalZipLocation = System.IO.Path.Combine("C:\\", "finalZip");
-                Directory.CreateDirectory(finalZipLocation);
+                string zipLocation = System.IO.Path.Combine("C:\\", "ZipFiles");
+                Directory.CreateDirectory(zipLocation);
                 //string selectedPath = "C:\\";
                 //string directoryName = "tempZipDirectory";
                 //string temporaryFolder = CreateTemporaryFolder(selectedPath, directoryName);
                 //string zipPath = LbTemporaryFolder.Content.ToString();
 
                 string finalLocation = null;
-                foreach (var file in Directory.GetFiles(finalZipLocation))
+                foreach (var file in Directory.GetFiles(zipLocation))
                 {
                     File.Delete(file);
                 }
@@ -339,17 +350,17 @@ namespace MicroServiceInstaller3
                     string ZipFilePath = entry.ToString(); //loob faili asukohanimest muutuja
                     string zipFileName = System.IO.Path.GetFileName(ZipFilePath);// eraldab loodud asukohanimest failinime
 
-                    finalLocation = System.IO.Path.Combine(finalZipLocation, zipFileName); // loob muutuja, kombineerides faili nime ja zip failide jaoks loodud kausta
+                    finalLocation = System.IO.Path.Combine(zipLocation, zipFileName); // loob muutuja, kombineerides faili nime ja zip failide jaoks loodud kausta
                     //string temporaryLocation = System.IO.Path.Combine(temporaryFolder, zipFileName);
                     File.Copy(ZipFilePath, finalLocation); // kopeerib faili algsest asukohast loppasukohta
                 }
 
-                string lastFinalZipLocation = System.IO.Path.Combine("C:\\", "lastzip");
-                Directory.CreateDirectory(lastFinalZipLocation);
+                string finalZipLocation = System.IO.Path.Combine("C:\\", "FinalZip");
+                Directory.CreateDirectory(finalZipLocation);
 
-                string archiveFileName = System.IO.Path.Combine(lastFinalZipLocation, "final.zip");
-                File.Delete(archiveFileName);
-                ZipFile.CreateFromDirectory(finalZipLocation, archiveFileName);
+                string finalZipFileName = System.IO.Path.Combine(finalZipLocation, "final.zip");
+                File.Delete(finalZipFileName);
+                ZipFile.CreateFromDirectory(zipLocation, finalZipFileName);
 
                 LbStatus.Content = "Zip file is created successfully: " + finalLocation;
 
@@ -371,47 +382,157 @@ namespace MicroServiceInstaller3
             {
                 string zipPath = zipFileBrowserDialog1.FileName;
                 LbSelectedZipFile.Content = zipPath;
-                if (LbSelectedZipFile.HasContent)
-                {
-                    BnConfigDownloadedAppSettings.IsEnabled = true;
-                }
                 string extractPath = CreateExtractFolder1(zipPath);
                 ZipFile.ExtractToDirectory(zipPath, extractPath);
-                IEnumerable<string> ZipFileList = CreateZipFileList(extractPath);
+                IEnumerable<string> unFilteredZipFileList = CreateUnFilteredZipFileList(extractPath);
+                foreach (var zipFile in unFilteredZipFileList)
+                {
+                    string extractPath2 = CreateExtractFolder1(zipFile);
+                    ZipFile.ExtractToDirectory(zipFile, extractPath2);
+                    IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(extractPath2);
+                    FilterZipFileList(unFilteredFileList);
+                }
             }
         }
 
-        private IEnumerable<string> CreateZipFileList(string extractPath)
+        private void FilterZipFileList(IEnumerable<string> unFilteredFileList)
+        {
+            foreach (var value in unFilteredFileList) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
+            {
+                if (!File.Exists(value)) continue; // kui fail eksisteerib, j'tkab
+
+                bool endsIn = (value.EndsWith(".exe.config")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
+                if (endsIn)
+                {
+                    ListAppSettingsFiles.Items.Add($"{value}");
+                }
+
+            }
+        }
+
+        private IEnumerable<string> CreateUnFilteredZipFileList(string extractPath)
         {
             IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(extractPath, "*", SearchOption.AllDirectories); // Otsib ajutisest kaustast ja alamkaustadest faile
             ListUnPackedZipFiles.ItemsSource = Files; // Paigutab failid faililisti
-            IEnumerable<string> ZipFileList = (IEnumerable<string>)ListUnPackedZipFiles.ItemsSource; //muudab valitud faili asukohanimetuse tekstiks
+            IEnumerable<string> unFilteredZipFileList = (IEnumerable<string>)ListUnPackedZipFiles.ItemsSource; //muudab valitud faili asukohanimetuse tekstiks
             //ListUnPackedZipFiles.ItemsSource = null; // m''rab, et alguses on faililist t[hi
-            return ZipFileList;
+            return unFilteredZipFileList;
         }
 
         private string CreateExtractFolder1(string zipPath)
         {
             //string temporaryRepository = System.IO.Path.GetTempPath(); //Otsib temp folderi.
             string extractFolderName = Guid.NewGuid().ToString();
-            string extractPath = System.IO.Path.Combine("C:\\", "Downloaded zip files", extractFolderName);
-            LbSelectedZipFile.Content = extractPath;
+            string extractPath = System.IO.Path.Combine("C:\\", "Downloaded_zip_files", extractFolderName);
+            //LbSelectedZipFile.Content = extractPath;
 
             return extractPath;
         }
 
-        private void BnConfigDownloadedAppSettings_Click(object sender, RoutedEventArgs e)
+
+        private void ListAppSettingsFiles_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
-            string confFilePath = FindAppSettingsFile(LbSelectedZipFile);
-            ListAppSettings(confFilePath, appSettingsPath: LbDownloadedAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges);
+            if (ListAppSettingsFiles.SelectedIndex >= 0)
+            {
+                BnConfigDownloadedAppSettings.IsEnabled = true;
+
+                
+                LbTemporary.Content = ListAppSettingsFiles.SelectedItem;
+                string selectedFile = LbTemporary.Content.ToString();
+                string filePath = System.IO.Path.GetDirectoryName(selectedFile);
+                LbTemporary.Content = filePath;
+                //LbTemporary.Content = Directory.GetDirectories(filePath);
+
+                //if (ListAppSettingsFiles.SelectedItem is ConfFileInfo obj)
+                //{
+                //    LbTemporary.Content = "Valitud file: "+obj.selectedFile;
+                    
+                //    //MessageBox.Show("The ID is: " + selectID);
+                //}
+                //foreach (System.Windows.Controls.ListViewItem item in ListAppSettingsFiles.SelectedItems)
+                //{
+
+
+                //    if (item.Focus = true) //(ListAppSettingsFiles.Items != null)
+                //    {
+                //    //string selectedConFile = ListAppSettingsFiles.SelectedItem.ToString;
+                //    BnConfigDownloadedAppSettings.IsEnabled = true;
+                //    }
+                //}
+            }
+            else
+            {
+                LbProcessStatus.Content = "You must select config file first";
+            }
+
         }
 
-        private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
+        public class ConfFileInfo
         {
-            Dictionary<string, string> appSettingsDictionary;
-            string appConfigPath;
-            ReadModifiedConfSettings(out appSettingsDictionary, out appConfigPath, configSettings: LvDownloadedConfigSettings, appSettingsPath: LbDownloadedAppSettingsFilePath);
-            WriteSettingsToConfFile(appConfigPath, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus); 
+            private string _selectedFile;
+
+
+            public string selectedFile
+            {
+                get { return _selectedFile; }
+                set { _selectedFile = value; }
+            }
         }
+
+        private void BnConfigDownloadedAppSettings_Click(object sender, RoutedEventArgs e)
+        {
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            folderBrowserDialog1.Description = "Select directory";
+            DialogResult result = folderBrowserDialog1.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                string selectedPath = ChooseFolder(folderBrowserDialog1);
+               // string selectedPath = folderBrowserDialog1.SelectedPath;
+                LbTemporaryFolderZipFile.Content = selectedPath;
+                
+                string temporaryFolder = LbTemporary.Content.ToString();
+                //string selectedPath = LbTemporaryFolderZipFile.Content.ToString();
+
+                bool emptyFolder = File.Exists(selectedPath);
+                if (!emptyFolder)
+                {
+                    string confFilePath = FindAppSettingsFile(selectedPath);
+                    ListAppSettings(confFilePath, appSettingsPath: LbappSettingsPath, configSettings: LvUploadedConfigSettings, saveChanges: BnSaveChanges); //TODO check the names
+                }
+                if (emptyFolder)
+                {
+                    string confFilePath = FindAppSettingsFile(selectedPath);
+                    DirectoryInfo diSource = new DirectoryInfo(LbTemporary.Content.ToString());
+                    DirectoryInfo diTarget = new DirectoryInfo(ChooseFolder(folderBrowserDialog1));
+                    CopyAll(diSource, diTarget);
+                    //otsi conf file
+
+                }
+
+
+            }
+        }
+
+        public static void CopyAll(DirectoryInfo source, DirectoryInfo target)
+        {
+            Directory.CreateDirectory(target.FullName);
+
+            // Copy each file into the new directory.
+            foreach (FileInfo fi in source.GetFiles())
+            {
+                Console.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
+                fi.CopyTo(System.IO.Path.Combine(target.FullName, fi.Name), true);
+            }
+
+            // Copy each subdirectory using recursion.
+            foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+            {
+                DirectoryInfo nextTargetSubDir =
+                    target.CreateSubdirectory(diSourceSubDir.Name);
+                CopyAll(diSourceSubDir, nextTargetSubDir);
+            }
+        }
+
+       
     }
 }
