@@ -18,21 +18,22 @@
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="148*" />
-                        <ColumnDefinition Width="591*"/>
+                        <ColumnDefinition Width="15*"/>
+                        <ColumnDefinition Width="576*"/>
                         <ColumnDefinition Width="247*" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Row="0" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="2" >
+                    <StackPanel Grid.Row="0" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="3" >
                         <Label x:Name="LbSelectedFolder" Content=""  Margin="5" Height="30" FontWeight="Bold" VerticalAlignment="Top"/>
                         <ListBox x:Name="ListFiles"   Grid.Row="0" Grid.Column="0"  Margin="3,3,3,3" Height="200">
                         </ListBox>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="0" Grid.Column="2"  Background="GhostWhite">
+                    <StackPanel Grid.Row="0" Grid.Column="3"  Background="GhostWhite">
                         <Button x:Name="BSelectFolder" Content="Select folder" FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BSelectFolder_Click"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
                         <Label x:Name="LbappSettingsPath" Content="" Margin="5"  Height="30" FontWeight="Bold"  VerticalAlignment="Top"/>
                         <ListView x:Name="LvUploadedConfigSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" Height="200">
                             <ListView.ItemTemplate>
@@ -46,29 +47,29 @@
                         </ListView>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="1" Grid.Column="2">
+                    <StackPanel Grid.Row="1" Grid.Column="3">
                         <Button x:Name="BnConfig" IsEnabled="False" Content="Config settings"  FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnConfig_Click" />
                         <Button x:Name="BnSaveChanges" IsEnabled="False" Content="Save changes" FontSize="20" Width="200" Height="50" Margin="5,20,5,5"   Click="BnSaveChanges_Click"/>
                         <Label x:Name="LbProcessStatus"  Content="" Margin="5,20,5,5" HorizontalAlignment="Center"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="2" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="2" >
+                    <StackPanel Grid.Row="2" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="3" >
                         <ListBox x:Name="ListZipFiles" Margin="3,3,3,3" Height="80"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="2" Grid.Column="2" Background="GhostWhite" >
+                    <StackPanel Grid.Row="2" Grid.Column="3" Background="GhostWhite" >
                         <Button x:Name="BnZip" IsEnabled="False" Content="Zip files"  FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnZip_Click"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
                         <Label x:Name="LbStatus" Content="" Height="25"    FontWeight="Bold" VerticalAlignment="Top" Margin="5"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="3" Grid.Column="2">
+                    <StackPanel Grid.Row="3" Grid.Column="3">
                         <Button x:Name="BnFinishandZip" Content="Finish and Zip" FontSize="20" Width="200"  Height="50" Margin="5,20,5,5"  Click="BnFinishandZip_Click" IsEnabled="false" />
                     </StackPanel>
 
-                    <Label x:Name="selectedPath" Grid.Column="2" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+                    <Label x:Name="selectedPath" Grid.Column="3" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Download" Selector.IsSelected="{Binding IsTabDownloadSelected}"  Width="100">
@@ -102,12 +103,14 @@
                     </StackPanel>
                     <StackPanel Grid.Row="1" Grid.Column="0">
                         <Label x:Name="LbDownloadedAppSettingsFilePath" Content="" Margin="5"  Height="30" FontWeight="Bold"  VerticalAlignment="Top"/>
+                        <Label x:Name="LbExistingAppSettingsFilePath" Content="" Margin="5"  Height="30" FontWeight="Bold"  VerticalAlignment="Top"/>
                         <ListView x:Name="LvDownloadedConfigSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" Height="200">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock x:Name="Key" Text="{Binding Key}" FontWeight="Bold" Margin="10" Width="180"/>
                                         <TextBox x:Name="Value" Text="{Binding Value}"/>
+                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -116,7 +119,7 @@
 
                     <StackPanel Grid.Row="1" Grid.Column="1">
                         <Button x:Name="BnConfigDownloadedAppSettings" IsEnabled="False" Content="Config settings"  FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnConfigDownloadedAppSettings_Click"  />
-                        <Button x:Name="BnSaveDownloadedAppSettingsChanges" IsEnabled="False" Content="Save changes" FontSize="20" Width="200" Height="50" Margin="5,20,5,5"    />
+                        <Button x:Name="BnSaveDownloadedAppSettingsChanges" IsEnabled="False" Content="Save changes" FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnSaveDownloadedAppSettingsChanges_Click"    />
                         <Label x:Name="LbDownloadedProcessStatus"  Content="" Margin="5,20,5,5" HorizontalAlignment="Center"/>
                     </StackPanel>
 

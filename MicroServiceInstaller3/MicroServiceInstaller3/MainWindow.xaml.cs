@@ -180,6 +180,19 @@ namespace MicroServiceInstaller3
                 foreach (var item in elements)
                 {
                     AppSettingsConfig appSetting = new AppSettingsConfig();
+                    
+                    //if (LvDownloadedConfigSettings.HasItems) //juhul kui listis on juba value
+                    //{
+                    //    if (item.Name == LvDownloadedConfigSettings.ItemsSource.ToString())
+                    //    {
+                    //        appSetting.Value = (string)item.Attribute("existingvalue");
+                    //    }
+                    //    else
+                    //    {
+                    //        appSetting.Key = (string)item.Attribute("key");
+                    //        appSetting.Value = (string)item.Attribute("existingvalue");
+                    //    }    
+                    //}
                     appSetting.Key = (string)item.Attribute("key");
                     appSetting.Value = (string)item.Attribute("value");
                     appSettingsCollection.Add(appSetting);
@@ -432,6 +445,9 @@ namespace MicroServiceInstaller3
 
         private void ListAppSettingsFiles_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
+            LbDownloadedAppSettingsFilePath.Content = "";
+            LvDownloadedConfigSettings.ItemsSource = "";
+            LbDownloadedProcessStatus.Content = "";
             if (ListAppSettingsFiles.SelectedIndex >= 0)
             {
                 BnConfigDownloadedAppSettings.IsEnabled = true;
@@ -493,21 +509,38 @@ namespace MicroServiceInstaller3
                 string temporaryFolder = LbTemporary.Content.ToString();
                 //string selectedPath = LbTemporaryFolderZipFile.Content.ToString();
 
-                bool emptyFolder = File.Exists(selectedPath);
-                if (!emptyFolder)
+                string[] folderIsEmpty = Directory.GetFiles(selectedPath);
+                if (folderIsEmpty.Length == 0)
                 {
-                    string confFilePath = FindAppSettingsFile(selectedPath);
-                    ListAppSettings(confFilePath, appSettingsPath: LbappSettingsPath, configSettings: LvUploadedConfigSettings, saveChanges: BnSaveChanges); //TODO check the names
-                }
-                if (emptyFolder)
-                {
-                    string confFilePath = FindAppSettingsFile(selectedPath);
                     DirectoryInfo diSource = new DirectoryInfo(LbTemporary.Content.ToString());
                     DirectoryInfo diTarget = new DirectoryInfo(ChooseFolder(folderBrowserDialog1));
                     CopyAll(diSource, diTarget);
-                    //otsi conf file
-
+                    string confFilePath = FindAppSettingsFile(selectedPath);
+                    LbDownloadedAppSettingsFilePath.Content = confFilePath;
+                    ListAppSettings(confFilePath, appSettingsPath: LbDownloadedAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges);
                 }
+                else
+                {
+                    string existingConfFilePath = FindAppSettingsFile(selectedPath);
+                    string downloadedConfFilePath = FindAppSettingsFile(temporaryFolder);
+                    string existingConfFileName = System.IO.Path.GetFileName(path: existingConfFilePath);
+                    string downloadedConfFileName = System.IO.Path.GetFileName(downloadedConfFilePath);
+                    if (existingConfFileName == downloadedConfFileName)
+                    {
+                        LbExistingAppSettingsFilePath.Content = existingConfFilePath;
+                        LbDownloadedAppSettingsFilePath.Content = downloadedConfFilePath;
+                        ListAppSettings(downloadedConfFilePath, appSettingsPath: LbDownloadedAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges);
+                        ListAppSettings(existingConfFilePath, appSettingsPath: LbExistingAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges);
+                    }
+                    else
+                    {
+                        LbExistingAppSettingsFilePath.Content = "Existing conf file name does not match with downloaded conf file name. Please select another folder";
+                        LbDownloadedAppSettingsFilePath.Content = "Existing conf file name does not match with downloaded conf file name. Please select another folder";
+                    }
+                    //ListAppSettings(confFilePath, appSettingsPath: LbDownloadedAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges); //TODO check the names
+                }
+            
+
 
 
             }
@@ -533,6 +566,13 @@ namespace MicroServiceInstaller3
             }
         }
 
-       
+
+        private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
+        {
+            Dictionary<string, string> appSettingsDictionary;
+            string appConfigPath;
+            ReadModifiedConfSettings(out appSettingsDictionary, out appConfigPath, configSettings: LvDownloadedConfigSettings, appSettingsPath: LbDownloadedAppSettingsFilePath);
+            WriteSettingsToConfFile(appConfigPath, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus);
+        }
     }
 }
