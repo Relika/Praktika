@@ -121,14 +121,15 @@ namespace MicroServiceInstaller3
         {
             string confFilePath = FindAppSettingsFile(selectedPath);
             ListAppSettings(confFilePath, appSettingsPath: LbappSettingsPath, configSettings: LvUploadedConfigSettings, saveChanges: BnSaveChanges);
+            
         }
-        private void ListAppSettings(string fileSystemEntry, System.Windows.Controls.Label appSettingsPath, System.Windows.Controls.ListView configSettings, System.Windows.Controls.Button saveChanges)
+        private ObservableCollection<AppSettingsConfig> ListAppSettings(string fileSystemEntry, System.Windows.Controls.Label appSettingsPath, System.Windows.Controls.ListView configSettings, System.Windows.Controls.Button saveChanges)
         {
             ObservableCollection<AppSettingsConfig> appSettingsDictionary = null;
             appSettingsPath.Content = fileSystemEntry;
-            if (appSettingsPath == LbappSettingsPath)
+            if (appSettingsPath == LbappSettingsPath) // kontrollin, kas 
             {
-                appSettingsDictionary = FindConfSettings(fileSystemEntry, statusLabel: LbProcessStatus);
+                appSettingsDictionary =  FindConfSettings(fileSystemEntry, statusLabel: LbProcessStatus);
             }
             else
             {
@@ -140,6 +141,7 @@ namespace MicroServiceInstaller3
             {
                 saveChanges.IsEnabled = true;
             }
+            return appSettingsDictionary;
         }
 
         private string FindAppSettingsFile(System.Windows.Controls.Label temporaryfolderLabel)
@@ -147,7 +149,7 @@ namespace MicroServiceInstaller3
 
             //string temporaryFolder = handlePropertyChanged(sender, e);
             string temporaryFolder = temporaryfolderLabel.Content.ToString();
-           
+
             return FindAppSettingsFile(temporaryFolder);
         }
 
@@ -157,7 +159,7 @@ namespace MicroServiceInstaller3
         {
 
             //string temporaryFolder = handlePropertyChanged(sender, e);
-           
+
             foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
             {
                 if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
@@ -168,6 +170,74 @@ namespace MicroServiceInstaller3
             }
             return string.Empty;
         }
+        private ObservableCollection<AppSettingsConfig> CompareAppSettings(string fileSystemEntry, string confFilePath)
+        {
+            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = new ObservableCollection<AppSettingsConfig>();
+            try
+            {
+
+                HashSet<string> KeySet = new HashSet<string>();
+                var doc = XDocument.Load(fileSystemEntry);
+                var elements = doc.Descendants("appSettings").Elements();
+                foreach (var item in elements)
+                {
+                    //AppSettingsConfig appSetting = new AppSettingsConfig();
+                    //appSetting.Key = (string)item.Attribute("key");
+                    //appSetting.Value = (string)item.Attribute("value");
+
+                    KeySet.Add((string)item.Attribute("key"));
+                    //Value1Set.Add(appSetting.Value);
+                    //evenNumbers.Add(i * 2);
+                }
+                var doc2 = XDocument.Load(confFilePath);
+                var elements2 = doc2.Descendants("appSettings").Elements();
+                foreach (var item in elements2)
+                {
+                    //AppSettingsConfig appSetting = new AppSettingsConfig();
+                   //appSetting.Key = (string)item.Attribute("key");
+                    ////appSetting.Value = (string)item.Attribute("value");
+
+                    KeySet.Add((string)item.Attribute("key"));
+                    //Value2Set.Add(appSetting.Value);
+                    //evenNumbers.Add(i * 2);
+                }
+
+
+                foreach (var key in KeySet)
+                {
+                    AppSettingsConfig appSetting = new AppSettingsConfig();
+                    appSetting.Key = key;
+                    string appSettingValue = FindValue(fileSystemEntry, key);
+                    string existingValue = FindValue(confFilePath, key);
+                    appSetting.Value = appSettingValue;
+                    appSetting.ExistingValue = existingValue;
+                    comparedAppSettingsCollection.Add(appSetting);
+
+                }
+
+                LvDownloadedConfigSettings.ItemsSource = comparedAppSettingsCollection;
+
+            }
+            catch (Exception error)
+            {
+                //statusLabel.Content = error.Message;
+            }
+            return comparedAppSettingsCollection;
+        }
+
+        private string FindValue(string confFilePath, string key)
+        {
+            var doc = XDocument.Load(confFilePath);
+            var elements = doc.Descendants("appSettings").Elements();
+            foreach (var item in elements)
+            {
+                if ((string)item.Attribute("key") == key)
+                {
+                    return (string)item.Attribute("value");
+                }
+            }
+            return null;
+        }
 
         private ObservableCollection<AppSettingsConfig> FindConfSettings(string fileSystemEntry, System.Windows.Controls.Label statusLabel)
         {
@@ -177,26 +247,13 @@ namespace MicroServiceInstaller3
                 var doc = XDocument.Load(fileSystemEntry);
                 var elements = doc.Descendants("appSettings").Elements();
 
-                foreach (var item in elements)
-                {
-                    AppSettingsConfig appSetting = new AppSettingsConfig();
-                    
-                    //if (LvDownloadedConfigSettings.HasItems) //juhul kui listis on juba value
-                    //{
-                    //    if (item.Name == LvDownloadedConfigSettings.ItemsSource.ToString())
-                    //    {
-                    //        appSetting.Value = (string)item.Attribute("existingvalue");
-                    //    }
-                    //    else
-                    //    {
-                    //        appSetting.Key = (string)item.Attribute("key");
-                    //        appSetting.Value = (string)item.Attribute("existingvalue");
-                    //    }    
-                    //}
-                    appSetting.Key = (string)item.Attribute("key");
-                    appSetting.Value = (string)item.Attribute("value");
-                    appSettingsCollection.Add(appSetting);
-                }
+                    foreach (var item in elements)
+                    {
+                        AppSettingsConfig appSetting = new AppSettingsConfig();
+                        appSetting.Key = (string)item.Attribute("key");
+                        appSetting.Value = (string)item.Attribute("value");
+                        appSettingsCollection.Add(appSetting);
+                    }
             }
             catch (Exception error)
             {
@@ -209,6 +266,7 @@ namespace MicroServiceInstaller3
         {
             public string Key { get; set; }
             public string Value { get; set; }
+            public string ExistingValue { get; set; }
         }
 
         private void BnSaveChanges_Click(object sender, RoutedEventArgs e)
@@ -400,10 +458,19 @@ namespace MicroServiceInstaller3
                 IEnumerable<string> unFilteredZipFileList = CreateUnFilteredZipFileList(extractPath);
                 foreach (var zipFile in unFilteredZipFileList)
                 {
-                    string extractPath2 = CreateExtractFolder1(zipFile);
-                    ZipFile.ExtractToDirectory(zipFile, extractPath2);
-                    IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(extractPath2);
-                    FilterZipFileList(unFilteredFileList);
+                    bool endsIn = (zipFile.EndsWith(".zip"));
+                    if (endsIn)
+                    {
+                        string extractPath2 = CreateExtractFolder1(zipFile);
+                        ZipFile.ExtractToDirectory(zipFile, extractPath2);
+                        IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(extractPath2);
+                        FilterZipFileList(unFilteredFileList);
+                    }
+                    else
+                    {
+                        FilterZipFileList(unFilteredZipFileList);
+                    }
+
                 }
             }
         }
@@ -446,7 +513,7 @@ namespace MicroServiceInstaller3
         private void ListAppSettingsFiles_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
             LbDownloadedAppSettingsFilePath.Content = "";
-            LvDownloadedConfigSettings.ItemsSource = "";
+            //LvDownloadedConfigSettings.ItemsSource = "";
             LbDownloadedProcessStatus.Content = "";
             if (ListAppSettingsFiles.SelectedIndex >= 0)
             {
@@ -526,11 +593,16 @@ namespace MicroServiceInstaller3
                     string existingConfFileName = System.IO.Path.GetFileName(path: existingConfFilePath);
                     string downloadedConfFileName = System.IO.Path.GetFileName(downloadedConfFilePath);
                     if (existingConfFileName == downloadedConfFileName)
-                    {
+                    {                      
                         LbExistingAppSettingsFilePath.Content = existingConfFilePath;
                         LbDownloadedAppSettingsFilePath.Content = downloadedConfFilePath;
                         ListAppSettings(downloadedConfFilePath, appSettingsPath: LbDownloadedAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges);
-                        ListAppSettings(existingConfFilePath, appSettingsPath: LbExistingAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges);
+                        //ObservableCollection<AppSettingsConfig> appSettingsCollection =  appSettingsDictionary;
+                        CompareAppSettings(existingConfFilePath , downloadedConfFilePath);
+
+
+
+                            //ListAppSettings(existingConfFilePath, appSettingsPath: LbExistingAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges);
                     }
                     else
                     {

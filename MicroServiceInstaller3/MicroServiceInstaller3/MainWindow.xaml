@@ -8,7 +8,7 @@
         Title="Service Installer" Height="800" Width="1000">
     <Grid>
         <TabControl x:Name="Tab">
-            <TabItem Header="Upload" Selector.IsSelected="{Binding IsTabUploadSelected}" Width="490" Height="50" FontSize="20">
+            <TabItem Header="Upload"  Selector.IsSelected="{Binding IsTabUploadSelected}" Width="490" Height="50"  FontSize="50">
                 <Grid x:Name="grid">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -39,8 +39,8 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock x:Name="Key" Text="{Binding Key}" FontWeight="Bold" Margin="10" Width="180"/>
-                                        <TextBox x:Name="Value" Text="{Binding Value}"/>
+                                        <TextBlock x:Name="Key" Text="{Binding Key}" FontWeight="Bold" Margin="10" FontSize="12" Width="180"/>
+                                        <TextBox x:Name="Value" Text="{Binding Value}" FontSize="12"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -115,12 +115,13 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
+                        <Label x:Name="LbDownloadedProcessStatus"  Content="" Margin="118,20,119,5" HorizontalAlignment="Center" RenderTransformOrigin="-66.4,4.162"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="1">
                         <Button x:Name="BnConfigDownloadedAppSettings" IsEnabled="False" Content="Config settings"  FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnConfigDownloadedAppSettings_Click"  />
                         <Button x:Name="BnSaveDownloadedAppSettingsChanges" IsEnabled="False" Content="Save changes" FontSize="20" Width="200" Height="50" Margin="5,20,5,5" Click="BnSaveDownloadedAppSettingsChanges_Click"    />
-                        <Label x:Name="LbDownloadedProcessStatus"  Content="" Margin="5,20,5,5" HorizontalAlignment="Center"/>
+                        
                     </StackPanel>
 
 
