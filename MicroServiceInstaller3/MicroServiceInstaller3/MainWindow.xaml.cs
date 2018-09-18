@@ -129,10 +129,10 @@ namespace MicroServiceInstaller3
 
         private void BnConfig_Click(object sender, RoutedEventArgs e)
         {
-            string confFilePath = FindAppSettingsFile(selectedPath);
-            FindConfSettings(confFilePath, statusLabel: LbProcessStatus);
+            string confFilePath = FindAppSettingsFile(LbworkFilesFolder);
+            LvUploadedConfigSettings.ItemsSource = FindConfSettings(confFilePath, statusLabel: LbProcessStatus);
             //ListAppSettings(confFilePath, appSettingsPath: LbappSettingsPath, configSettings: LvUploadedConfigSettings, saveChanges: BnSaveChanges);
-            
+
         }
 
         private string FindAppSettingsFile(System.Windows.Controls.Label temporaryfolderLabel)
@@ -184,13 +184,22 @@ namespace MicroServiceInstaller3
             return comparedAppSettingsCollection;
         }
 
-        private static void FindKeys(string fileSystemEntry, HashSet<string> KeySet)
+        private void FindKeys(string fileSystemEntry, HashSet<string> KeySet)
         {
             var doc = XDocument.Load(fileSystemEntry);
             var elements = doc.Descendants("appSettings").Elements();
             foreach (var item in elements)
             {
                 KeySet.Add((string)item.Attribute("key"));
+                if (fileSystemEntry == LbExistingAppSettingsFilePath.Content.ToString())
+                {
+                     KeySet.Add((string)item.Attribute("rbExistingValue"));
+                }
+                else
+                {
+                    KeySet.Add((string)item.Attribute("rbNewValue"));
+                }
+               
             }
         }
 
@@ -202,6 +211,7 @@ namespace MicroServiceInstaller3
             {
                 if ((string)item.Attribute("key") == key)
                 {
+
                     return (string)item.Attribute("value");
                 }
             }
@@ -501,7 +511,8 @@ namespace MicroServiceInstaller3
                     {
                         //LbExistingAppSettingsFilePath.Content = existingConfFilePath;
                         LbDownloadedAppSettingsFilePath.Content = downloadedConfFilePath;
-                        CompareAppSettings(existingConfFilePath , downloadedConfFilePath);
+                        ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = CompareAppSettings(existingConfFilePath , downloadedConfFilePath);
+                        AddRadioButtons(comparedAppSettingsCollection);
                     }
                     else
                     {
@@ -511,6 +522,11 @@ namespace MicroServiceInstaller3
 
                 }
             }
+        }
+
+        private void AddRadioButtons(ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection)
+        {
+            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollectionWithButtons = new ObservableCollection<AppSettingsConfig>();
         }
 
         public static void CopyAll(DirectoryInfo source, DirectoryInfo target)

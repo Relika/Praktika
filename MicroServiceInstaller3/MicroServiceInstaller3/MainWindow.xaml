@@ -107,7 +107,7 @@
                         <Button x:Name="BnFinishandZip" Content="Finish and Zip"   Click="BnFinishandZip_Click" IsEnabled="false" />
                     </StackPanel>
 
-                    <Label x:Name="selectedPath" Grid.Column="3" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+                    <Label x:Name="LbselectedPath" Grid.Column="3" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
                     <Label x:Name="LbworkFilesFolder" Grid.Column="3" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
                     <Label x:Name="LbZipFilesFolder" Grid.Column="3" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
                     <Label x:Name="LbFinalZipFolder" Grid.Column="3" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
@@ -149,6 +149,8 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
+                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}"/>
+                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}"/>
                                         <TextBlock x:Name="Key" Text="{Binding Key}" FontWeight="Bold" />
                                         <TextBox x:Name="Value" Text="{Binding Value}"/>
                                         <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}"/>
