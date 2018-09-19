@@ -156,23 +156,23 @@ namespace MicroServiceInstaller3
             }
             return string.Empty;
         }
-        private ObservableCollection<AppSettingsConfig> CompareAppSettings(string fileSystemEntry, string confFilePath)
+        private ObservableCollection<AppSettingsConfig> CompareAppSettings(string existingFileSystemEntry, string downloadedFileSystemEntry)
         {
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = new ObservableCollection<AppSettingsConfig>();
             try
             {
 
                 HashSet<string> KeySet = new HashSet<string>();
-                FindKeys(fileSystemEntry, KeySet);
-                FindKeys(confFilePath, KeySet);
+                FindKeys(existingFileSystemEntry, KeySet);
+                FindKeys(downloadedFileSystemEntry, KeySet);
                 foreach (var key in KeySet)
                 {
                     AppSettingsConfig appSetting = new AppSettingsConfig();
                     appSetting.Key = key;
-                    string appSettingValue = FindValue(fileSystemEntry, key);
-                    string existingValue = FindValue(confFilePath, key);
-                    appSetting.Value = appSettingValue;
-                    appSetting.ExistingValue = existingValue;
+                    string downloadedAppSettingValue = FindValue(downloadedFileSystemEntry, key); 
+                    string existingAppSettingValue = FindValue(existingFileSystemEntry, key);
+                    appSetting.NewValue = downloadedAppSettingValue;    
+                    appSetting.ExistingValue = existingAppSettingValue;
                     comparedAppSettingsCollection.Add(appSetting);
                 }
                 LvDownloadedConfigSettings.ItemsSource = comparedAppSettingsCollection;
@@ -190,16 +190,7 @@ namespace MicroServiceInstaller3
             var elements = doc.Descendants("appSettings").Elements();
             foreach (var item in elements)
             {
-                KeySet.Add((string)item.Attribute("key"));
-                if (fileSystemEntry == LbExistingAppSettingsFilePath.Content.ToString())
-                {
-                     KeySet.Add((string)item.Attribute("rbExistingValue"));
-                }
-                else
-                {
-                    KeySet.Add((string)item.Attribute("rbNewValue"));
-                }
-               
+                KeySet.Add((string)item.Attribute("key"));               
             }
         }
 
@@ -211,8 +202,12 @@ namespace MicroServiceInstaller3
             {
                 if ((string)item.Attribute("key") == key)
                 {
-
                     return (string)item.Attribute("value");
+                   
+                }
+                else
+                {
+                    
                 }
             }
             return null;
@@ -230,7 +225,7 @@ namespace MicroServiceInstaller3
                     {
                         AppSettingsConfig appSetting = new AppSettingsConfig();
                         appSetting.Key = (string)item.Attribute("key");
-                        appSetting.Value = (string)item.Attribute("value");
+                        appSetting.NewValue = (string)item.Attribute("newvalue");
                         appSettingsCollection.Add(appSetting);
                     }
             }
@@ -244,8 +239,14 @@ namespace MicroServiceInstaller3
         public class AppSettingsConfig
         {
             public string Key { get; set; }
-            public string Value { get; set; }
+            public string NewValue { get; set; }
             public string ExistingValue { get; set; }
+            public bool RbNewValue { get; set; }
+            public bool RbExistingValue { get; set; }
+            public Visibility TbValueVisibility { get; set; }
+            public Visibility TbExistingValueVisibility { get; set; }
+            public Visibility RbNewValueVisibility { get; set; }
+            public Visibility RbExistingValueVisibility { get; set; }
         }
 
         private void BnSaveChanges_Click(object sender, RoutedEventArgs e)
@@ -263,7 +264,7 @@ namespace MicroServiceInstaller3
             foreach (var item in ModifiedAppSettings)
             {
                 AppSettingsConfig appSetting = item as AppSettingsConfig;
-                appSettingsDictionary.Add(appSetting.Key, appSetting.Value);
+                appSettingsDictionary.Add(appSetting.Key, appSetting.NewValue);
             }
             appConfigPath = appSettingsPath.Content.ToString();
         }
@@ -496,10 +497,11 @@ namespace MicroServiceInstaller3
                     DirectoryInfo diTarget = new DirectoryInfo(ChooseFolder(folderBrowserDialog1));
                     CopyAll(diSource, diTarget);
                     string confFilePath = FindAppSettingsFile(selectedPath);
-                    
+
                     //LbExistingAppSettingsFilePath.Content = confFilePath;
                     //ListAppSettings(confFilePath, appSettingsPath: LbExistingAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges);
-                    FindConfSettings(confFilePath, statusLabel: LbDownloadedProcessStatus);
+                    ObservableCollection<AppSettingsConfig> appSettingsCollection = FindConfSettings(confFilePath, statusLabel: LbDownloadedProcessStatus);
+                    LvDownloadedConfigSettings.ItemsSource = appSettingsCollection;
                 }
                 else
                 {
@@ -513,6 +515,7 @@ namespace MicroServiceInstaller3
                         LbDownloadedAppSettingsFilePath.Content = downloadedConfFilePath;
                         ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = CompareAppSettings(existingConfFilePath , downloadedConfFilePath);
                         AddRadioButtons(comparedAppSettingsCollection);
+                        HideEmptyTextBox(comparedAppSettingsCollection);
                     }
                     else
                     {
@@ -524,10 +527,45 @@ namespace MicroServiceInstaller3
             }
         }
 
-        private void AddRadioButtons(ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection)
+        private void HideEmptyTextBox(ObservableCollection<AppSettingsConfig> appSettings)
         {
-            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollectionWithButtons = new ObservableCollection<AppSettingsConfig>();
+            foreach (var item in appSettings)
+            {
+                if (string.IsNullOrEmpty(item.ExistingValue))
+                {
+                    item.TbExistingValueVisibility = Visibility.Hidden;
+                    item.RbExistingValueVisibility = Visibility.Hidden;
+
+                }
+                if (string.IsNullOrEmpty(item.NewValue))
+                {
+                    item.TbValueVisibility = Visibility.Hidden;
+                    item.RbNewValueVisibility = Visibility.Hidden;
+
+                }
+            }
         }
+
+        private void AddRadioButtons(ObservableCollection<AppSettingsConfig> appSettings)
+        {
+            foreach (var item in appSettings)
+            {
+                if (!string.IsNullOrEmpty(item.ExistingValue))
+                {
+                    item.RbExistingValue = true;
+                }
+                else
+                {
+                    item.RbNewValue = true;
+                }
+            }
+
+        }
+
+        //private HideEmptyTextBox (ObservableCollection<AppSettingsConfig> appSettings)
+        //{
+
+        //}
 
         public static void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
