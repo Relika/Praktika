@@ -49,6 +49,10 @@ namespace MicroServiceInstaller3
             string finalZipLocation = System.IO.Path.Combine("C:\\", "FinalZip");
             LbFinalZipFolder.Content = finalZipLocation;
             FShandler.CreateDirectory(finalZipLocation);
+
+            string temporaryConfFileLocation = System.IO.Path.Combine(temporaryFolderPath, "tempConfFile");
+            LbDownloadedAppSettingsFilePath.Content = temporaryConfFileLocation;
+            FShandler.CreateDirectory(temporaryConfFileLocation);
         }
 
         string RandomFileName = "";
@@ -286,6 +290,19 @@ namespace MicroServiceInstaller3
                     {
                         item.Attribute("value").Value = appSettingsDic[key];
                     }
+                    //kui key-d ei ole, tuleb lisada key + value
+                    else
+                    {
+                        XElement xmlAddElement = new XElement("add");
+                        XAttribute configValueAttribute = new XAttribute("value", appSettingsDic[key]);
+                        XAttribute configKeyAttribute = new XAttribute("key", key);
+
+                        xmlAddElement.Add(configKeyAttribute);
+                        xmlAddElement.Add(configValueAttribute);
+
+                        XElement appSettingsElement = doc.Descendants("appSettings").First();
+                        appSettingsElement.Add(xmlAddElement);
+                    }
                 }
                 doc.Save(appConfigPath);
                 statusLabel.Content = "Changes saved";
@@ -340,31 +357,12 @@ namespace MicroServiceInstaller3
             }
         }
 
-
-
         private void BnFinishandZip_Click(object sender, RoutedEventArgs e)
         {
             BnZip.IsEnabled = false;
             using (var scope = new TransactionScope())
             {
-                //string zipLocation = System.IO.Path.Combine("C:\\", "ZipFiles");
-                //Directory.CreateDirectory(zipLocation);
-                //string finalLocation = null;
-                //foreach (var file in Directory.GetFiles(zipLocation))
-                //{
-                //    File.Delete(file);
-                //}
-
-                //foreach (var entry in ListZipFiles.Items) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
-                //{
-                //    string ZipFilePath = entry.ToString(); //loob faili asukohanimest muutuja
-                //    string zipFileName = System.IO.Path.GetFileName(ZipFilePath);// eraldab loodud asukohanimest failinime
-
-                //    finalLocation = System.IO.Path.Combine(zipLocation, zipFileName); // loob muutuja, kombineerides faili nime ja zip failide jaoks loodud kausta
-                //    //string temporaryLocation = System.IO.Path.Combine(temporaryFolder, zipFileName);
-                //    File.Copy(ZipFilePath, finalLocation); // kopeerib faili algsest asukohast loppasukohta
-                //}
-                string zipLocation = LbZipFilesFolder.Content.ToString();
+               string zipLocation = LbZipFilesFolder.Content.ToString();
 
                 string finalZipFileName = System.IO.Path.Combine(LbFinalZipFolder.Content.ToString(), "final.zip");
                 File.Delete(finalZipFileName);
@@ -572,12 +570,10 @@ namespace MicroServiceInstaller3
                 if (!string.IsNullOrEmpty(item.ExistingValue))
                 {
                     item.RbExistingValue = true;
-                    //item.TbExistigValueBorder = new Thickness(1, 1, 1, 3);
                 }
                 else
                 {
                     item.RbNewValue = true;
-                    //item.TbNewValueBorder = new Thickness(3, 3, 3, 3);
                 }
             }
 
@@ -607,16 +603,23 @@ namespace MicroServiceInstaller3
 
         private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
         {
-           // Dictionary<string, string> comparedAppSettingsDictionary;
-            string appConfigPath;
-            Dictionary<string, string> appSettingsDictionary = CreateComparedAppSettingsDicitionary(out appSettingsDictionary, out appConfigPath, configSettings: LvDownloadedConfigSettings, appSettingsPath: LbDownloadedAppSettingsFilePath);
+            //string appConfigPath = LbExistingAppSettingsFilePath.Content.ToString();
+            string appConfigFileName = LbDownloadedAppSettingsFilePath.Content.ToString();
+            string existingConfigFileName = LbExistingAppSettingsFilePath.Content.ToString();
+            DirectoryInfo diSource = new DirectoryInfo(appConfigFileName);
+            DirectoryInfo diTarget = new DirectoryInfo(existingConfigFileName);
+            //String dirName = diSource.Directory.Name;
 
-            
-            ReadModifiedConfSettings(out comparedAppSettingsDictionary, out appConfigPath, configSettings: LvDownloadedConfigSettings, appSettingsPath: LbDownloadedAppSettingsFilePath);
-            WriteSettingsToConfFile(appConfigPath, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus);
+            Dictionary<string, string> appSettingsDictionary = CreateComparedAppSettingsDicitionary();            
+            WriteSettingsToConfFile(existingConfigFileName, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus);
+            //CopyAll(diSource, diTarget);
+            //foreach (var file in Directory.GetFiles(DirectoryInfo diSource.ToString())
+            //{
+            //    File.Copy(file, System.IO.Path.Combine(existingConfigFileName, System.IO.Path.GetFileName(file)), false);
+            //}
         }
 
-        private  Dictionary<string, string> CreateComparedAppSettingsDicitionary(out Dictionary<string, string> appSettingsDictionary, out string appConfigPath, System.Windows.Controls.ListView configSettings, System.Windows.Controls.Label appSettingsPath)
+        private Dictionary<string, string> CreateComparedAppSettingsDicitionary()
         {
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
             Dictionary<string, string> newAppSettingsDictionary = new Dictionary<string, string>();
@@ -632,12 +635,9 @@ namespace MicroServiceInstaller3
                 {
                     value = appSetting.ExistingValue;
                 }
-                newAppSettingsDictionary.Add(key, value);
-                
+                newAppSettingsDictionary.Add(key, value);           
             }
-            appConfigPath = appSettingsPath.Content.ToString();
             return newAppSettingsDictionary;
-            
         }
     }
 }
