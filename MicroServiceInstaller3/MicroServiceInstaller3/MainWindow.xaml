@@ -152,8 +152,8 @@
                                         <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding RbNewValueVisibility}" Margin="5"/>
                                         <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding RbExistingValueVisibility}" Margin="5"/>
                                         <TextBlock x:Name="Key" Text="{Binding Key}" FontWeight="Bold" Margin="5" />
-                                        <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding TbValueVisibility}" Margin="5"/>
-                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding TbExistingValueVisibility}" Margin="5"/>
+                                        <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding TbValueVisibility}" Margin="5" BorderThickness="{Binding TbNewValueBorder}"/>
+                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding TbExistingValueVisibility}" Margin="5" BorderThickness="{Binding TbExistingValueBorder}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>

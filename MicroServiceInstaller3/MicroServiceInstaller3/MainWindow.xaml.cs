@@ -247,6 +247,8 @@ namespace MicroServiceInstaller3
             public Visibility TbExistingValueVisibility { get; set; }
             public Visibility RbNewValueVisibility { get; set; }
             public Visibility RbExistingValueVisibility { get; set; }
+            public Thickness TbNewValueBorder { get; set; }
+            public Thickness TbExistigValueBorder { get; set; }
         }
 
         private void BnSaveChanges_Click(object sender, RoutedEventArgs e)
@@ -516,6 +518,8 @@ namespace MicroServiceInstaller3
                         ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = CompareAppSettings(existingConfFilePath , downloadedConfFilePath);
                         AddRadioButtons(comparedAppSettingsCollection);
                         HideEmptyTextBox(comparedAppSettingsCollection);
+                        AddThickBorder(comparedAppSettingsCollection);
+                        BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                     }
                     else
                     {
@@ -523,6 +527,21 @@ namespace MicroServiceInstaller3
                         LbDownloadedAppSettingsFilePath.Content = "Existing conf file name does not match with downloaded conf file name. Please select another folder";
                     }
 
+                }
+            }
+        }
+
+        private void AddThickBorder(ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection)
+        {
+            foreach (var item in comparedAppSettingsCollection)
+            {
+                if (item.RbExistingValue == true)
+                {
+                    item.TbExistigValueBorder = new Thickness(3);
+                }
+                if (item.RbNewValue == true)
+                {
+                    item.TbNewValueBorder = new Thickness(3);
                 }
             }
         }
@@ -553,19 +572,17 @@ namespace MicroServiceInstaller3
                 if (!string.IsNullOrEmpty(item.ExistingValue))
                 {
                     item.RbExistingValue = true;
+                    //item.TbExistigValueBorder = new Thickness(1, 1, 1, 3);
                 }
                 else
                 {
                     item.RbNewValue = true;
+                    //item.TbNewValueBorder = new Thickness(3, 3, 3, 3);
                 }
             }
 
         }
 
-        //private HideEmptyTextBox (ObservableCollection<AppSettingsConfig> appSettings)
-        //{
-
-        //}
 
         public static void CopyAll(DirectoryInfo source, DirectoryInfo target)
         {
@@ -590,10 +607,37 @@ namespace MicroServiceInstaller3
 
         private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
         {
-            Dictionary<string, string> appSettingsDictionary;
+           // Dictionary<string, string> comparedAppSettingsDictionary;
             string appConfigPath;
-            ReadModifiedConfSettings(out appSettingsDictionary, out appConfigPath, configSettings: LvDownloadedConfigSettings, appSettingsPath: LbDownloadedAppSettingsFilePath);
+            Dictionary<string, string> appSettingsDictionary = CreateComparedAppSettingsDicitionary(out appSettingsDictionary, out appConfigPath, configSettings: LvDownloadedConfigSettings, appSettingsPath: LbDownloadedAppSettingsFilePath);
+
+            
+            ReadModifiedConfSettings(out comparedAppSettingsDictionary, out appConfigPath, configSettings: LvDownloadedConfigSettings, appSettingsPath: LbDownloadedAppSettingsFilePath);
             WriteSettingsToConfFile(appConfigPath, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus);
+        }
+
+        private  Dictionary<string, string> CreateComparedAppSettingsDicitionary(out Dictionary<string, string> appSettingsDictionary, out string appConfigPath, System.Windows.Controls.ListView configSettings, System.Windows.Controls.Label appSettingsPath)
+        {
+            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
+            Dictionary<string, string> newAppSettingsDictionary = new Dictionary<string, string>();
+            foreach (var appSetting in comparedAppSettingsCollection)
+            {
+                string key = appSetting.Key;
+                string value = "";
+                if (appSetting.RbNewValue == true)
+                {
+                    value = appSetting.NewValue;
+                }
+                else //if (appSetting.RbExistingValue == true)
+                {
+                    value = appSetting.ExistingValue;
+                }
+                newAppSettingsDictionary.Add(key, value);
+                
+            }
+            appConfigPath = appSettingsPath.Content.ToString();
+            return newAppSettingsDictionary;
+            
         }
     }
 }
