@@ -285,38 +285,22 @@ namespace MicroServiceInstaller3
                 {
                     string key = appsettings.Key;
                     AppSettingsConfig conf = appsettings.Value;
-                    //try
-                    //{
                     if(conf.RbExistingValue == true)
                     {
                         foreach (var item in elements)
                         {
-                            //string key = (string)item.Attribute("key");
                             if (appsettings.Key == (string)item.Attribute("key"))
-                            //if (appSettingsDic.ContainsKey(key) && )
                             {
-                                item.Attribute("value").Value = appSettingsDic[key];
+                                item.Attribute("value").Value = conf.ExistingValue;
+                                break;
                             }
-//kui key-d ei ole, tuleb lisada key + value
-
                         }
                     }
                     else
                     {
-                        XElement xmlAddElement = new XElement("add");
-                        XAttribute configValueAttribute = new XAttribute("value", appSettingsDic[key]);
-                        XAttribute configKeyAttribute = new XAttribute("key", key);
-
-                        xmlAddElement.Add(configKeyAttribute);
-                        xmlAddElement.Add(configValueAttribute);
-
-                        XElement appSettingsElement = doc.Descendants("appSettings").First();
-                        appSettingsElement.Add(xmlAddElement);
+                        SaveValue(elements, appsettings, conf);
                     }
-                    //}
-
                 }
-
                 doc.Save(appConfigPath);
                 statusLabel.Content = "Changes saved";
             }
@@ -325,6 +309,40 @@ namespace MicroServiceInstaller3
                 statusLabel.Content = error.Message;
             }
 
+        }
+
+        private static void SaveValue(IEnumerable<XElement> elements, KeyValuePair<string, AppSettingsConfig> appsettings, AppSettingsConfig conf)
+        {
+            
+            if (conf.RbExistingValueVisibility == Visibility.Hidden)
+            {
+                AddKeyToConfFile(appsettings, elements);
+            }
+            else
+            {
+                foreach (var item in elements)
+                {
+                    if (appsettings.Key == (string)item.Attribute("key"))
+                    {
+                        item.Attribute("value").Value = conf.NewValue;
+                        break;
+                    }
+                }
+            }   
+        }
+
+        private static void AddKeyToConfFile(KeyValuePair<string, AppSettingsConfig> appsettings, IEnumerable<XElement> elements)
+        {
+            XElement xmlAddElement = new XElement("add");
+            XAttribute configValueAttribute = new XAttribute("value", appsettings.Value.ToString());
+            XAttribute configKeyAttribute = new XAttribute("key", appsettings.Key.ToString());
+
+            xmlAddElement.Add(configKeyAttribute);
+            xmlAddElement.Add(configValueAttribute);
+
+            
+            XElement appSettingsElement = elements.Descendants("appSettings").First();
+            appSettingsElement.Add(xmlAddElement);
         }
 
         private void BnZip_Click(object sender, RoutedEventArgs e)
@@ -632,7 +650,7 @@ namespace MicroServiceInstaller3
             string temporaryConFilePath = System.IO.Path.Combine(temporaryConFileDirectory, temporaryConFileName);
             bool overwrite = true;
             //File.Copy(existingConfigFilePath, temporaryConFilePath);
-            Dictionary<string, string> appSettingsDictionary = CreateComparedAppSettingsDicitionary();            
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = CreateComparedAppSettingsDicitionary();            
             WriteSettingsToConfFile(temporaryConFilePath, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus);
             File.Copy(temporaryConFilePath, System.IO.Path.Combine(existingConfigFileDirectory, temporaryConFileName), overwrite);
             //CopyAll(diSource, diTarget);
@@ -642,23 +660,15 @@ namespace MicroServiceInstaller3
             //}
         }
 
-        private Dictionary<string, string> CreateComparedAppSettingsDicitionary()
+        private Dictionary<string, AppSettingsConfig> CreateComparedAppSettingsDicitionary()
         {
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
-            Dictionary<string, string> newAppSettingsDictionary = new Dictionary<string, string>();
+            Dictionary<string, AppSettingsConfig> newAppSettingsDictionary = new Dictionary<string, AppSettingsConfig>();
             foreach (var appSetting in comparedAppSettingsCollection)
             {
                 string key = appSetting.Key;
-                string value = "";
-                if (appSetting.RbNewValue == true)
-                {
-                    value = appSetting.NewValue;
-                }
-                else //if (appSetting.RbExistingValue == true)
-                {
-                    value = appSetting.ExistingValue;
-                }
-                newAppSettingsDictionary.Add(key, value);           
+               
+                newAppSettingsDictionary.Add(key, appSetting);           
             }
             return newAppSettingsDictionary;
         }
