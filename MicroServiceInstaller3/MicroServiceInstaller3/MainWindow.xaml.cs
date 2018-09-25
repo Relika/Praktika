@@ -51,7 +51,7 @@ namespace MicroServiceInstaller3
             FShandler.CreateDirectory(finalZipLocation);
 
             string temporaryConfFileLocation = System.IO.Path.Combine(temporaryFolderPath, "tempConfFile");
-            LbDownloadedAppSettingsFilePath.Content = temporaryConfFileLocation;
+            LbTemporaryComparedConfFilePath.Content = temporaryConfFileLocation;
             FShandler.CreateDirectory(temporaryConfFileLocation);
         }
 
@@ -257,40 +257,50 @@ namespace MicroServiceInstaller3
 
         private void BnSaveChanges_Click(object sender, RoutedEventArgs e)
         {
-            Dictionary<string, string> appSettingsDictionary;
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary;
             string appConfigPath;
             ReadModifiedConfSettings(out appSettingsDictionary, out appConfigPath, configSettings: LvUploadedConfigSettings, appSettingsPath:LbappSettingsPath);
             WriteSettingsToConfFile(appConfigPath, appSettingsDic: appSettingsDictionary, statusLabel: LbProcessStatus);
         }
 
-        private static void ReadModifiedConfSettings(out Dictionary<string, string> appSettingsDictionary, out string appConfigPath, System.Windows.Controls.ListView configSettings, System.Windows.Controls.Label appSettingsPath)
+        private static void ReadModifiedConfSettings(out Dictionary<string, AppSettingsConfig> appSettingsDictionary, out string appConfigPath, System.Windows.Controls.ListView configSettings, System.Windows.Controls.Label appSettingsPath)
         {
             var ModifiedAppSettings = configSettings.ItemsSource;
-            appSettingsDictionary = new Dictionary<string, string>();
+            appSettingsDictionary = new Dictionary<string, AppSettingsConfig>();
             foreach (var item in ModifiedAppSettings)
             {
                 AppSettingsConfig appSetting = item as AppSettingsConfig;
-                appSettingsDictionary.Add(appSetting.Key, appSetting.NewValue);
+                appSettingsDictionary.Add(appSetting.Key, appSetting);
             }
             appConfigPath = appSettingsPath.Content.ToString();
         }
 
-        private void WriteSettingsToConfFile(string appConfigPath, Dictionary<string, string> appSettingsDic, System.Windows.Controls.Label statusLabel)
+        private void WriteSettingsToConfFile(string appConfigPath, Dictionary<string, AppSettingsConfig> appSettingsDic, System.Windows.Controls.Label statusLabel)
         {
             try
             {
                 var doc = XDocument.Load(appConfigPath);
                 var elements = doc.Descendants("appSettings").Elements();
-
-                foreach (var item in elements)
+                foreach (var appsettings in appSettingsDic)
                 {
-                    string key = (string)item.Attribute("key");
-
-                    if (appSettingsDic.ContainsKey(key))
+                    string key = appsettings.Key;
+                    AppSettingsConfig conf = appsettings.Value;
+                    //try
+                    //{
+                    if(conf.RbExistingValue == true)
                     {
-                        item.Attribute("value").Value = appSettingsDic[key];
+                        foreach (var item in elements)
+                        {
+                            //string key = (string)item.Attribute("key");
+                            if (appsettings.Key == (string)item.Attribute("key"))
+                            //if (appSettingsDic.ContainsKey(key) && )
+                            {
+                                item.Attribute("value").Value = appSettingsDic[key];
+                            }
+//kui key-d ei ole, tuleb lisada key + value
+
+                        }
                     }
-                    //kui key-d ei ole, tuleb lisada key + value
                     else
                     {
                         XElement xmlAddElement = new XElement("add");
@@ -303,7 +313,10 @@ namespace MicroServiceInstaller3
                         XElement appSettingsElement = doc.Descendants("appSettings").First();
                         appSettingsElement.Add(xmlAddElement);
                     }
+                    //}
+
                 }
+
                 doc.Save(appConfigPath);
                 statusLabel.Content = "Changes saved";
             }
@@ -511,6 +524,11 @@ namespace MicroServiceInstaller3
                     string downloadedConfFileName = System.IO.Path.GetFileName(downloadedConfFilePath);
                     if (existingConfFileName == downloadedConfFileName)
                     {
+                        string temporaryConFileDirectory = LbTemporaryComparedConfFilePath.Content.ToString();
+                       // string temporaryConFileName = System.IO.Path.GetFileName(existingConfigFilePath);
+                        string temporaryConFilePath = System.IO.Path.Combine(temporaryConFileDirectory, existingConfFileName);
+                        File.Copy(existingConfFilePath, temporaryConFilePath);
+
                         //LbExistingAppSettingsFilePath.Content = existingConfFilePath;
                         LbDownloadedAppSettingsFilePath.Content = downloadedConfFilePath;
                         ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = CompareAppSettings(existingConfFilePath , downloadedConfFilePath);
@@ -604,14 +622,19 @@ namespace MicroServiceInstaller3
         private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
         {
             //string appConfigPath = LbExistingAppSettingsFilePath.Content.ToString();
-            string appConfigFileName = LbDownloadedAppSettingsFilePath.Content.ToString();
-            string existingConfigFileName = LbExistingAppSettingsFilePath.Content.ToString();
-            DirectoryInfo diSource = new DirectoryInfo(appConfigFileName);
-            DirectoryInfo diTarget = new DirectoryInfo(existingConfigFileName);
+            string downloadedConfigFilePath = LbDownloadedAppSettingsFilePath.Content.ToString();
+            string existingConfigFileDirectory = LbExistingAppSettingsFilePath.Content.ToString();
+            //DirectoryInfo diSource = new DirectoryInfo(downloadedConfigFilePath);
+            //DirectoryInfo diTarget = new DirectoryInfo(existingConfigFilePath);
             //String dirName = diSource.Directory.Name;
-
+            string temporaryConFileDirectory = LbTemporaryComparedConfFilePath.Content.ToString();
+            string temporaryConFileName = System.IO.Path.GetFileName(downloadedConfigFilePath);
+            string temporaryConFilePath = System.IO.Path.Combine(temporaryConFileDirectory, temporaryConFileName);
+            bool overwrite = true;
+            //File.Copy(existingConfigFilePath, temporaryConFilePath);
             Dictionary<string, string> appSettingsDictionary = CreateComparedAppSettingsDicitionary();            
-            WriteSettingsToConfFile(existingConfigFileName, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus);
+            WriteSettingsToConfFile(temporaryConFilePath, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus);
+            File.Copy(temporaryConFilePath, System.IO.Path.Combine(existingConfigFileDirectory, temporaryConFileName), overwrite);
             //CopyAll(diSource, diTarget);
             //foreach (var file in Directory.GetFiles(DirectoryInfo diSource.ToString())
             //{

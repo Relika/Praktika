@@ -74,7 +74,7 @@
                     <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
                         <Label x:Name="LbappSettingsPath" FontWeight="Bold"  VerticalAlignment="Top"/>
                         <ListView x:Name="LvUploadedConfigSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" >
-                        <ListView.ItemTemplate>
+                            <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock x:Name="Key" Text="{Binding Key}" />
@@ -164,12 +164,13 @@
                     <StackPanel Grid.Row="1" Grid.Column="1">
                         <Button x:Name="BnConfigDownloadedAppSettings" IsEnabled="False" Content="Config settings"  Click="BnConfigDownloadedAppSettings_Click"  />
                         <Button x:Name="BnSaveDownloadedAppSettingsChanges" IsEnabled="False" Content="Save changes"  Click="BnSaveDownloadedAppSettingsChanges_Click"    />
-                        
+
                     </StackPanel>
 
 
                     <Label x:Name="LbTemporaryFolderZipFile" Grid.Column="1" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
-                    <Label x:Name="LbTemporary" HorizontalAlignment="Left" Margin="280,186,0,-220" Grid.Row="3" VerticalAlignment="Top" RenderTransformOrigin="0.2,7.9" Height="36" Width="800" />
+                    <Label x:Name="LbTemporary" HorizontalAlignment="Left" Margin="10,75,0,-108" Grid.Row="3" VerticalAlignment="Top" RenderTransformOrigin="0.2,7.9" Height="36" Width="800" Grid.ColumnSpan="2" Visibility="Hidden"/>
+                    <Label x:Name="LbTemporaryComparedConfFilePath" HorizontalAlignment="Left" Margin="10,75,0,-108" Grid.Row="3" VerticalAlignment="Top" RenderTransformOrigin="0.2,7.9" Height="36" Width="800" Grid.ColumnSpan="2" Visibility="Hidden"/>
                 </Grid>
             </TabItem>
         </TabControl>
