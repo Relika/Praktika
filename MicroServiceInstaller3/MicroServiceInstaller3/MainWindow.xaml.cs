@@ -298,7 +298,7 @@ namespace MicroServiceInstaller3
                     }
                     else
                     {
-                        SaveValue(elements, appsettings, conf);
+                        SaveValue(elements, appsettings, conf, doc);
                     }
                 }
                 doc.Save(appConfigPath);
@@ -311,12 +311,12 @@ namespace MicroServiceInstaller3
 
         }
 
-        private static void SaveValue(IEnumerable<XElement> elements, KeyValuePair<string, AppSettingsConfig> appsettings, AppSettingsConfig conf)
+        private static void SaveValue(IEnumerable<XElement> elements, KeyValuePair<string, AppSettingsConfig> appsettings, AppSettingsConfig conf, XDocument doc)
         {
             
             if (conf.RbExistingValueVisibility == Visibility.Hidden)
             {
-                AddKeyToConfFile(appsettings, elements);
+                AddKeyToConfFile(appsettings, elements, doc, conf);
             }
             else
             {
@@ -331,19 +331,41 @@ namespace MicroServiceInstaller3
             }   
         }
 
-        private static void AddKeyToConfFile(KeyValuePair<string, AppSettingsConfig> appsettings, IEnumerable<XElement> elements)
+        private static void AddKeyToConfFile(KeyValuePair<string, AppSettingsConfig> appsettings, IEnumerable<XElement> elements, XDocument doc, AppSettingsConfig conf)
         {
             XElement xmlAddElement = new XElement("add");
-            XAttribute configValueAttribute = new XAttribute("value", appsettings.Value.ToString());
+            XAttribute configValueAttribute = new XAttribute("value", conf.NewValue.ToString());
             XAttribute configKeyAttribute = new XAttribute("key", appsettings.Key.ToString());
 
             xmlAddElement.Add(configKeyAttribute);
             xmlAddElement.Add(configValueAttribute);
 
-            
-            XElement appSettingsElement = elements.Descendants("appSettings").First();
+
+            XElement appSettingsElement = doc.Descendants("appSettings").First(); //.First()
             appSettingsElement.Add(xmlAddElement);
+
+            //xmlAddElement = doc.  CreateElement("add");
+            //xmlAddElement.Attributes.Append("key", appsettings.Value.ToString());
+            //xmlAddElement.Attributes.Append("value", appsettings.Key.ToString());
+            //doc.Descendants("appSettings").AppendChild(xmlAddElement);
         }
+
+
+
+        //XElement element = new XElement("Conn");
+        //XAttribute attribute = new XAttribute("Server", comboBox1.Text);
+        //element.Add(attribute);
+
+        //2
+        //down vote
+        //XmlDocument doc = new XmlDocument();
+        //        doc.Load("input.xml");
+
+        //XmlElement records = doc.CreateElement("Records");
+        //        records.InnerText = Guid.NewGuid().ToString();
+        //        doc.DocumentElement.AppendChild(records);
+
+        //doc.Save("output.xml"); 
 
         private void BnZip_Click(object sender, RoutedEventArgs e)
         {
@@ -667,6 +689,9 @@ namespace MicroServiceInstaller3
             foreach (var appSetting in comparedAppSettingsCollection)
             {
                 string key = appSetting.Key;
+                //AppSettingsConfig NewValue = appSetting.NewValue;
+                //AppSettingsConfig ExistingValue = appSetting.ExistingValue;
+                
                
                 newAppSettingsDictionary.Add(key, appSetting);           
             }
