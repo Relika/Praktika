@@ -137,6 +137,8 @@ namespace MicroServiceInstaller3
             LvUploadedConfigSettings.ItemsSource = FindConfSettings(confFilePath, statusLabel: LbProcessStatus);
             //ListAppSettings(confFilePath, appSettingsPath: LbappSettingsPath, configSettings: LvUploadedConfigSettings, saveChanges: BnSaveChanges);
 
+            BnSaveChanges.IsEnabled = true;
+
         }
 
         private string FindAppSettingsFile(System.Windows.Controls.Label temporaryfolderLabel)
@@ -229,7 +231,7 @@ namespace MicroServiceInstaller3
                     {
                         AppSettingsConfig appSetting = new AppSettingsConfig();
                         appSetting.Key = (string)item.Attribute("key");
-                        appSetting.NewValue = (string)item.Attribute("newvalue");
+                        appSetting.NewValue = (string)item.Attribute("value"); // muutsin newvalue-> value
                         appSettingsCollection.Add(appSetting);
                     }
             }
@@ -257,9 +259,10 @@ namespace MicroServiceInstaller3
 
         private void BnSaveChanges_Click(object sender, RoutedEventArgs e)
         {
-            Dictionary<string, AppSettingsConfig> appSettingsDictionary;
-            string appConfigPath;
-            ReadModifiedConfSettings(out appSettingsDictionary, out appConfigPath, configSettings: LvUploadedConfigSettings, appSettingsPath:LbappSettingsPath);
+            
+            string appConfigPath = LbworkFilesFolder.Content.ToString(); // ei saa salvestada , peab tegema ajutise folderi
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = CreateComparedAppSettingsDicitionary(appsettingslist: LvUploadedConfigSettings);
+            //ReadModifiedConfSettings(out appSettingsDictionary, out appConfigPath, configSettings: LvUploadedConfigSettings, appSettingsPath:LbappSettingsPath);
             WriteSettingsToConfFile(appConfigPath, appSettingsDic: appSettingsDictionary, statusLabel: LbProcessStatus);
         }
 
@@ -343,29 +346,10 @@ namespace MicroServiceInstaller3
 
             XElement appSettingsElement = doc.Descendants("appSettings").First(); //.First()
             appSettingsElement.Add(xmlAddElement);
-
-            //xmlAddElement = doc.  CreateElement("add");
-            //xmlAddElement.Attributes.Append("key", appsettings.Value.ToString());
-            //xmlAddElement.Attributes.Append("value", appsettings.Key.ToString());
-            //doc.Descendants("appSettings").AppendChild(xmlAddElement);
         }
 
 
 
-        //XElement element = new XElement("Conn");
-        //XAttribute attribute = new XAttribute("Server", comboBox1.Text);
-        //element.Add(attribute);
-
-        //2
-        //down vote
-        //XmlDocument doc = new XmlDocument();
-        //        doc.Load("input.xml");
-
-        //XmlElement records = doc.CreateElement("Records");
-        //        records.InnerText = Guid.NewGuid().ToString();
-        //        doc.DocumentElement.AppendChild(records);
-
-        //doc.Save("output.xml"); 
 
         private void BnZip_Click(object sender, RoutedEventArgs e)
         {
@@ -672,7 +656,7 @@ namespace MicroServiceInstaller3
             string temporaryConFilePath = System.IO.Path.Combine(temporaryConFileDirectory, temporaryConFileName);
             bool overwrite = true;
             //File.Copy(existingConfigFilePath, temporaryConFilePath);
-            Dictionary<string, AppSettingsConfig> appSettingsDictionary = CreateComparedAppSettingsDicitionary();            
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = CreateComparedAppSettingsDicitionary(appsettingslist: LvDownloadedConfigSettings);            
             WriteSettingsToConfFile(temporaryConFilePath, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus);
             File.Copy(temporaryConFilePath, System.IO.Path.Combine(existingConfigFileDirectory, temporaryConFileName), overwrite);
             //CopyAll(diSource, diTarget);
@@ -682,9 +666,9 @@ namespace MicroServiceInstaller3
             //}
         }
 
-        private Dictionary<string, AppSettingsConfig> CreateComparedAppSettingsDicitionary()
+        private Dictionary<string, AppSettingsConfig> CreateComparedAppSettingsDicitionary(System.Windows.Controls.ListView appsettingslist)
         {
-            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
+            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = appsettingslist.ItemsSource as ObservableCollection<AppSettingsConfig>;
             Dictionary<string, AppSettingsConfig> newAppSettingsDictionary = new Dictionary<string, AppSettingsConfig>();
             foreach (var appSetting in comparedAppSettingsCollection)
             {

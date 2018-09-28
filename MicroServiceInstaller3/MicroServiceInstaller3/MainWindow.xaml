@@ -78,7 +78,7 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock x:Name="Key" Text="{Binding Key}" />
-                                        <TextBox x:Name="Value" Text="{Binding Value}"/>
+                                        <TextBox x:Name="NewValue" Text="{Binding NewValue}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -143,8 +143,8 @@
                         </ListView>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Grid.Column="0">
-                        <Label x:Name="LbDownloadedAppSettingsFilePath" FontWeight="Bold" Background="Yellow"  VerticalAlignment="Top"/>
-                        <Label x:Name="LbExistingAppSettingsFilePath"  FontWeight="Bold" Background="Green" VerticalAlignment="Top"/>
+                        <Label x:Name="LbDownloadedAppSettingsFilePath" FontWeight="Bold" Background="Yellow"  VerticalAlignment="Top" Visibility="Collapsed"/>
+                        <Label x:Name="LbExistingAppSettingsFilePath"  FontWeight="Bold"  VerticalAlignment="Top"/>
                         <ListView x:Name="LvDownloadedConfigSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" >
                             <ListView.ItemTemplate>
                                 <DataTemplate>
