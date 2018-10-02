@@ -139,14 +139,17 @@ namespace MicroServiceInstaller3
         {
             //LbDownloadedAppSettingsFilePath.Content = "";
             //LbDownloadedProcessStatus.Content = "";
-            if (ListFiles.SelectedIndex != 0)
+            if (ListFiles.SelectedIndex >= 0)
             {
                 BnConfig.IsEnabled = true;
-                LbTemporary.Content = ListFiles.SelectedItem;
-                string selectedFile = LbTemporary.Content.ToString();
+                //LbTemporary.Content
+                LbTemporary.Content = ListFiles.SelectedItem.ToString() ;
+                //string value = selectedFile.Value.ToString();
+                 //= ConfFileInfo ListFiles.SelectedItem;
+                //string selectedFile = LbTemporary.Content.ToString();
                 //string selectedFileName = System.IO.Path.GetFileName(selectedFile);
                 //string filePath = System.IO.Path.GetDirectoryName(selectedFile);
-                LbTemporary.Content = selectedFile;
+                //LbTemporary.Content = selectedFile;
                 //LbDownloadedAppSettingsFilePath.Content = filePath;
             }
             else
@@ -292,6 +295,8 @@ namespace MicroServiceInstaller3
             string temporaryConFileDirectory = LbTemporaryComparedConfFilePath.Content.ToString();
             string temporaryConFileName = System.IO.Path.GetFileName(selectedPath);
             string temporaryConFilePath = System.IO.Path.Combine(temporaryConFileDirectory, temporaryConFileName);
+            //Directory.Delete
+            File.Delete(temporaryConFilePath);
             File.Copy(selectedPath, temporaryConFilePath);
             Dictionary<string, AppSettingsConfig> appSettingsDictionary;
             ReadModifiedConfSettings(out appSettingsDictionary, out appConfigPath, configSettings: LvUploadedConfigSettings, appSettingsPath: LbappSettingsPath);
@@ -340,7 +345,8 @@ namespace MicroServiceInstaller3
                     }
                 }
                 doc.Save(appConfigPath);
-                statusLabel.Content = "Changes saved";
+                
+                statusLabel.Content = "Changes saved ";
             }
             catch (Exception error)
             {
@@ -393,6 +399,7 @@ namespace MicroServiceInstaller3
             string zipFile = System.IO.Path.Combine(zipFileFolder, RandomFileName + ".zip"); // M''rab zip faili asukoha ja nime
 
             BnConfig.IsEnabled = false;
+            BnSaveChanges.IsEnabled = false;
             using (var scope = new TransactionScope())
             {
                // File.Delete(zipFile); // kustutab faili, mis asub sellel aadressil
@@ -490,7 +497,8 @@ namespace MicroServiceInstaller3
                 bool endsIn = (value.EndsWith(".exe.config")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
                 if (endsIn)
                 {
-                    ListFiles.Items.Add($"{value}");                  
+                    ListAppSettingsFiles.Items.Add($"{value}");
+                    //ListFiles.Items.Add($"{value}");                  
                 }
             }
         }
@@ -520,11 +528,16 @@ namespace MicroServiceInstaller3
         {
             private string _selectedFile;
 
-
+            //public string Path { get; set; }
             public string selectedFile
             {
                 get { return _selectedFile; }
                 set { _selectedFile = value; }
+            }
+
+            public static implicit operator string(ConfFileInfo v)
+            {
+                throw new NotImplementedException();
             }
         }
 
@@ -555,6 +568,9 @@ namespace MicroServiceInstaller3
                     //ListAppSettings(confFilePath, appSettingsPath: LbExistingAppSettingsFilePath, configSettings: LvDownloadedConfigSettings, saveChanges: BnSaveDownloadedAppSettingsChanges);
                     ObservableCollection<AppSettingsConfig> appSettingsCollection = FindConfSettings(confFilePath, statusLabel: LbDownloadedProcessStatus);
                     LvDownloadedConfigSettings.ItemsSource = appSettingsCollection;
+                    AddRadioButtons(appSettingsCollection);
+                    HideEmptyTextBox(appSettingsCollection);
+                    BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                 }
                 else
                 {
@@ -662,14 +678,17 @@ namespace MicroServiceInstaller3
         private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
         {
             //string appConfigPath = LbExistingAppSettingsFilePath.Content.ToString();
-            string downloadedConfigFilePath = LbDownloadedAppSettingsFilePath.Content.ToString();
+            string downloadedConfigFileDirectory = LbDownloadedAppSettingsFilePath.Content.ToString();
             string existingConfigFileDirectory = LbExistingAppSettingsFilePath.Content.ToString();
+            //CopyAll(downloadedConfigFileDirectory, existingConfigFileDirectory);
             //DirectoryInfo diSource = new DirectoryInfo(downloadedConfigFilePath);
             //DirectoryInfo diTarget = new DirectoryInfo(existingConfigFilePath);
             //String dirName = diSource.Directory.Name;
             string temporaryConFileDirectory = LbTemporaryComparedConfFilePath.Content.ToString();
-            string temporaryConFileName = System.IO.Path.GetFileName(downloadedConfigFilePath);
+            string temporaryConFileName = System.IO.Path.GetFileName(downloadedConfigFileDirectory);
             string temporaryConFilePath = System.IO.Path.Combine(temporaryConFileDirectory, temporaryConFileName);
+            //Directory.CreateDirectory(temporaryConFilePath); //sest tyhja directirisse salvestamisel annab veateate
+            //File.Copy(downloadedConfigFilePath, temporaryConFilePath);
             bool overwrite = true;
             //File.Copy(existingConfigFilePath, temporaryConFilePath);
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = CreateComparedAppSettingsDicitionary(appsettingslist: LvDownloadedConfigSettings);            
@@ -702,10 +721,10 @@ namespace MicroServiceInstaller3
         {
             LbDownloadedAppSettingsFilePath.Content = "";
             LbDownloadedProcessStatus.Content = "";
-            if (ListFiles.SelectedIndex != 0)
+            if (ListAppSettingsFiles.SelectedIndex >= 0)
             {
                 BnConfigDownloadedAppSettings.IsEnabled = true;
-                LbTemporary.Content = ListFiles.SelectedItem;
+                LbTemporary.Content = ListAppSettingsFiles.SelectedItem;
                 string selectedFile = LbTemporary.Content.ToString();
                 string filePath = System.IO.Path.GetDirectoryName(selectedFile);
                 LbTemporary.Content = filePath;
@@ -713,7 +732,7 @@ namespace MicroServiceInstaller3
             }
             else
             {
-                LbProcessStatus.Content = "You must select config file first";
+                LbDownloadedProcessStatus.Content = "You have to select config file first";
             }
         }
     }
