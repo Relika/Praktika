@@ -33,19 +33,25 @@
             <Setter Property="Height" Value="50" />
             <Setter Property="Width" Value="490" />
         </Style>
+        <Style TargetType="RadioButton">
+            <Setter Property="Margin" Value="5" />
+            
+        </Style>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="Margin" Value="10" />
+            <Setter Property="Margin" Value="5" />
             <Setter Property="Width" Value="180" />
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Background" Value="Red" />
+            <!--FontWeight="Bold" Margin="5"-->
         </Style>
         <Style TargetType="TextBox">
             <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="5" />
         </Style>
     </Window.Resources>
     <Grid>
-        <TabControl x:Name="Tab">
+        <TabControl x:Name="Tab" >
             <TabItem Header="Upload"  Selector.IsSelected="{Binding IsTabUploadSelected}" >
                 <Grid x:Name="grid">
                     <Grid.RowDefinitions>
@@ -90,6 +96,7 @@
                         <Button x:Name="BnConfig" IsEnabled="False" Content="Config settings"  Click="BnConfig_Click" />
                         <Button x:Name="BnSaveChanges" IsEnabled="False" Content="Save changes"     Click="BnSaveChanges_Click"/>
                         <Label x:Name="LbProcessStatus"   Margin="5,20,5,5" HorizontalAlignment="Center"/>
+                        <Label x:Name="ggyg"   Margin="5,20,5,5" HorizontalAlignment="Center"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
@@ -154,11 +161,11 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding RbNewValueVisibility}" Margin="5"/>
-                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding RbExistingValueVisibility}" Margin="5"/>
-                                        <TextBlock x:Name="Key" Text="{Binding Key}" FontWeight="Bold" Margin="5" />
-                                        <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding TbValueVisibility}" Margin="5" BorderThickness="{Binding TbNewValueBorder}"/>
-                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding TbExistingValueVisibility}" Margin="5" BorderThickness="{Binding TbExistingValueBorder}"/>
+                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding RbNewValueVisibility}"/>
+                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding RbExistingValueVisibility}"/>
+                                        <TextBlock x:Name="Key" Text="{Binding Key}"/>
+                                        <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding TbValueVisibility}"  BorderThickness="{Binding TbNewValueBorder}"/>
+                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding TbExistingValueVisibility}" BorderThickness="{Binding TbExistingValueBorder}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
