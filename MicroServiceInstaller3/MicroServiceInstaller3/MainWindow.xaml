@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MicroServiceInstaller3"
         mc:Ignorable="d"
-        Title="Service Installer" Height="800" Width="1000">
+        Title="Service Installer" Height="1000" Width="1000">
     <Window.Resources>
         <Style TargetType="Label">
             <Setter Property="FontSize" Value="12" />
@@ -86,6 +86,17 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock x:Name="Key" Text="{Binding Key}" />
                                         <TextBox x:Name="NewValue" Text="{Binding NewValue}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <ListView x:Name="LvUploadedConnectionSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" Height="131" >
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock x:Name="Name" Text="{Binding Name}" />
+                                        <TextBox x:Name="ConnectionString" Text="{Binding ConnectionString}"/>
+                                        <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>

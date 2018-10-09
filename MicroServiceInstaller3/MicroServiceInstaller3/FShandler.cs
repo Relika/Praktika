@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows.Forms;
 
 namespace MicroServiceInstaller3
 {
@@ -64,6 +65,78 @@ namespace MicroServiceInstaller3
                 }
             }
         }
+        //string RandomFileName = "";
 
+        public static void CreateMetaDataFile(string selectedPath, string workFilesFolderPath)
+        {
+            string RandomFileName = Guid.NewGuid().ToString();
+
+            string path = System.IO.Path.Combine(workFilesFolderPath, RandomFileName + ".txt");
+            if (!File.Exists(path))
+            {
+                // Create a file to write to.
+                using (StreamWriter sw = File.CreateText(path))
+                {
+                    sw.WriteLine(selectedPath);
+                }
+            }
+        }
+
+        public static string ChooseFolder(FolderBrowserDialog folderBrowserDialog1, System.Windows.Controls.Label selectedFolderLabel, System.Windows.Controls.Button savebutton)
+        {
+            string selectedPath = folderBrowserDialog1.SelectedPath; // Loob muutuja, mis vastab valitud kaustale
+            selectedFolderLabel.Content = selectedPath;// M''rab, kuhu kuvatakse valitud kausta sisu
+            if (selectedFolderLabel.HasContent)
+            {
+                savebutton.IsEnabled = true;
+            }
+            return selectedPath;
+        }
+        public static string CreateExtractFolder1()
+        {
+            string extractFolderName = Guid.NewGuid().ToString();
+            string extractDirectoryPath = System.IO.Path.Combine("C:\\", "Downloaded_zip_files", extractFolderName);
+            return extractDirectoryPath;
+        }
+
+        public static void CopyAll(DirectoryInfo source, DirectoryInfo target)
+        {
+            Directory.CreateDirectory(target.FullName);
+
+            // Copy each file into the new directory.
+            foreach (FileInfo fi in source.GetFiles())
+            {
+                Console.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
+                fi.CopyTo(System.IO.Path.Combine(target.FullName, fi.Name), true);
+            }
+
+            // Copy each subdirectory using recursion.
+            foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+            {
+                DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
+                CopyAll(diSourceSubDir, nextTargetSubDir);
+            }
+        }
+
+        public static void MakeFolders(System.Windows.Controls.Label zipFileLabel, System.Windows.Controls.Label workFilesLabel, System.Windows.Controls.Label finalZipLabel)
+        {
+            string temporaryFolderPath = System.IO.Path.GetTempPath();
+
+            string zipPath = System.IO.Path.Combine(temporaryFolderPath, "ZipDirectory");
+            FShandler.CreateDirectory(zipPath);
+            zipFileLabel.Content = zipPath;
+
+            string workDirectoryPath = System.IO.Path.Combine(temporaryFolderPath, "tempDirectory");
+            workFilesLabel.Content = workDirectoryPath;
+            FShandler.CreateDirectory(workDirectoryPath);
+
+            string finalZipLocation = System.IO.Path.Combine("C:\\", "FinalZip");
+            finalZipLabel.Content = finalZipLocation;
+            FShandler.CreateDirectory(finalZipLocation);
+
+            //string temporaryConfFileLocation = System.IO.Path.Combine(temporaryFolderPath, "tempConfFile");
+            //LbTemporaryComparedConfFilePath.Content = temporaryConfFileLocation;
+            //FShandler.CreateDirectory(temporaryConfFileLocation);
+        }
     }
 }

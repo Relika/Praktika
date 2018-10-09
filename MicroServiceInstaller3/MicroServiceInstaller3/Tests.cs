@@ -5,8 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 using System.Xml;
 using System.Xml.Linq;
+using System.IO.Compression;
 
 namespace MicroServiceInstaller3
 {
@@ -67,10 +69,9 @@ namespace MicroServiceInstaller3
             XAttribute configKeyAttribute = new XAttribute("key", "TestKey");
 
             xmlAddElement.Add(configKeyAttribute);
-                xmlAddElement.Add(configValueAttribute);
+            xmlAddElement.Add(configValueAttribute);
 
-
-                XElement appSettingsElement = doc.Descendants("appSettings").First(); //.First()
+            XElement appSettingsElement = doc.Descendants("appSettings").First(); //.First()
 
             appSettingsElement.Add(xmlAddElement);
             doc.Save(path);
@@ -119,18 +120,23 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void XmlSaveTest()
         {
-
             string path = CreateTestXML();
             XElement xmlAddElement =  AddXmlElement(path);
             bool elementExists = DoesXmlElementExist(xmlAddElement, path);
-
-
-            //kontrollida, kas lisatud key on failis olemas
-
         }
 
+        [TestMethod]
+        public void CreateTestZipFile()
+        {
+            string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "TestFiles");
+            string zipDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "TestZip");
+            string zipFile = System.IO.Path.Combine(zipDirectory, "TestZipFile.zip");
+            FShandler.CreateDirectory(zipDirectory);
+            using (TransactionScope scope = new TransactionScope())
+            {
+                ZipFile.CreateFromDirectory(directory, zipFile);
+            }
 
-
-
+        }
     }
 }
