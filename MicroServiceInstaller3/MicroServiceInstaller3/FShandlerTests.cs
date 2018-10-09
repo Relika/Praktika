@@ -54,5 +54,23 @@ namespace MicroServiceInstaller3
         //        CopyAll(diSourceSubDir, nextTargetSubDir);
         //    }
         //}
+
+        [TestMethod]
+        public void TestMakeFolders()
+        {
+            string directory = "test";
+            string folderPath;
+            if (directory == "finalZipDirectory")
+            {
+                folderPath = "C:\\";
+            }
+            else
+            {
+                folderPath = System.IO.Path.GetTempPath();
+            }
+            string path = System.IO.Path.Combine(folderPath, directory);
+            FShandler.CreateDirectory(path);
+            Assert.AreEqual("C:\\Users\\User\\AppData\\Local\\Temp\\test", path);
+        }
     }
 }

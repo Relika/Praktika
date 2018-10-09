@@ -20,6 +20,7 @@ using System.Collections.ObjectModel;
 using System.Xml.Linq;
 using System.ComponentModel;
 using System.Collections;
+using System.Configuration;
 
 namespace MicroServiceInstaller3
 {
@@ -31,7 +32,12 @@ namespace MicroServiceInstaller3
         public MainWindow()
         {
             InitializeComponent();
-            FShandler.MakeFolders(zipFileLabel: LbZipFilesFolder, workFilesLabel: LbworkFilesFolder, finalZipLabel: LbFinalZipFolder);
+            string zipDirectory = ConfigurationManager.AppSettings["zipDirectory"];
+            LbZipFilesFolder.Content = FShandler.MakeFolders(zipDirectory);
+            string workDirectory = ConfigurationManager.AppSettings["workDirectory"];
+            LbZipFilesFolder.Content = FShandler.MakeFolders(workDirectory);
+            string finalZipDirectory = ConfigurationManager.AppSettings["finalZipDirectory"];
+            LbFinalZipFolder.Content = FShandler.MakeFolders(finalZipDirectory);
         }
         string RandomFileName = "";
 
@@ -223,10 +229,11 @@ namespace MicroServiceInstaller3
             Dictionary<string, AppSettingsConfig> appSettingsDictionary;
             ReadModifiedConfSettings(out appSettingsDictionary, out appConfigPath, configSettings: LvUploadedConfigSettings, appSettingsPath: LbappSettingsPath);
             WriteSettingsToConfFile(selectedPath, appSettingsDic: appSettingsDictionary, statusLabel: LbProcessStatus);
-            Dictionary<string, ConnectionStrings> connectionStringsDicitionary;
+
             //ReadModifiedConnectionSettings
-            ReadModifiedConnectionStrings(out connectionStringsDicitionary, out appConfigPath, connectionStrings: LvUploadedConnectionSettings, appSettingsPath: LbappSettingsPath);
+            Dictionary<string, ConnectionStrings> connectionStringsDictionary = CreateConnectionStringsDicitionary(connectionStrings: LvUploadedConnectionSettings);
             //WriteConnectionSettings to confFile
+            //WriteConnectionStringstoConFile(appConfigPath, connectionStringsDictionary);
         }
 
         private static void ReadModifiedConfSettings(out Dictionary<string, AppSettingsConfig> appSettingsDictionary, out string appConfigPath, System.Windows.Controls.ListView configSettings, System.Windows.Controls.Label appSettingsPath)
@@ -241,17 +248,33 @@ namespace MicroServiceInstaller3
             appConfigPath = appSettingsPath.Content.ToString();
         }
 
-        private static void ReadModifiedConnectionStrings(out Dictionary<string, ConnectionStrings> connectionStringsDicitionary, out string appConfigPath, System.Windows.Controls.ListView connectionStrings, System.Windows.Controls.Label appSettingsPath)
+        private Dictionary<string, ConnectionStrings> CreateConnectionStringsDicitionary(System.Windows.Controls.ListView connectionStrings)
         {
-            IEnumerable modifiedConnectionStrings = connectionStrings.ItemsSource;
-            connectionStringsDicitionary = new Dictionary<string, ConnectionStrings>();
-            foreach (var item in modifiedConnectionStrings)
+            ObservableCollection<ConnectionStrings> connectionStringsCollection = connectionStrings.ItemsSource as ObservableCollection<ConnectionStrings>;
+            Dictionary<string, ConnectionStrings> connectionStringsDictionary = new Dictionary<string, ConnectionStrings>();
+            foreach (var connectionString in connectionStringsCollection)
             {
-                ConnectionStrings connectionString = item as ConnectionStrings;
-                connectionStringsDicitionary.Add(connectionString.Name, connectionString);
+                string name = connectionString.Name;
+                connectionStringsDictionary.Add(name, connectionString);
             }
-            appConfigPath = appSettingsPath.Content.ToString();
+            return connectionStringsDictionary;
         }
+        //private void WriteConnectionStringstoConFile(string appConfigPath, Dictionary<string, ConnectionStrings> connectionStringsDicitionary)
+        //{
+        //    try
+        //    {
+        //        var doc = XDocument.Load(appConfigPath);
+        //        var elements = doc.Descendants("connectionstrings").Elements();
+        //        foreach (var connectionstring in connectionStringsDicitionary)
+        //        {
+
+        //        }
+        //    }
+        //    catch
+        //    {
+
+        //    }
+        //}
 
         private void WriteSettingsToConfFile(string appConfigPath, Dictionary<string, AppSettingsConfig> appSettingsDic, System.Windows.Controls.Label statusLabel)
         {

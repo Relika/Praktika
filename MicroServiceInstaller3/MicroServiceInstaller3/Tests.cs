@@ -9,6 +9,7 @@ using System.Transactions;
 using System.Xml;
 using System.Xml.Linq;
 using System.IO.Compression;
+using System.Collections.ObjectModel;
 
 namespace MicroServiceInstaller3
 {
@@ -138,5 +139,39 @@ namespace MicroServiceInstaller3
             }
 
         }
+        [TestMethod]
+        public ObservableCollection<MainWindow.ConnectionStrings> FindConnectionsStrings()
+        {
+            ObservableCollection<MainWindow.ConnectionStrings> ConnectionStringsCollection = new ObservableCollection<MainWindow.ConnectionStrings>();
+            try
+            {
+                string fileSystemEntry = "C:\\Users\\User\\Downloads\\test67";
+                var doc = XDocument.Load(fileSystemEntry);
+                var elements = doc.Descendants("connectionStrings").Elements();
+
+                foreach (var element in elements)
+                {
+                    MainWindow.ConnectionStrings connectionStrings = new MainWindow.ConnectionStrings();
+                    connectionStrings.Name = (string)element.Attribute("name");
+                    connectionStrings.ConnectionString = (string)element.Attribute("connectionString");
+                    connectionStrings.ProviderName = (string)element.Attribute("providerName");
+                    ConnectionStringsCollection.Add(connectionStrings);
+                }
+            }
+            catch (Exception error)
+            {
+                //statusLabel.Content = error.Message;
+                //statusLabel.Content = "This file does not consist connectionSettings, please select another file";
+                Assert.Fail(error.Message);
+            }
+            return ConnectionStringsCollection;
+        }
+
+       // [TestMethod]
+        
+        //public static Dictionary<string, MainWindow.ConnectionStrings> CreateConnectionStringsDicitionary()
+        //{
+            
+        //}
     }
 }
