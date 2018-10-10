@@ -120,10 +120,6 @@ namespace MicroServiceInstaller3
             bool elementExists = DoesXmlElementExist(xmlAddElement, path);
         }
 
-
-
-
-
         [TestMethod]
         public void CreateTestZipFile()
         {

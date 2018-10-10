@@ -113,136 +113,45 @@ namespace MicroServiceInstaller3
         private void BnConfig_Click(object sender, RoutedEventArgs e)
         {
             string confFilePath = LbTemporary.Content.ToString();
-            LvUploadedConfigSettings.ItemsSource = FindConfSettings(confFilePath, statusLabel: LbProcessStatus);
-            LvUploadedConnectionSettings.ItemsSource = FindConnectionsStrings(confFilePath, statusLabel: LbProcessStatus);
+            try
+            {
+                ObservableCollection<AppSettingsConfig> appsettingsCollection = Conffilehandler.FindConfSettings(confFilePath);
+                LvUploadedConfigSettings.ItemsSource = appsettingsCollection;
+            }
+            catch (Exception error)
+            {
+                LbStatus.Content = "This file does not consist appsettings, please select another file" + error.Message;
+            }
+            try
+            {
+                ObservableCollection<ConnectionStrings> ConnectionStringsCollection = Conffilehandler.FindConnectionsStrings(confFilePath);
+                LvUploadedConnectionSettings.ItemsSource = ConnectionStringsCollection;
+            }
+            catch (Exception error)
+            {
+                LbProcessStatus.Content = "This file does not consist connectionSettings, please select another file"  + error.Message;
+            }
             BnSaveChanges.IsEnabled = true;
-        }
-
-        private string FindAppSettingsFile(System.Windows.Controls.Label temporaryfolderLabel)
-        {
-
-            //string temporaryFolder = handlePropertyChanged(sender, e);
-            string temporaryFolder = temporaryfolderLabel.Content.ToString();
-
-            return FindAppSettingsFile(temporaryFolder);
-        }
-
-        private string FindAppSettingsFile(string temporaryFolder)
-        {
-            foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
-            {
-                if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
-
-                if (fileSystemEntry.EndsWith(".exe.config")) return fileSystemEntry;
-
-
-            }
-            return string.Empty;
-        }
-        private ObservableCollection<AppSettingsConfig> CompareAppSettings(string existingFileSystemEntry, string downloadedFileSystemEntry, System.Windows.Controls.Label statusLabel)
-        {
-            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = new ObservableCollection<AppSettingsConfig>();
-            try
-            {
-                HashSet<string> KeySet = new HashSet<string>();
-                FindKeys(existingFileSystemEntry, KeySet);
-                FindKeys(downloadedFileSystemEntry, KeySet);
-                foreach (var key in KeySet)
-                {
-                    AppSettingsConfig appSetting = new AppSettingsConfig();
-                    appSetting.Key = key;
-                    string downloadedAppSettingValue = FindValue(downloadedFileSystemEntry, key); 
-                    string existingAppSettingValue = FindValue(existingFileSystemEntry, key);
-                    appSetting.NewValue = downloadedAppSettingValue;    
-                    appSetting.ExistingValue = existingAppSettingValue;
-                    comparedAppSettingsCollection.Add(appSetting);
-                }
-                LvDownloadedConfigSettings.ItemsSource = comparedAppSettingsCollection;
-            }
-            catch //(Exception error)
-            {
-                statusLabel.Content = "This file do not consist keys";
-            }
-            return comparedAppSettingsCollection;
-        }
-
-        private void FindKeys(string fileSystemEntry, HashSet<string> KeySet)
-        {
-            var doc = XDocument.Load(fileSystemEntry);
-            var elements = doc.Descendants("appSettings").Elements();
-            foreach (var item in elements)
-            {
-                KeySet.Add((string)item.Attribute("key"));               
-            }
-        }
-
-        private string FindValue(string confFilePath, string key)
-        {
-            var doc = XDocument.Load(confFilePath);
-            var elements = doc.Descendants("appSettings").Elements();
-            foreach (var item in elements)
-            {
-                if ((string)item.Attribute("key") == key)
-                {
-                    return (string)item.Attribute("value");
-                   
-                }
-                else
-                {
-                    
-                }
-            }
-            return null;
-        }
-
-        private ObservableCollection<AppSettingsConfig> FindConfSettings(string fileSystemEntry, System.Windows.Controls.Label statusLabel)
-        {
-            ObservableCollection<AppSettingsConfig> appSettingsCollection = new ObservableCollection<AppSettingsConfig>();
-            try
-            {
-                var doc = XDocument.Load(fileSystemEntry);
-                var elements = doc.Descendants("appSettings").Elements();
-
-                    foreach (var item in elements)
-                    {
-                    AppSettingsConfig appSetting = new AppSettingsConfig();
-                        appSetting.Key = (string)item.Attribute("key");
-                        appSetting.NewValue = (string)item.Attribute("value"); // muutsin newvalue-> value
-                        appSettingsCollection.Add(appSetting);
-                    }
-            }
-            catch //(Exception error)
-            {
-                //statusLabel.Content = error.Message;
-                statusLabel.Content = "This file does not consist appsettings, please select another file";
-            }
-            return appSettingsCollection;
         }
 
         private void BnSaveChanges_Click(object sender, RoutedEventArgs e)
         {        
             string appConfigPath = LbworkFilesFolder.Content.ToString();
-            string selectedPath = LbTemporary.Content.ToString();
-            Dictionary<string, AppSettingsConfig> appSettingsDictionary;
-            ReadModifiedConfSettings(out appSettingsDictionary, out appConfigPath, configSettings: LvUploadedConfigSettings, appSettingsPath: LbappSettingsPath);
-            WriteSettingsToConfFile(selectedPath, appSettingsDic: appSettingsDictionary, statusLabel: LbProcessStatus);
-
-            //ReadModifiedConnectionSettings
-            Dictionary<string, ConnectionStrings> connectionStringsDictionary = CreateConnectionStringsDicitionary(connectionStrings: LvUploadedConnectionSettings);
-            //WriteConnectionSettings to confFile
-            //WriteConnectionStringstoConFile(appConfigPath, connectionStringsDictionary);
-        }
-
-        private static void ReadModifiedConfSettings(out Dictionary<string, AppSettingsConfig> appSettingsDictionary, out string appConfigPath, System.Windows.Controls.ListView configSettings, System.Windows.Controls.Label appSettingsPath)
-        {
-            var ModifiedAppSettings = configSettings.ItemsSource;
-            appSettingsDictionary = new Dictionary<string, AppSettingsConfig>();
-            foreach (var item in ModifiedAppSettings)
+            string selectedPath = LbTemporary.Content.ToString();         
+            ObservableCollection<AppSettingsConfig> modifiedAppSettings = LvUploadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = Conffilehandler.ReadModifiedConfSettings( modifiedAppSettings);
+            //appConfigPath = appSettingsPath.Content.ToString();
+            try
             {
-                AppSettingsConfig appSetting = item as AppSettingsConfig;
-                appSettingsDictionary.Add(appSetting.Key, appSetting);
+                Conffilehandler.WriteSettingsToConfFile(selectedPath, appSettingsDic: appSettingsDictionary);
+                LbProcessStatus.Content = "Changes saved ";
             }
-            appConfigPath = appSettingsPath.Content.ToString();
+            catch (Exception error)
+            {
+                LbProcessStatus.Content = error.Message;
+            }
+            Dictionary<string, ConnectionStrings> connectionStringsDictionary = CreateConnectionStringsDicitionary(connectionStrings: LvUploadedConnectionSettings);
+            //WriteConnectionStringstoConFile(appConfigPath, connectionStringsDictionary);
         }
 
         private Dictionary<string, ConnectionStrings> CreateConnectionStringsDicitionary(System.Windows.Controls.ListView connectionStrings)
@@ -273,72 +182,6 @@ namespace MicroServiceInstaller3
         //    }
         //}
 
-        private void WriteSettingsToConfFile(string appConfigPath, Dictionary<string, AppSettingsConfig> appSettingsDic, System.Windows.Controls.Label statusLabel)
-        {
-            try
-            {
-                var doc = XDocument.Load(appConfigPath);
-                var elements = doc.Descendants("appSettings").Elements();
-                foreach (var appsettings in appSettingsDic)
-                {
-                    string key = appsettings.Key;
-                    AppSettingsConfig conf = appsettings.Value;
-                    if(conf.RbExistingValue == true)
-                    {
-                        foreach (var item in elements)
-                        {
-                            if (appsettings.Key == (string)item.Attribute("key"))
-                            {
-                                item.Attribute("value").Value = conf.ExistingValue;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        SaveValue(elements, appsettings, conf, doc);
-                    }
-                }
-                doc.Save(appConfigPath);
-                
-                statusLabel.Content = "Changes saved ";
-            }
-            catch (Exception error)
-            {
-                statusLabel.Content = error.Message;
-            }
-        }
-
-        private static void SaveValue(IEnumerable<XElement> elements, KeyValuePair<string, AppSettingsConfig> appsettings, AppSettingsConfig conf, XDocument doc)
-        {       
-            if (conf.RbExistingValueVisibility == Visibility.Hidden)
-            {
-                AddKeyToConfFile(appsettings, elements, doc, conf);
-            }
-            else
-            {
-                foreach (var item in elements)
-                {
-                    if (appsettings.Key == (string)item.Attribute("key"))
-                    {
-                        item.Attribute("value").Value = conf.NewValue;
-                        break;
-                    }
-                }
-            }   
-        }
-
-        private static void AddKeyToConfFile(KeyValuePair<string, AppSettingsConfig> appsettings, IEnumerable<XElement> elements, XDocument doc, AppSettingsConfig conf)
-        {
-            XElement xmlAddElement = new XElement("add");
-            XAttribute configValueAttribute = new XAttribute("value", conf.NewValue.ToString());
-            XAttribute configKeyAttribute = new XAttribute("key", appsettings.Key.ToString());
-            xmlAddElement.Add(configKeyAttribute);
-            xmlAddElement.Add(configValueAttribute);
-            XElement appSettingsElement = doc.Descendants("appSettings").First(); //.First()
-            appSettingsElement.Add(xmlAddElement);
-        }
-
         private void BnZip_Click(object sender, RoutedEventArgs e)
         {
             string InitialsFilesFolder = LbworkFilesFolder.Content.ToString();
@@ -350,9 +193,7 @@ namespace MicroServiceInstaller3
             using (var scope = new TransactionScope())
             {
                // File.Delete(zipFile); // kustutab faili, mis asub sellel aadressil
-
                 ZipFile.CreateFromDirectory(InitialsFilesFolder, zipFile); // loob zip faili
-
                 bool existItem = false;
                 foreach (var value in ListZipFiles.Items) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
                 {
@@ -363,12 +204,10 @@ namespace MicroServiceInstaller3
                         break;
                     }
                 }
-
                 if (!existItem)
                 {
                     ListZipFiles.Items.Add($"{zipFile}");
                 }
-
                 ListFiles.Items.Clear(); // eemaldab listis olevad asukohakirjed
                 LbSelectedFolder.Content = ""; // eemaldab valitud algse kataloogi asukoha kirje.
                 LbappSettingsPath.Content = "";
@@ -457,8 +296,6 @@ namespace MicroServiceInstaller3
             return unFilteredZipFileList;
         }
 
-
-
         private void BnConfigDownloadedAppSettings_Click(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
@@ -471,13 +308,21 @@ namespace MicroServiceInstaller3
                 LbExistingAppSettingsFilePath.Content = selectedPath; // n'itab valitud kausta Seda rida pole vaja, toimub chooseFolderi funktsioonis!!!!
                 string temporaryFolder = LbTemporary.Content.ToString();
                 string[] folderIsEmpty = Directory.GetFiles(selectedPath);
+                ObservableCollection<AppSettingsConfig> appSettingsCollection = null;
                 if (folderIsEmpty.Length == 0)
                 {
                     DirectoryInfo diSource = new DirectoryInfo(temporaryFolder);
                     DirectoryInfo diTarget = new DirectoryInfo(selectedPath);
                     FShandler.CopyAll(diSource, diTarget);
-                    string confFilePath = FindAppSettingsFile(selectedPath);
-                    ObservableCollection<AppSettingsConfig> appSettingsCollection = FindConfSettings(confFilePath, statusLabel: LbDownloadedProcessStatus);
+                    string confFilePath = Conffilehandler.FindAppSettingsFile(selectedPath);
+                    try
+                    {
+                    appSettingsCollection = Conffilehandler.FindConfSettings(confFilePath);
+                    }
+                    catch (Exception error)
+                    {
+                        LbDownloadedProcessStatus.Content = "This file does not consist appsettings, please select another file" + error.Message;
+                    }
                     LvDownloadedConfigSettings.ItemsSource = appSettingsCollection;
                     AddRadioButtons(appSettingsCollection);
                     HideEmptyTextBox(appSettingsCollection);
@@ -485,15 +330,24 @@ namespace MicroServiceInstaller3
                 }
                 else
                 {
-                    string existingConfFilePath = FindAppSettingsFile(selectedPath);
-                    string downloadedConfFilePath = FindAppSettingsFile(temporaryFolder);
+                    string existingConfFilePath = Conffilehandler.FindAppSettingsFile(selectedPath);
+                    string downloadedConfFilePath = Conffilehandler.FindAppSettingsFile(temporaryFolder);
                     string existingConfFileName = System.IO.Path.GetFileName(path: existingConfFilePath);
                     string downloadedConfFileName = System.IO.Path.GetFileName(downloadedConfFilePath);
+                    ObservableCollection < AppSettingsConfig > comparedAppSettingsCollection = null;
                     if (existingConfFileName == downloadedConfFileName)
                     {
                         LbDownloadedAppSettingsFilePath.Content = downloadedConfFilePath;
-                        ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = CompareAppSettings(existingConfFilePath , downloadedConfFilePath, statusLabel: LbDownloadedProcessStatus);
-                        AddRadioButtons(comparedAppSettingsCollection);
+                        try
+                        {
+                            comparedAppSettingsCollection = Conffilehandler.CompareAppSettings( existingConfFilePath, downloadedConfFilePath);
+                        }
+                        catch (Exception error)
+                        {
+                            LbStatus.Content = "This file dont consist appsettings" + error.Message; // see label on vale
+                        }
+                        LvDownloadedConfigSettings.ItemsSource = comparedAppSettingsCollection;
+                         AddRadioButtons(comparedAppSettingsCollection);
                         HideEmptyTextBox(comparedAppSettingsCollection);
                        // AddThickBorder(comparedAppSettingsCollection);
                         BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
@@ -552,7 +406,6 @@ namespace MicroServiceInstaller3
                     item.RbNewValue = true;
                 }
             }
-
         }
 
         private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
@@ -560,20 +413,17 @@ namespace MicroServiceInstaller3
             string downloadedConfigFilePath = LbDownloadedAppSettingsFilePath.Content.ToString();
             string existingConfigFileDirectory = LbExistingAppSettingsFilePath.Content.ToString();
             string existingConfFilePath = System.IO.Path.Combine(existingConfigFileDirectory, System.IO.Path.GetFileName(downloadedConfigFilePath));
-            Dictionary<string, AppSettingsConfig> appSettingsDictionary = CreateComparedAppSettingsDicitionary(appsettingslist: LvDownloadedConfigSettings);            
-            WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary, statusLabel: LbDownloadedProcessStatus);
-        }
-
-        private Dictionary<string, AppSettingsConfig> CreateComparedAppSettingsDicitionary(System.Windows.Controls.ListView appsettingslist)
-        {
-            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = appsettingslist.ItemsSource as ObservableCollection<AppSettingsConfig>;
-            Dictionary<string, AppSettingsConfig> newAppSettingsDictionary = new Dictionary<string, AppSettingsConfig>();
-            foreach (var appSetting in comparedAppSettingsCollection)
+            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = Conffilehandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
+            try
             {
-                string key = appSetting.Key;
-                newAppSettingsDictionary.Add(key, appSetting);           
+                Conffilehandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                LbDownloadedProcessStatus.Content = "Changes saved ";             
             }
-            return newAppSettingsDictionary;
+            catch (Exception error)
+            {
+                LbDownloadedProcessStatus.Content = error.Message;
+            }
         }
 
         private void ListAppSettingsFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -599,33 +449,5 @@ namespace MicroServiceInstaller3
         {
 
         }
-
-        private ObservableCollection<ConnectionStrings> FindConnectionsStrings(string fileSystemEntry, System.Windows.Controls.Label statusLabel)
-        {
-            ObservableCollection<ConnectionStrings> ConnectionStringsCollection = new ObservableCollection<ConnectionStrings>();
-            try
-            {
-                var doc = XDocument.Load(fileSystemEntry);
-                var elements = doc.Descendants("connectionStrings").Elements();
-
-                foreach (var element in elements)
-                {
-                    ConnectionStrings connectionStrings = new ConnectionStrings();
-                    connectionStrings.Name = (string)element.Attribute("name");
-                    connectionStrings.ConnectionString = (string)element.Attribute("connectionString");
-                    connectionStrings.ProviderName = (string)element.Attribute("providerName");
-                    ConnectionStringsCollection.Add(connectionStrings);          
-                }
-                
-            }
-            catch //(Exception error)
-            {
-                //statusLabel.Content = error.Message;
-                statusLabel.Content = "This file does not consist connectionSettings, please select another file";
-            }
-            return ConnectionStringsCollection;
-        }
-
-
     }
 }

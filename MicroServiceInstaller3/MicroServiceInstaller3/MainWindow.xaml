@@ -90,7 +90,7 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <ListView x:Name="LvUploadedConnectionSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" Height="131" >
+                        <ListView x:Name="LvUploadedConnectionSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" Height="100" >
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -111,7 +111,7 @@
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
-                        <ListBox x:Name="ListZipFiles"  Height="80"/>
+                        <ListBox x:Name="ListZipFiles"  Height="70"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="4" Background="GhostWhite" >
