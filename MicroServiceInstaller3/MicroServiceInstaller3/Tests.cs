@@ -10,22 +10,14 @@ using System.Xml;
 using System.Xml.Linq;
 using System.IO.Compression;
 using System.Collections.ObjectModel;
+using MicroServiceInstaller3.Poco;
 
 namespace MicroServiceInstaller3
 {
 
     [TestClass]
     public class Tests
-    {
-
-        [TestMethod]
-        public void St()
-        {
-            int c = 3 + 5;
-            Assert.IsTrue(c == 9, "Problem");
-        }
-
-        
+    {      
         public string CreateTestXML()
         {
             //olemasolev fail tuleb 'ra kustutada ja siis luua uus
@@ -49,6 +41,15 @@ namespace MicroServiceInstaller3
                 xmlWriter.WriteAttributeString("value", "SE_30");
 
                 xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndElement();
+
+                xmlWriter.WriteStartElement("connectionStrings");
+                xmlWriter.WriteStartElement("add");
+                xmlWriter.WriteAttributeString("name", "LogBook");
+                xmlWriter.WriteAttributeString("connectionString","lvh8tgeugeo8496u49tjft0p358990u" );
+                xmlWriter.WriteAttributeString("providerName","SqlServer" );
+
+                xmlWriter.WriteEndElement();
 
                 xmlWriter.WriteEndDocument();
                 xmlWriter.Close();
@@ -60,8 +61,11 @@ namespace MicroServiceInstaller3
             return testXmlPath;
         }
 
+       
         public XElement AddXmlElement(string path)
         {
+
+         
             var doc = XDocument.Load(path);
             var elements = doc.Descendants("appSettings").Elements();
 
@@ -79,7 +83,7 @@ namespace MicroServiceInstaller3
 
             return xmlAddElement;
         }
-
+        
         public bool DoesXmlElementExist(XElement xmlElement, string path)
         {
             var doc = XDocument.Load(path);
@@ -87,10 +91,7 @@ namespace MicroServiceInstaller3
 
             foreach (var item in elements)
             {
-                //string keyAttributeValue;
-                //string valueAttributeValue;
-
-                if (item.Attribute("key") != null)   //item.Attributes("key") != null
+                if (item.Attribute("key") != null)
                 {
                     if (item.Attribute("key").Value == xmlElement.Attribute("key").Value)
                     {
@@ -107,13 +108,6 @@ namespace MicroServiceInstaller3
                     continue;
                 }
                 continue;
-                //XAttribute keyAttribute = item.Attribute("key");
-                //keyAttributeValue = keyAttribute.Value;
-                //{
-                //    XAttribute valueAttribute = item.Attribute("value");
-                //    valueAttributeValue = valueAttribute.Value;
-                //}
-
             }
             return false;
         }
@@ -125,6 +119,10 @@ namespace MicroServiceInstaller3
             XElement xmlAddElement =  AddXmlElement(path);
             bool elementExists = DoesXmlElementExist(xmlAddElement, path);
         }
+
+
+
+
 
         [TestMethod]
         public void CreateTestZipFile()
@@ -140,9 +138,9 @@ namespace MicroServiceInstaller3
 
         }
         [TestMethod]
-        public ObservableCollection<MainWindow.ConnectionStrings> FindConnectionsStrings()
+        public ObservableCollection<ConnectionStrings> TestFindConnectionsStrings()
         {
-            ObservableCollection<MainWindow.ConnectionStrings> ConnectionStringsCollection = new ObservableCollection<MainWindow.ConnectionStrings>();
+            ObservableCollection<ConnectionStrings> ConnectionStringsCollection = new ObservableCollection<ConnectionStrings>();
             try
             {
                 string fileSystemEntry = "C:\\Users\\User\\Downloads\\test67";
@@ -151,7 +149,7 @@ namespace MicroServiceInstaller3
 
                 foreach (var element in elements)
                 {
-                    MainWindow.ConnectionStrings connectionStrings = new MainWindow.ConnectionStrings();
+                    ConnectionStrings connectionStrings = new ConnectionStrings();
                     connectionStrings.Name = (string)element.Attribute("name");
                     connectionStrings.ConnectionString = (string)element.Attribute("connectionString");
                     connectionStrings.ProviderName = (string)element.Attribute("providerName");
@@ -164,14 +162,15 @@ namespace MicroServiceInstaller3
                 //statusLabel.Content = "This file does not consist connectionSettings, please select another file";
                 Assert.Fail(error.Message);
             }
+            //Assert
             return ConnectionStringsCollection;
         }
 
-       // [TestMethod]
-        
+        // [TestMethod]
+
         //public static Dictionary<string, MainWindow.ConnectionStrings> CreateConnectionStringsDicitionary()
         //{
-            
+
         //}
     }
 }

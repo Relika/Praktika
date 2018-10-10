@@ -46,7 +46,7 @@ namespace MicroServiceInstaller3
             }
 
             DirectoryInfo[] dirs = dir.GetDirectories();
-            FShandler.CreateDirectory(destDirName);
+            CreateDirectory(destDirName);
 
             // Get the files in the directory and copy them to the new location.
             FileInfo[] files = dir.GetFiles();
@@ -83,20 +83,10 @@ namespace MicroServiceInstaller3
             }
         }
 
-        public static string ChooseFolder(FolderBrowserDialog folderBrowserDialog1, System.Windows.Controls.Label selectedFolderLabel, System.Windows.Controls.Button savebutton)
-        {
-            string selectedPath = folderBrowserDialog1.SelectedPath; // Loob muutuja, mis vastab valitud kaustale
-            selectedFolderLabel.Content = selectedPath;// M''rab, kuhu kuvatakse valitud kausta sisu
-            if (selectedFolderLabel.HasContent)
-            {
-                savebutton.IsEnabled = true;
-            }
-            return selectedPath;
-        }
-        public static string CreateExtractFolder1()
+        public static string CreateExtractFolder(string extractFolderPath)
         {
             string extractFolderName = Guid.NewGuid().ToString();
-            string extractDirectoryPath = System.IO.Path.Combine("C:\\", "Downloaded_zip_files", extractFolderName);
+            string extractDirectoryPath = System.IO.Path.Combine(extractFolderPath, extractFolderName);
             return extractDirectoryPath;
         }
 
@@ -121,17 +111,15 @@ namespace MicroServiceInstaller3
 
         public static string MakeFolders(string directory)
         {
-            string folderPath;
-            if (directory == "finalZipDirectory")
-            {
-                folderPath = "C:\\";
-            }
-            else
-            {
-            folderPath = System.IO.Path.GetTempPath();
-            }        
+            string folderPath = System.IO.Path.GetTempPath();     
             string path = System.IO.Path.Combine(folderPath, directory);
-            FShandler.CreateDirectory(path);
+            CreateDirectory(path);
+            return path;
+        }
+
+        public static string MakeFolder(string path)
+        {
+            CreateDirectory(path);
             return path;
         }
     }

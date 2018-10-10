@@ -71,6 +71,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FShandlerTests.cs" />
+    <Compile Include="Poco\AppSettingsConfig.cs" />
+    <Compile Include="Poco\ConnectionStrings.cs" />
     <Compile Include="Tests.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
