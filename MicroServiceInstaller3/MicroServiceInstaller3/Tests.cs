@@ -123,56 +123,29 @@ namespace MicroServiceInstaller3
         public bool DoesXmlElementExist(XElement xmlElement, string path)
         {
             string xmlElementName = "connectionStrings"; // "connectionStrings" "appSettings"
-            List<KeyValuePair<string, string>> appSettingList = CreateAppSettingsList();
+            List<KeyValuePair<string, string>> appSettingList = CreateAppSettingsListFalse();
 
             var doc = XDocument.Load(path);
             var elements = doc.Descendants(xmlElementName).Elements();
 
-            foreach (var appSetting in appSettingList)
+            foreach (var appSetting in appSettingList) // siin on yks key + value paar ehk atribute
             {
-                string attributeName = appSetting.Key;
-                string attributeValue = appSetting.Value;
-                foreach (var item in elements)
+                bool attributeFound = false;
+                foreach (var item in elements) // siin on terve rida, mida kontrollib 
                 {
-                    if (item.Attribute(attributeName) != null)
+                    if (item.Attribute(appSetting.Key) != null && item.Attribute(appSetting.Key).Value == appSetting.Value) // kas selles reas on sellise nime ja v''rtusega atribute.
                     {
-                        if (item.Attribute(attributeName).Value == appSetting.Value)
-                        {
-                            //jah sobis
-                            break;
-                        }
-                        continue;
+                        // kui atribute on olemas, on mul vaja teada, kas selles reas on olemas ka teised atribute-d
+                        attributeFound = true;
+                        break;
                     }
-                    // ei sobinud return false;
+                    // sellise nime ja v''rtusega v]i sellise v''rtusega attribute ei ole olemas;
                     return false;
                 }
-                return false;
+                if(attributeFound) continue; // selline atribute on olemas, siis l'heb kontrollib teised ka
             }
-            return false;
-
-        //    foreach (var item in elements)
-        //    {
-
-
-        //        if (item.Attribute("key") != null)
-        //        {
-        //            if (item.Attribute("key").Value == xmlElement.Attribute("key").Value)
-        //            {
-        //                if (item.Attributes("value") != null)
-        //                {
-        //                    if (item.Attribute("value").Value == xmlElement.Attribute("value").Value)
-        //                    {
-        //                        return true;
-        //                    }
-        //                    continue;
-        //                }
-        //                continue;
-        //            }
-        //            continue;
-        //        }
-        //        continue;
-        //    }
-        //    return false;
+            // k]ik elemendid on kontrollitud ja sobivad
+            return true;
         }
 
         [TestMethod]
@@ -181,6 +154,7 @@ namespace MicroServiceInstaller3
             string path = CreateTestXML();
             XElement xmlAddElement =  AddXmlElements(path);
             bool elementExists = DoesXmlElementExist(xmlAddElement, path);
+            Assert.IsTrue(elementExists);
         }
 
         [TestMethod]
