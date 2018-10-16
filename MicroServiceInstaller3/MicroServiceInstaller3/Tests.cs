@@ -171,32 +171,34 @@ namespace MicroServiceInstaller3
 
         }
         [TestMethod]
-        public ObservableCollection<ConnectionStrings> TestFindConnectionsStrings()
+        public void TestFindConnectionsStrings()
         {
-            ObservableCollection<ConnectionStrings> ConnectionStringsCollection = new ObservableCollection<ConnectionStrings>();
-            try
-            {
+            //ObservableCollection<ConnectionStrings> ConnectionStringsCollection = new ObservableCollection<ConnectionStrings>();
+            //try
+            //{
                 string fileSystemEntry = "C:\\Users\\User\\Downloads\\test67";
-                var doc = XDocument.Load(fileSystemEntry);
-                var elements = doc.Descendants("connectionStrings").Elements();
+                ObservableCollection<ConnectionStrings> connectionStringsCollection = Conffilehandler.FindConnectionsStrings(fileSystemEntry);
 
-                foreach (var element in elements)
-                {
-                    ConnectionStrings connectionStrings = new ConnectionStrings();
-                    connectionStrings.Name = (string)element.Attribute("name");
-                    connectionStrings.ConnectionString = (string)element.Attribute("connectionString");
-                    connectionStrings.ProviderName = (string)element.Attribute("providerName");
-                    ConnectionStringsCollection.Add(connectionStrings);
-                }
-            }
-            catch (Exception error)
-            {
+                //var doc = XDocument.Load(fileSystemEntry);
+                //var elements = doc.Descendants("connectionStrings").Elements();
+
+                //foreach (var element in elements)
+                //{
+                //    ConnectionStrings connectionStrings = new ConnectionStrings();
+                //    connectionStrings.Name = (string)element.Attribute("name");
+                //    connectionStrings.ConnectionString = (string)element.Attribute("connectionString");
+                //    connectionStrings.ProviderName = (string)element.Attribute("providerName");
+                //    ConnectionStringsCollection.Add(connectionStrings);
+                //}
+            //}
+            //catch (Exception error)
+            //{
                 //statusLabel.Content = error.Message;
                 //statusLabel.Content = "This file does not consist connectionSettings, please select another file";
-                Assert.Fail(error.Message);
-            }
-            //Assert
-            return ConnectionStringsCollection;
+                Assert.IsNotNull(connectionStringsCollection);
+            //}
+            ////Assert
+            //return ConnectionStringsCollection;
         }
 
         // [TestMethod]
