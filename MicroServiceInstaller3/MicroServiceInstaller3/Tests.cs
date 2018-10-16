@@ -61,42 +61,16 @@ namespace MicroServiceInstaller3
             return testXmlPath;
         }
 
-       
-        //public XElement AddXmlElement(string path)
-        //{
 
-         
-        //    var doc = XDocument.Load(path);
-        //    var elements = doc.Descendants("appSettings").Elements();
 
-        //    XElement xmlAddElement = new XElement("add");
-        //    XAttribute configValueAttribute = new XAttribute("value", "TestValue");
-        //    XAttribute configKeyAttribute = new XAttribute("key", "TestKey");
 
-        //    xmlAddElement.Add(configKeyAttribute);
-        //    xmlAddElement.Add(configValueAttribute);
-
-        //    XElement appSettingsElement = doc.Descendants("appSettings").First(); //.First()
-
-        //    appSettingsElement.Add(xmlAddElement);
-        //    doc.Save(path);
-
-        //    return xmlAddElement;
-        //}
-        [TestMethod]
-        public void  AddXmlElements() //XElement
+        //[TestMethod]
+        public XElement   AddXmlElements(string path) //XElement
         {
-            string path = System.IO.Path.Combine(Path.GetTempPath(), "TestFiles", "test.exe.config");
+            //string path = System.IO.Path.Combine(Path.GetTempPath(), "TestFiles", "test.exe.config");
             string xmlElement = "connectionStrings"; // "connectionStrings" "appSettings"
-            String[] names = new string[] { "name", "connectionString", "providerName"  }; // "name", "connectionString", "providerName" "key", "value"
-            String[] values = new string[] { "SeeOnNimi", "seeOnString", "seeonproviderName"  }; // "SeeOnNimi", "seeOnString", "seeonproviderName"   "SeeOnKey", "SeeOnValue"
+            List<KeyValuePair<string, string>> appSettingList = CreateAppSettingsList();
 
-            var appSettingList = new List<KeyValuePair<string, string>>();
-
-            for (var i = 0; i < names.Length; i++)
-            {
-                appSettingList.Add(new KeyValuePair<string, string>(names[i], values[i]));
-            }
             var doc = XDocument.Load(path);
             var elements = doc.Descendants(xmlElement).Elements();
 
@@ -113,43 +87,99 @@ namespace MicroServiceInstaller3
             appSettingsElement.Add(xmlAddElement);
             doc.Save(path);
 
-            //return xmlAddElement;
+            return xmlAddElement;
+        }
+
+        private static List<KeyValuePair<string, string>> CreateAppSettingsList()
+        {
+            String[] names = new string[] { "name", "connectionString", "providerName" }; // "name", "connectionString", "providerName" "key", "value"
+            String[] values = new string[] { "SeeOnNimi", "seeOnString", "seeonproviderName" }; // "SeeOnNimi", "seeOnString", "seeonproviderName"   "SeeOnKey", "SeeOnValue"
+
+            var appSettingList = new List<KeyValuePair<string, string>>();
+
+            for (var i = 0; i < names.Length; i++)
+            {
+                appSettingList.Add(new KeyValuePair<string, string>(names[i], values[i]));
+            }
+
+            return appSettingList;
+        }
+
+        private static List<KeyValuePair<string, string>> CreateAppSettingsListFalse()
+        {
+            String[] names = new string[] { "name", "connectionString", "providerName" }; // "name", "connectionString", "providerName" "key", "value"
+            String[] values = new string[] { "SeeEiOleNimi", "seeEiOleString", "seeEiOleproviderName" }; // "SeeOnNimi", "seeOnString", "seeonproviderName"   "SeeOnKey", "SeeOnValue"
+
+            var appSettingList = new List<KeyValuePair<string, string>>();
+
+            for (var i = 0; i < names.Length; i++)
+            {
+                appSettingList.Add(new KeyValuePair<string, string>(names[i], values[i]));
+            }
+
+            return appSettingList;
         }
 
         public bool DoesXmlElementExist(XElement xmlElement, string path)
         {
             string xmlElementName = "connectionStrings"; // "connectionStrings" "appSettings"
+            List<KeyValuePair<string, string>> appSettingList = CreateAppSettingsList();
+
             var doc = XDocument.Load(path);
             var elements = doc.Descendants(xmlElementName).Elements();
 
-            foreach (var item in elements)
+            foreach (var appSetting in appSettingList)
             {
-                if (item.Attribute("key") != null)
+                string attributeName = appSetting.Key;
+                string attributeValue = appSetting.Value;
+                foreach (var item in elements)
                 {
-                    if (item.Attribute("key").Value == xmlElement.Attribute("key").Value)
+                    if (item.Attribute(attributeName) != null)
                     {
-                        if (item.Attributes("value") != null)
+                        if (item.Attribute(attributeName).Value == appSetting.Value)
                         {
-                            if (item.Attribute("value").Value == xmlElement.Attribute("value").Value)
-                            {
-                                return true;
-                            }
-                            continue;
+                            //jah sobis
+                            break;
                         }
                         continue;
                     }
-                    continue;
+                    // ei sobinud return false;
+                    return false;
                 }
-                continue;
+                return false;
             }
             return false;
+
+        //    foreach (var item in elements)
+        //    {
+
+
+        //        if (item.Attribute("key") != null)
+        //        {
+        //            if (item.Attribute("key").Value == xmlElement.Attribute("key").Value)
+        //            {
+        //                if (item.Attributes("value") != null)
+        //                {
+        //                    if (item.Attribute("value").Value == xmlElement.Attribute("value").Value)
+        //                    {
+        //                        return true;
+        //                    }
+        //                    continue;
+        //                }
+        //                continue;
+        //            }
+        //            continue;
+        //        }
+        //        continue;
+        //    }
+        //    return false;
         }
 
         [TestMethod]
         public void XmlSaveTest()
         {
             string path = CreateTestXML();
-            XElement xmlAddElement =  AddXmlElement(path);
+            XElement xmlAddElement =  AddXmlElements(path);
             bool elementExists = DoesXmlElementExist(xmlAddElement, path);
         }
 
