@@ -15,30 +15,30 @@ namespace MicroServiceInstaller3
     [TestClass]
     public class FShandlerTests
     {
+
+        //MakeRandomDirectorytoTemp- ei ole m]tet testida.
+
         [TestMethod]
-        public void CreateDirectory()
+        public void TestMakeDirectorytoTemp()
+        {
+            string directory = "test";
+            string directoryPath = FShandler.MakeDirectorytoTemp(directory);
+            Assert.AreEqual(Path.Combine(Path.GetTempPath(), directory), directoryPath);
+        }
+
+        [TestMethod]
+        public void MakeDirectory()
         {
             string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "TestFiles");
             string zipDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "TestZip");
             string zipFile = System.IO.Path.Combine(zipDirectory, "TestZipFile.zip");
-            FShandler.CreateDirectory(zipDirectory);
+            FShandler.MakeDirectory(zipDirectory);
             using (TransactionScope scope = new TransactionScope())
             {
                 ZipFile.CreateFromDirectory(directory, zipFile);
             }
             Assert.IsNotNull("C:\\Users\\User\\AppData\\Local\\Temp\\TestZip");
-
         }
-
-
-        //[TestMethod]
-        //public void CopyAll()
-        //{
-        //    DirectoryInfo source = new DirectoryInfo("C:\\Users\\User\\Downloads\\Test56");
-        //    DirectoryInfo target = new DirectoryInfo("C:\\Users\\User\\Downloads\\test67");
-        //    FShandler.CopyAll(source, target);
-        //    Assert.IsNotNull(target);
-        //}
 
         [TestMethod]
         public void DirectoryCopy()
@@ -59,24 +59,7 @@ namespace MicroServiceInstaller3
             Assert.IsNotNull(workFilesFolderPath);
         }
 
-        [TestMethod]
-        public void TestMakeFolders()
-        {
-            string directory = "test";
-            string folderPath = System.IO.Path.GetTempPath();
-            string path = System.IO.Path.Combine(folderPath, directory);
-            FShandler.CreateDirectory(path);
-            Assert.AreEqual("C:\\Users\\User\\AppData\\Local\\Temp\\test", path);
-            
-        }
 
-        [TestMethod]
-        public void TestMakeFolder()
-        {
-            string path = "C:\\FinalzipDirectory";
-            FShandler.CreateDirectory(path);
-            //Kas saab kontrollida kasuta loomist?
-        }
 
 
     }

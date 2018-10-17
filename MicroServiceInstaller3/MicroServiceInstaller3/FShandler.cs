@@ -18,7 +18,23 @@ namespace MicroServiceInstaller3
         /// </summary>
         /// <param name="fullPath"></param>
         /// <returns></returns>
-        public static DirectoryInfo CreateDirectory (string fullPath)
+        public static string MakeRandomDirectorytoTemp()
+        {
+            string directoryName = Guid.NewGuid().ToString();
+            string directoryPath = MakeDirectorytoTemp(directoryName);
+            return directoryPath;
+        }
+
+        public static string MakeDirectorytoTemp(string directory)
+        {
+            string folderPath = System.IO.Path.GetTempPath();
+            string path = System.IO.Path.Combine(folderPath, directory);
+            MakeDirectory(path);
+            return path;
+        }
+
+
+        public static string MakeDirectory (string fullPath)
         {
             // lisada kontroll, kas sisestatud fullPathiga on v[imalik kausta teha.
             DirectoryInfo createdDirectory = null;
@@ -29,7 +45,7 @@ namespace MicroServiceInstaller3
             }
 
             createdDirectory = Directory.CreateDirectory(fullPath);
-            return createdDirectory;
+            return createdDirectory.ToString();
         }
 
       public static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
@@ -46,7 +62,7 @@ namespace MicroServiceInstaller3
             }
 
             DirectoryInfo[] dirs = dir.GetDirectories();
-            CreateDirectory(destDirName);
+            MakeDirectory(destDirName);
 
             // Get the files in the directory and copy them to the new location.
             FileInfo[] files = dir.GetFiles();
@@ -83,44 +99,5 @@ namespace MicroServiceInstaller3
             }
         }
 
-        public static string CreateExtractFolder(string extractFolderPath)
-        {
-            string extractFolderName = Guid.NewGuid().ToString();
-            string extractDirectoryPath = System.IO.Path.Combine(extractFolderPath, extractFolderName);
-            return extractDirectoryPath;
-        }
-
-        //public static void CopyAll(DirectoryInfo source, DirectoryInfo target)
-        //{
-        //    Directory.CreateDirectory(target.FullName);
-
-        //    // Copy each file into the new directory.
-        //    foreach (FileInfo fi in source.GetFiles())
-        //    {
-        //        Console.WriteLine(@"Copying {0}\{1}", target.FullName, fi.Name);
-        //        fi.CopyTo(System.IO.Path.Combine(target.FullName, fi.Name), true);
-        //    }
-
-        //    // Copy each subdirectory using recursion.
-        //    foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
-        //    {
-        //        DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
-        //        CopyAll(diSourceSubDir, nextTargetSubDir);
-        //    }
-        //}
-
-        public static string MakeFolders(string directory)
-        {
-            string folderPath = System.IO.Path.GetTempPath();     
-            string path = System.IO.Path.Combine(folderPath, directory);
-            CreateDirectory(path);
-            return path;
-        }
-
-        public static string MakeFolder(string path)
-        {
-            CreateDirectory(path);
-            return path;
-        }
     }
 }

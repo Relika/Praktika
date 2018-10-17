@@ -21,13 +21,12 @@ namespace MicroServiceInstaller3
         {
             InitializeComponent();
             string zipDirectory = ConfigurationManager.AppSettings["zipDirectory"];
-            LbZipFilesFolder.Content = FShandler.MakeFolders(zipDirectory);
+            LbZipFilesFolder.Content = FShandler.MakeDirectorytoTemp(zipDirectory);
             string workDirectory = ConfigurationManager.AppSettings["workDirectory"];
-            LbworkFilesFolder.Content = FShandler.MakeFolders(workDirectory);
-            string finalZipPath = ConfigurationManager.AppSettings["finalZipDirectory"];
-            LbFinalZipFolder.Content = FShandler.MakeFolder(finalZipPath);
+            LbworkFilesFolder.Content = FShandler.MakeDirectorytoTemp(workDirectory);
+
         }
-        string RandomFileName = "";
+        string randomFileName = "";
 
         public static string ChooseFolder(FolderBrowserDialog folderBrowserDialog1, System.Windows.Controls.Label selectedFolderLabel, System.Windows.Controls.Button savebutton)
         {
@@ -78,6 +77,7 @@ namespace MicroServiceInstaller3
 
         private IEnumerable<string> CreateUnFilteredFileList(string temporaryFolder)
         {
+            ListFiles.ItemsSource = null;
             IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories); // Otsib ajutisest kaustast ja alamkaustadest faile
             ListFiles.ItemsSource = Files; // Paigutab failid faililisti
             IEnumerable<string> unFilteredFileList = (IEnumerable<string>)ListFiles.ItemsSource; //muudab valitud faili asukohanimetuse tekstiks
@@ -174,7 +174,8 @@ namespace MicroServiceInstaller3
         {
             string InitialsFilesFolder = LbworkFilesFolder.Content.ToString();
             string zipFileFolder = LbZipFilesFolder.Content.ToString();
-            string zipFile = System.IO.Path.Combine(zipFileFolder, RandomFileName + ".zip"); // M''rab zip faili asukoha ja nime
+            randomFileName = Guid.NewGuid().ToString();
+            string zipFile = System.IO.Path.Combine(zipFileFolder, randomFileName + ".zip"); // M''rab zip faili asukoha ja nime
 
             BnConfig.IsEnabled = false;
             BnSaveChanges.IsEnabled = false;
@@ -215,11 +216,16 @@ namespace MicroServiceInstaller3
             BnZip.IsEnabled = false;
             using (var scope = new TransactionScope())
             {
-               string zipLocation = LbZipFilesFolder.Content.ToString();
+                string zipLocation = LbZipFilesFolder.Content.ToString();
+                string finalZipPath = ConfigurationManager.AppSettings["finalZipDirectory"];
+                FShandler.MakeDirectory(finalZipPath);
+                //LbFinalZipFolder.Content = finalZipPath;
 
-                string finalZipFileName = System.IO.Path.Combine(LbFinalZipFolder.Content.ToString(), "final.zip");
-                File.Delete(finalZipFileName);
-
+                string finalZipFileName = System.IO.Path.Combine(finalZipPath, "final.zip");
+                //if (File.Exists(finalZipFileName))
+                //{
+                //    File.Delete(finalZipFileName);
+                //}
                 ZipFile.CreateFromDirectory(zipLocation, finalZipFileName);
                 string finalLocation = System.IO.Path.Combine(zipLocation, finalZipFileName);
 
@@ -242,18 +248,19 @@ namespace MicroServiceInstaller3
             {
                 string zipFileName = zipFileBrowserDialog1.FileName;
                 LbSelectedZipFile.Content = zipFileName;
-                string extractFolderPath = ConfigurationManager.AppSettings["extractFolderPath"];
-                string extractDirectory = FShandler.CreateExtractFolder(extractFolderPath);
-                ZipFile.ExtractToDirectory(zipFileName, extractDirectory);
-                IEnumerable<string> unFilteredZipFileList = CreateUnFilteredZipFileList(extractDirectory);
+                string extractFolderPath = FShandler.MakeRandomDirectorytoTemp();
+                //string extractFolderPath = ConfigurationManager.AppSettings["extractFolderPath"];
+                //string extractDirectory = FShandler.CreateExtractFolder(extractFolderPath);
+                ZipFile.ExtractToDirectory(zipFileName, extractFolderPath);
+                IEnumerable<string> unFilteredZipFileList = CreateUnFilteredZipFileList(extractFolderPath);
                 foreach (var zipFile in unFilteredZipFileList)
                 {
                     bool endsIn = (zipFile.EndsWith(".zip"));
                     if (endsIn)
                     {
-                        string extractDirectory2 = FShandler.CreateExtractFolder(extractFolderPath);
-                        ZipFile.ExtractToDirectory(zipFile, extractDirectory2);
-                        IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(extractDirectory2);
+                        string extractFolderPath2 = FShandler.MakeRandomDirectorytoTemp();
+                        ZipFile.ExtractToDirectory(zipFile, extractFolderPath2);
+                        IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(extractFolderPath2);
                         FilterZipFileList(unFilteredFileList);
                     }              
                 }

@@ -24,7 +24,7 @@ namespace MicroServiceInstaller3
             string temporaryFolderPath = System.IO.Path.GetTempPath();
 
             string testXmlDirectory = System.IO.Path.Combine(temporaryFolderPath, "TestFiles");
-            FShandler.CreateDirectory(testXmlDirectory);
+            FShandler.MakeDirectory(testXmlDirectory);
    
             string testXmlPath = System.IO.Path.Combine(testXmlDirectory, "test.exe.config");
             if (!File.Exists(testXmlPath))
