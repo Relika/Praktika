@@ -157,26 +157,14 @@ namespace MicroServiceInstaller3
             Assert.IsTrue(elementExists);
         }
 
-        [TestMethod]
-        public void CreateTestZipFile()
-        {
-            string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "TestFiles");
-            string zipDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "TestZip");
-            string zipFile = System.IO.Path.Combine(zipDirectory, "TestZipFile.zip");
-            FShandler.CreateDirectory(zipDirectory);
-            using (TransactionScope scope = new TransactionScope())
-            {
-                ZipFile.CreateFromDirectory(directory, zipFile);
-            }
 
-        }
         [TestMethod]
         public void TestFindConnectionsStrings()
         {
             //ObservableCollection<ConnectionStrings> ConnectionStringsCollection = new ObservableCollection<ConnectionStrings>();
             //try
             //{
-                string fileSystemEntry = "C:\\Users\\User\\Downloads\\test67";
+                string fileSystemEntry = "C:\\Users\\User\\Downloads\\test67\\Enics.WiseToSapIntegration.Shipper.exe.config";
                 ObservableCollection<ConnectionStrings> connectionStringsCollection = Conffilehandler.FindConnectionsStrings(fileSystemEntry);
 
                 //var doc = XDocument.Load(fileSystemEntry);

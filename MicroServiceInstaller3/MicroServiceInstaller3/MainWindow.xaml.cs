@@ -50,6 +50,7 @@ namespace MicroServiceInstaller3
             {
                 string selectedPath = ChooseFolder(folderBrowserDialog1, selectedFolderLabel: LbSelectedFolder, savebutton: BnZip);
                 string workFilesFolderPath = LbworkFilesFolder.Content.ToString();
+                //FShandler.CopyAll(selectedPath, workFilesFolderPath);
                 FShandler.DirectoryCopy(selectedPath, workFilesFolderPath, copySubDirs: true);
                 IEnumerable<string> unFilteredFileList = CreateUnFilteredFileList(workFilesFolderPath);
                 FilterFileList(unFilteredFileList);
@@ -298,9 +299,10 @@ namespace MicroServiceInstaller3
                 ObservableCollection<AppSettingsConfig> appSettingsCollection = null;
                 if (folderIsEmpty.Length == 0)
                 {
-                    DirectoryInfo diSource = new DirectoryInfo(temporaryFolder);
-                    DirectoryInfo diTarget = new DirectoryInfo(selectedPath);
-                    FShandler.CopyAll(diSource, diTarget);
+                    //DirectoryInfo diSource = new DirectoryInfo(temporaryFolder);
+                    //DirectoryInfo diTarget = new DirectoryInfo(selectedPath);
+                    FShandler.DirectoryCopy(temporaryFolder, selectedPath, copySubDirs: true);
+                    //FShandler.CopyAll(diSource, diTarget);
                     string confFilePath = Conffilehandler.FindAppSettingsFile(selectedPath);
                     try
                     {
