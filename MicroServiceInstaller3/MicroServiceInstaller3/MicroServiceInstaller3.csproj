@@ -70,7 +70,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="conffilehandler.cs" />
+    <Compile Include="ConfFileHandler.cs" />
+    <Compile Include="ConfFileHandlerTests.cs" />
     <Compile Include="FShandlerTests.cs" />
     <Compile Include="Poco\AppSettingsConfig.cs" />
     <Compile Include="Poco\ConnectionStrings.cs" />

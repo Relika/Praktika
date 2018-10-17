@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace MicroServiceInstaller3
 {
-    class Conffilehandler
+    class ConfFileHandler
     {
 
         public static string FindAppSettingsFile(string temporaryFolder)
@@ -19,10 +19,7 @@ namespace MicroServiceInstaller3
             foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(temporaryFolder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
             {
                 if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
-
                 if (fileSystemEntry.EndsWith(".exe.config")) return fileSystemEntry;
-
-
             }
             return string.Empty;
         }

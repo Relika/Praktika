@@ -103,7 +103,7 @@ namespace MicroServiceInstaller3
             string confFilePath = LbTemporary.Content.ToString();
             try
             {
-                ObservableCollection<AppSettingsConfig> appsettingsCollection = Conffilehandler.FindConfSettings(confFilePath);
+                ObservableCollection<AppSettingsConfig> appsettingsCollection = ConfFileHandler.FindConfSettings(confFilePath);
                 LvUploadedConfigSettings.ItemsSource = appsettingsCollection;
             }
             catch (Exception error)
@@ -112,7 +112,7 @@ namespace MicroServiceInstaller3
             }
             try
             {
-                ObservableCollection<ConnectionStrings> ConnectionStringsCollection = Conffilehandler.FindConnectionsStrings(confFilePath);
+                ObservableCollection<ConnectionStrings> ConnectionStringsCollection = ConfFileHandler.FindConnectionsStrings(confFilePath);
                 LvUploadedConnectionSettings.ItemsSource = ConnectionStringsCollection;
             }
             catch (Exception error)
@@ -127,11 +127,11 @@ namespace MicroServiceInstaller3
             string appConfigPath = LbworkFilesFolder.Content.ToString();
             string selectedPath = LbTemporary.Content.ToString();         
             ObservableCollection<AppSettingsConfig> modifiedAppSettings = LvUploadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
-            Dictionary<string, AppSettingsConfig> appSettingsDictionary = Conffilehandler.ReadModifiedConfSettings( modifiedAppSettings);
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.ReadModifiedConfSettings( modifiedAppSettings);
             //appConfigPath = appSettingsPath.Content.ToString();
             try
             {
-                Conffilehandler.WriteSettingsToConfFile(selectedPath, appSettingsDic: appSettingsDictionary);
+                ConfFileHandler.WriteSettingsToConfFile(selectedPath, appSettingsDic: appSettingsDictionary);
                 LbProcessStatus.Content = "Changes saved ";
             }
             catch (Exception error)
@@ -310,10 +310,10 @@ namespace MicroServiceInstaller3
                     //DirectoryInfo diTarget = new DirectoryInfo(selectedPath);
                     FShandler.DirectoryCopy(temporaryFolder, selectedPath, copySubDirs: true);
                     //FShandler.CopyAll(diSource, diTarget);
-                    string confFilePath = Conffilehandler.FindAppSettingsFile(selectedPath);
+                    string confFilePath = ConfFileHandler.FindAppSettingsFile(selectedPath);
                     try
                     {
-                    appSettingsCollection = Conffilehandler.FindConfSettings(confFilePath);
+                    appSettingsCollection = ConfFileHandler.FindConfSettings(confFilePath);
                     }
                     catch (Exception error)
                     {
@@ -326,8 +326,8 @@ namespace MicroServiceInstaller3
                 }
                 else
                 {
-                    string existingConfFilePath = Conffilehandler.FindAppSettingsFile(selectedPath);
-                    string downloadedConfFilePath = Conffilehandler.FindAppSettingsFile(temporaryFolder);
+                    string existingConfFilePath = ConfFileHandler.FindAppSettingsFile(selectedPath);
+                    string downloadedConfFilePath = ConfFileHandler.FindAppSettingsFile(temporaryFolder);
                     string existingConfFileName = System.IO.Path.GetFileName(path: existingConfFilePath);
                     string downloadedConfFileName = System.IO.Path.GetFileName(downloadedConfFilePath);
                     ObservableCollection < AppSettingsConfig > comparedAppSettingsCollection = null;
@@ -336,7 +336,7 @@ namespace MicroServiceInstaller3
                         LbDownloadedAppSettingsFilePath.Content = downloadedConfFilePath;
                         try
                         {
-                            comparedAppSettingsCollection = Conffilehandler.CompareAppSettings( existingConfFilePath, downloadedConfFilePath);
+                            comparedAppSettingsCollection = ConfFileHandler.CompareAppSettings( existingConfFilePath, downloadedConfFilePath);
                         }
                         catch (Exception error)
                         {
@@ -410,10 +410,10 @@ namespace MicroServiceInstaller3
             string existingConfigFileDirectory = LbExistingAppSettingsFilePath.Content.ToString();
             string existingConfFilePath = System.IO.Path.Combine(existingConfigFileDirectory, System.IO.Path.GetFileName(downloadedConfigFilePath));
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
-            Dictionary<string, AppSettingsConfig> appSettingsDictionary = Conffilehandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
             try
             {
-                Conffilehandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                 LbDownloadedProcessStatus.Content = "Changes saved ";             
             }
             catch (Exception error)

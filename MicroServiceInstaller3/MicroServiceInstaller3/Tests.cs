@@ -165,7 +165,7 @@ namespace MicroServiceInstaller3
             //try
             //{
                 string fileSystemEntry = "C:\\Users\\User\\Downloads\\test67\\Enics.WiseToSapIntegration.Shipper.exe.config";
-                ObservableCollection<ConnectionStrings> connectionStringsCollection = Conffilehandler.FindConnectionsStrings(fileSystemEntry);
+                ObservableCollection<ConnectionStrings> connectionStringsCollection = ConfFileHandler.FindConnectionsStrings(fileSystemEntry);
 
                 //var doc = XDocument.Load(fileSystemEntry);
                 //var elements = doc.Descendants("connectionStrings").Elements();
