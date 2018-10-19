@@ -106,7 +106,7 @@
                     <StackPanel Grid.Row="1" Grid.Column="4">
                         <Button x:Name="BnConfig" IsEnabled="False" Content="Config settings"  Click="BnConfig_Click" />
                         <Button x:Name="BnSaveChanges" IsEnabled="False" Content="Save changes"     Click="BnSaveChanges_Click"/>
-                        <Label x:Name="LbProcessStatus"   Margin="5,20,5,5" HorizontalAlignment="Center"/>
+                        <Label x:Name="LbProcessStatus"   Margin="5,20,5,5" HorizontalAlignment="Center" />
                         <Label x:Name="ggyg"   Margin="5,20,5,5" HorizontalAlignment="Center"/>
                     </StackPanel>
 
@@ -177,6 +177,19 @@
                                         <TextBlock x:Name="Key" Text="{Binding Key}"/>
                                         <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding TbValueVisibility}"  BorderThickness="{Binding TbNewValueBorder}"/>
                                         <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding TbExistingValueVisibility}" BorderThickness="{Binding TbExistingValueBorder}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <ListView x:Name="LvDownLoadedConnectionSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" Height="100" >
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding RbNewValueVisibility}"/>
+                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding RbExistingValueVisibility}"/>
+                                        <TextBlock x:Name="Name" Text="{Binding Name}" />
+                                        <TextBox x:Name="ConnectionString" Text="{Binding ConnectionString}"/>
+                                        <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>

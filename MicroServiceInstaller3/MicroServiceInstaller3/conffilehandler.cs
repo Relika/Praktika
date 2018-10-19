@@ -24,7 +24,7 @@ namespace MicroServiceInstaller3
             return string.Empty;
         }
 
-        public static ObservableCollection<AppSettingsConfig> FindConfSettings(string fileSystemEntry)
+        public static ObservableCollection<AppSettingsConfig> FindAppSettings(string fileSystemEntry)
         {
             ObservableCollection<AppSettingsConfig> appSettingsCollection = new ObservableCollection<AppSettingsConfig>();
 
@@ -102,7 +102,7 @@ namespace MicroServiceInstaller3
             return null;
         }
 
-        public static Dictionary<string, AppSettingsConfig> ReadModifiedConfSettings( ObservableCollection<AppSettingsConfig> modifiedAppSettings)
+        public static Dictionary<string, AppSettingsConfig> ReadModifiedAppSettings( ObservableCollection<AppSettingsConfig> modifiedAppSettings)
         {
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = new Dictionary<string, AppSettingsConfig>();
             foreach (var item in modifiedAppSettings)
@@ -135,7 +135,7 @@ namespace MicroServiceInstaller3
                 if (conf.RbExistingValueVisibility == Visibility.Hidden)
                 {
                     //AddKeyToConfFile(appsettings, elements, doc, conf);
-                    AddSettingtoConFile(doc, appsettings, conf);
+                    AddNewAppSettingtoConFile(doc, appsettings, conf);
                 }
                 else
                 {
@@ -152,7 +152,7 @@ namespace MicroServiceInstaller3
             doc.Save(appConfigPath);
         }
 
-        private static void AddSettingtoConFile(XDocument doc, KeyValuePair<string, AppSettingsConfig> appsettings, AppSettingsConfig conf)
+        private static void AddNewAppSettingtoConFile(XDocument doc, KeyValuePair<string, AppSettingsConfig> appsettings, AppSettingsConfig conf)
         {
             XElement xmlAddElement = new XElement("add");
             XAttribute configValueAttribute = new XAttribute("value", conf.NewValue.ToString());
@@ -178,6 +178,63 @@ namespace MicroServiceInstaller3
                     ConnectionStringsCollection.Add(connectionStrings);
                 }
             return ConnectionStringsCollection;
+        }
+
+        public static  Dictionary<string, ConnectionStrings> CreateConnectionStringsDicitionary(ObservableCollection<ConnectionStrings> connectionStringsCollection)
+        {
+            Dictionary<string, ConnectionStrings> connectionStringsDictionary = new Dictionary<string, ConnectionStrings>();
+            foreach (var connectionString in connectionStringsCollection)
+            {
+                string name = connectionString.Name;
+                connectionStringsDictionary.Add(name, connectionString);
+            }
+            return connectionStringsDictionary;
+        }
+
+        public static void WriteConnectionStringstoConFile(string appConfigPath, ObservableCollection<ConnectionStrings> connectionStringsDicitionary)
+        {
+            try
+            {
+                var doc = XDocument.Load(appConfigPath);
+                var elements = doc.Descendants("connectionStrings").Elements();
+                foreach (var connectionstring in connectionStringsDicitionary)
+                {
+                    //string key = connectionstring.Name;
+                    //ConnectionStrings conf = connectionstring.Value;
+                    //if (conf.RbExistingValue == true)
+                    //{
+                    //    foreach (var item in elements)
+                    //    {
+                    //        if (connectionstring.Key == (string)item.Attribute("key"))
+                    //        {
+                    //            item.Attribute("value").Value = conf.ExistingValue;
+                    //            break;
+                    //        }
+                    //    }
+                    //}
+                    //if (conf.RbExistingValueVisibility == Visibility.Hidden)
+                    //{
+                    //    //AddKeyToConfFile(appsettings, elements, doc, conf);
+                    //    AddNewAppSettingtoConFile(doc, appsettings, conf);
+                    //}
+                    //else
+                    //{
+                    foreach (var item in elements)
+                    {
+                        if (connectionstring.Name == (string)item.Attribute("name"))
+                        {
+                            item.Attribute("connectionString").Value = connectionstring.ConnectionString;
+                            break;
+                        }
+                    }
+                    //}
+                }
+                doc.Save(appConfigPath);
+            }
+            catch
+            {
+
+            }
         }
     }
 }

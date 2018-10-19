@@ -9,6 +9,8 @@ using System.Transactions;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using MicroServiceInstaller3.Poco;
+using System.Xml.Linq;
+using System.Collections;
 
 namespace MicroServiceInstaller3
 {
@@ -52,27 +54,40 @@ namespace MicroServiceInstaller3
                 //FShandler.CopyAll(selectedPath, workFilesFolderPath);
                 FShandler.DirectoryCopy(selectedPath, workFilesFolderPath, copySubDirs: true);
                 IEnumerable<string> unFilteredFileList = CreateUnFilteredFileList(workFilesFolderPath);
+                //string value = 
                 FilterFileList(unFilteredFileList);
+                //if (value != null)
+                //{
+                    
+                //}
                 FShandler.CreateMetaDataFile(selectedPath, workFilesFolderPath);
             }
         }
 
-        private void FilterFileList(IEnumerable<string> unFilteredFileList)
+        public void FilterFileList(IEnumerable<string> unFilteredFileList)
         {
-            foreach (var value in unFilteredFileList) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
+            foreach (var file in unFilteredFileList) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
             {
-                if (!File.Exists(value)) continue; // kui fail eksisteerib, j'tkab
-
-                bool endsIn = (value.EndsWith(".pdb") || value.Contains("/deps/") || value.Contains(".vshost.")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
-                if (endsIn)
+                if (!File.Exists(file))
                 {
-                    File.Delete(value); // kustutab faili
+                    continue; // kui fail eksisteerib, j'tkab
                 }
-                if (!endsIn)
+                else
                 {
-                    ListFiles.Items.Add($"{value}");
+                    bool endsIn = (file.EndsWith(".pdb") || file.Contains("/deps/") || file.Contains(".vshost.")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
+                    if (endsIn)
+                    {
+                        File.Delete(file);
+                        //return null;// kustutab faili
+                    }
+                    else
+                    {
+                        ListFiles.Items.Add($"{file}");
+                        //return file;                   
+                    }
                 }
             }
+            //return null;
         }
 
         private IEnumerable<string> CreateUnFilteredFileList(string temporaryFolder)
@@ -87,8 +102,9 @@ namespace MicroServiceInstaller3
 
         private void ListFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            
             if (ListFiles.SelectedIndex >= 0)
-            {
+            {               
                 BnConfig.IsEnabled = true;
                 LbTemporary.Content = ListFiles.SelectedItem.ToString() ;
             }
@@ -100,24 +116,18 @@ namespace MicroServiceInstaller3
 
         private void BnConfig_Click(object sender, RoutedEventArgs e)
         {
+            LbProcessStatus.Content = "";
             string confFilePath = LbTemporary.Content.ToString();
             try
             {
-                ObservableCollection<AppSettingsConfig> appsettingsCollection = ConfFileHandler.FindConfSettings(confFilePath);
+                ObservableCollection<AppSettingsConfig> appsettingsCollection = ConfFileHandler.FindAppSettings(confFilePath);
                 LvUploadedConfigSettings.ItemsSource = appsettingsCollection;
-            }
-            catch (Exception error)
-            {
-                LbStatus.Content = "This file does not consist appsettings, please select another file" + error.Message;
-            }
-            try
-            {
                 ObservableCollection<ConnectionStrings> ConnectionStringsCollection = ConfFileHandler.FindConnectionsStrings(confFilePath);
                 LvUploadedConnectionSettings.ItemsSource = ConnectionStringsCollection;
             }
             catch (Exception error)
             {
-                LbProcessStatus.Content = "This file does not consist connectionSettings, please select another file"  + error.Message;
+                LbProcessStatus.Content = "This file does not consist ConfSettings, please select another file"  + error.Message;
             }
             BnSaveChanges.IsEnabled = true;
         }
@@ -127,7 +137,7 @@ namespace MicroServiceInstaller3
             string appConfigPath = LbworkFilesFolder.Content.ToString();
             string selectedPath = LbTemporary.Content.ToString();         
             ObservableCollection<AppSettingsConfig> modifiedAppSettings = LvUploadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
-            Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.ReadModifiedConfSettings( modifiedAppSettings);
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.ReadModifiedAppSettings( modifiedAppSettings);
             //appConfigPath = appSettingsPath.Content.ToString();
             try
             {
@@ -138,37 +148,18 @@ namespace MicroServiceInstaller3
             {
                 LbProcessStatus.Content = error.Message;
             }
-            Dictionary<string, ConnectionStrings> connectionStringsDictionary = CreateConnectionStringsDicitionary(connectionStrings: LvUploadedConnectionSettings);
-            //WriteConnectionStringstoConFile(appConfigPath, connectionStringsDictionary);
-        }
-
-        private Dictionary<string, ConnectionStrings> CreateConnectionStringsDicitionary(System.Windows.Controls.ListView connectionStrings)
-        {
-            ObservableCollection<ConnectionStrings> connectionStringsCollection = connectionStrings.ItemsSource as ObservableCollection<ConnectionStrings>;
-            Dictionary<string, ConnectionStrings> connectionStringsDictionary = new Dictionary<string, ConnectionStrings>();
-            foreach (var connectionString in connectionStringsCollection)
+            ObservableCollection<ConnectionStrings> connectionStringsCollection = LvUploadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
+            //Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateConnectionStringsDicitionary(connectionStringsCollection);
+            try
             {
-                string name = connectionString.Name;
-                connectionStringsDictionary.Add(name, connectionString);
+                ConfFileHandler.WriteConnectionStringstoConFile(selectedPath, connectionStringsCollection);
+
             }
-            return connectionStringsDictionary;
+             catch (Exception error)          
+            {
+                LbProcessStatus.Content = error.Message;
+            }
         }
-        //private void WriteConnectionStringstoConFile(string appConfigPath, Dictionary<string, ConnectionStrings> connectionStringsDicitionary)
-        //{
-        //    try
-        //    {
-        //        var doc = XDocument.Load(appConfigPath);
-        //        var elements = doc.Descendants("connectionstrings").Elements();
-        //        foreach (var connectionstring in connectionStringsDicitionary)
-        //        {
-
-        //        }
-        //    }
-        //    catch
-        //    {
-
-        //    }
-        //}
 
         private void BnZip_Click(object sender, RoutedEventArgs e)
         {
@@ -201,6 +192,7 @@ namespace MicroServiceInstaller3
                 LbSelectedFolder.Content = ""; // eemaldab valitud algse kataloogi asukoha kirje.
                 LbappSettingsPath.Content = "";
                 LvUploadedConfigSettings.ItemsSource = "";
+                LvUploadedConnectionSettings.ItemsSource = "";
                 LbProcessStatus.Content = "";
 
                 if (ListZipFiles.HasItems)
@@ -304,6 +296,7 @@ namespace MicroServiceInstaller3
                 string temporaryFolder = LbTemporary.Content.ToString();
                 string[] folderIsEmpty = Directory.GetFiles(selectedPath);
                 ObservableCollection<AppSettingsConfig> appSettingsCollection = null;
+                ObservableCollection<ConnectionStrings> connectionStringsCollection = null;
                 if (folderIsEmpty.Length == 0)
                 {
                     //DirectoryInfo diSource = new DirectoryInfo(temporaryFolder);
@@ -313,15 +306,20 @@ namespace MicroServiceInstaller3
                     string confFilePath = ConfFileHandler.FindAppSettingsFile(selectedPath);
                     try
                     {
-                    appSettingsCollection = ConfFileHandler.FindConfSettings(confFilePath);
+                    appSettingsCollection = ConfFileHandler.FindAppSettings(confFilePath);
+                    connectionStringsCollection = ConfFileHandler.FindConnectionsStrings(confFilePath);
+
                     }
                     catch (Exception error)
                     {
                         LbDownloadedProcessStatus.Content = "This file does not consist appsettings, please select another file" + error.Message;
                     }
                     LvDownloadedConfigSettings.ItemsSource = appSettingsCollection;
+                    LvDownLoadedConnectionSettings.ItemsSource = connectionStringsCollection;
                     AddRadioButtons(appSettingsCollection);
+                    AddRadioButtons(connectionStringsCollection);
                     HideEmptyTextBox(appSettingsCollection);
+                  //  HideEmptyTextBox(connectionStringsCollection);
                     BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                 }
                 else
@@ -389,11 +387,13 @@ namespace MicroServiceInstaller3
             }
         }
 
-        private void AddRadioButtons(ObservableCollection<AppSettingsConfig> appSettings)
+        private void AddRadioButtons(IEnumerable appSettings)
         {
-            foreach (var item in appSettings)
+            foreach (var it in appSettings)
             {
-                if (!string.IsNullOrEmpty(item.ExistingValue))
+                //if(typeof(ConnectionStrings)== it.GetType()) niimoodi 'ra tee
+                Poco.SettingsBase item = it as Poco.SettingsBase;
+                if (!string.IsNullOrEmpty("test")) //
                 {
                     item.RbExistingValue = true;
                 }

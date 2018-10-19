@@ -72,9 +72,11 @@
     </ApplicationDefinition>
     <Compile Include="ConfFileHandler.cs" />
     <Compile Include="ConfFileHandlerTests.cs" />
+    <Compile Include="FileListHandler.cs" />
     <Compile Include="FShandlerTests.cs" />
     <Compile Include="Poco\AppSettingsConfig.cs" />
     <Compile Include="Poco\ConnectionStrings.cs" />
+    <Compile Include="Poco\SettingsBase.cs" />
     <Compile Include="Tests.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

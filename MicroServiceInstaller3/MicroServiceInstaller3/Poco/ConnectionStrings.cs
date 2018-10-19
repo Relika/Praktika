@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MicroServiceInstaller3.Poco
 {
-    public class ConnectionStrings
+    public class ConnectionStrings: SettingsBase
     {
         public string Name { get; set; }
         public string ConnectionString { get; set; }
