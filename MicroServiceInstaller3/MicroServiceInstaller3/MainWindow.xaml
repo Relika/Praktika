@@ -188,7 +188,8 @@
                                         <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding RbNewValueVisibility}"/>
                                         <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding RbExistingValueVisibility}"/>
                                         <TextBlock x:Name="Name" Text="{Binding Name}" />
-                                        <TextBox x:Name="ConnectionString" Text="{Binding ConnectionString}"/>
+                                        <TextBox x:Name="ConnectionString" Text="{Binding NewConnectionString}"/>
+                                        <TextBox x:Name="ExistingConnectionString" Text="{Binding ExistingConnectionString}"/>
                                         <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
                                     </StackPanel>
                                 </DataTemplate>

@@ -8,8 +8,7 @@ namespace MicroServiceInstaller3.Poco
         public string NewValue { get; set; }
         public string ExistingValue { get; set; }
 
-        public Visibility TbValueVisibility { get; set; }
-        public Visibility TbExistingValueVisibility { get; set; }
+
 
         //public Thickness TbNewValueBorder { get; set; }
         //public Thickness TbExistigValueBorder { get; set; }

@@ -36,6 +36,14 @@ namespace MicroServiceInstaller3
             ObservableCollection<Poco.AppSettingsConfig> comparedAppSettingsCollection = ConfFileHandler.CompareAppSettings(existingfFilePath, downloadedFilePath);
             Assert.IsNotNull(comparedAppSettingsCollection);
         }
+        [TestMethod]
+        public void CompareConnectionStrings()
+        {
+            string existingfFilePath = "C:/Users/User/Downloads/Test56/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string downloadedFilePath = "C:/Users/User/Downloads/Test100/Enics.WiseToSapIntegration.Shipper.exe.config";
+            ObservableCollection<Poco.ConnectionStrings> comparedConnectionStringCollection = ConfFileHandler.CompareConnectionStrings(existingfFilePath, downloadedFilePath);
+            Assert.IsNotNull(comparedConnectionStringCollection);
+        }
 
     }
 }

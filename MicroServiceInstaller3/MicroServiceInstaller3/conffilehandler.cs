@@ -36,6 +36,7 @@ namespace MicroServiceInstaller3
                     AppSettingsConfig appSetting = new AppSettingsConfig();
                     appSetting.Key = (string)item.Attribute("key");
                     appSetting.NewValue = (string)item.Attribute("value"); // muutsin newvalue-> value
+                    appSetting.IsValueNew = true;
                     appSettingsCollection.Add(appSetting);
                 }
             return appSettingsCollection;
@@ -46,14 +47,23 @@ namespace MicroServiceInstaller3
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = new ObservableCollection<AppSettingsConfig>();
 
                 HashSet<string> KeySet = new HashSet<string>();
-                FindKeys(existingFileSystemEntry, KeySet);
-                FindKeys(downloadedFileSystemEntry, KeySet);
+                FindAppsettingKeys(existingFileSystemEntry, KeySet);
+                FindAppsettingKeys(downloadedFileSystemEntry, KeySet);
                 foreach (var key in KeySet)
                 {
                     AppSettingsConfig appSetting = new AppSettingsConfig();
                     appSetting.Key = key;
-                    string downloadedAppSettingValue = FindValue(downloadedFileSystemEntry, key);
-                    string existingAppSettingValue = FindValue(existingFileSystemEntry, key);
+                    string downloadedAppSettingValue = FindAppsettingValue(downloadedFileSystemEntry, key);
+                    if (!string.IsNullOrEmpty(downloadedAppSettingValue))
+                    {
+                        appSetting.IsValueNew = true;
+                        
+                    }
+                    string existingAppSettingValue = FindAppsettingValue(existingFileSystemEntry, key);
+                    if (!string.IsNullOrEmpty(existingAppSettingValue))
+                    {
+                        appSetting.IsValueExist = true;
+                    }
                     appSetting.NewValue = downloadedAppSettingValue;
                     appSetting.ExistingValue = existingAppSettingValue;
                     comparedAppSettingsCollection.Add(appSetting);
@@ -74,7 +84,7 @@ namespace MicroServiceInstaller3
             return newAppSettingsDictionary;
         }
 
-        private static void FindKeys(string fileSystemEntry, HashSet<string> KeySet)
+        private static void FindAppsettingKeys(string fileSystemEntry, HashSet<string> KeySet)
         {
             var doc = XDocument.Load(fileSystemEntry);
             var elements = doc.Descendants("appSettings").Elements();
@@ -84,7 +94,7 @@ namespace MicroServiceInstaller3
             }
         }
 
-        private static string FindValue(string confFilePath, string key)
+        private static string FindAppsettingValue(string confFilePath, string key)
         {
             var doc = XDocument.Load(confFilePath);
             var elements = doc.Descendants("appSettings").Elements();
@@ -173,8 +183,9 @@ namespace MicroServiceInstaller3
                 {
                     ConnectionStrings connectionStrings = new ConnectionStrings();
                     connectionStrings.Name = (string)element.Attribute("name");
-                    connectionStrings.ConnectionString = (string)element.Attribute("connectionString");
+                    connectionStrings.NewConnectionString = (string)element.Attribute("connectionString");
                     connectionStrings.ProviderName = (string)element.Attribute("providerName");
+                    connectionStrings.IsValueNew = true;
                     ConnectionStringsCollection.Add(connectionStrings);
                 }
             return ConnectionStringsCollection;
@@ -189,6 +200,75 @@ namespace MicroServiceInstaller3
                 connectionStringsDictionary.Add(name, connectionString);
             }
             return connectionStringsDictionary;
+        }
+
+        public static ObservableCollection<ConnectionStrings> CompareConnectionStrings(string existingFileSystemEntry, string downloadedFileSystemEntry)
+        {
+            ObservableCollection<ConnectionStrings> comparedConnectionStringsCollection = new ObservableCollection<ConnectionStrings>();
+
+            HashSet<string> KeySet = new HashSet<string>();
+            FindConnectionStringsNames(existingFileSystemEntry, KeySet);
+            FindConnectionStringsNames(downloadedFileSystemEntry, KeySet);
+            foreach (var name in KeySet)
+            {
+                ConnectionStrings connectionStrings = new ConnectionStrings();
+                connectionStrings.Name = name;
+                string downloadedConnectionStringsValue = FindConnectionStringValue(downloadedFileSystemEntry, name);
+                if (!string.IsNullOrEmpty(downloadedConnectionStringsValue))
+                {
+                    connectionStrings.IsValueNew = true;
+
+                }
+                string existingConnectionStringValue = FindConnectionStringValue(existingFileSystemEntry, name);
+                if (!string.IsNullOrEmpty(existingConnectionStringValue))
+                {
+                    connectionStrings.IsValueExist = true;
+                }
+                connectionStrings.NewConnectionString = downloadedConnectionStringsValue;
+                connectionStrings.ExistingConnectionString = existingConnectionStringValue;
+                comparedConnectionStringsCollection.Add(connectionStrings);
+            }
+
+            return comparedConnectionStringsCollection;
+
+        }
+
+        private static void FindConnectionStringsNames(string fileSystemEntry, HashSet<string> KeySet)
+        {
+            var doc = XDocument.Load(fileSystemEntry);
+            var elements = doc.Descendants("connectionStrings").Elements();
+            foreach (var item in elements)
+            {
+                KeySet.Add((string)item.Attribute("name"));
+            }
+        }
+
+        private static string FindConnectionStringValue(string confFilePath, string name)
+        {
+            var doc = XDocument.Load(confFilePath);
+            var elements = doc.Descendants("connectionStrings").Elements();
+            foreach (var item in elements)
+            {
+                if ((string)item.Attribute("name") == name)
+                {
+                    return (string)item.Attribute("connectionString");
+                }
+                else
+                {
+                }
+            }
+            return null;
+        }
+
+        public static Dictionary<string, ConnectionStrings> CreateComparedConnectionStringsDicitionary(ObservableCollection<ConnectionStrings> comparedConnectionStringsCollection)
+        {
+            Dictionary<string, AppSettingsConfig> newAppSettingsDictionary = new Dictionary<string, AppSettingsConfig>();
+            foreach (var appSetting in comparedAppSettingsCollection)
+            {
+                string key = appSetting.Key;
+                newAppSettingsDictionary.Add(key, appSetting);
+            }
+            return newAppSettingsDictionary;
         }
 
         public static void WriteConnectionStringstoConFile(string appConfigPath, ObservableCollection<ConnectionStrings> connectionStringsDicitionary)
@@ -223,7 +303,7 @@ namespace MicroServiceInstaller3
                     {
                         if (connectionstring.Name == (string)item.Attribute("name"))
                         {
-                            item.Attribute("connectionString").Value = connectionstring.ConnectionString;
+                            item.Attribute("connectionString").Value = connectionstring.NewConnectionString;
                             break;
                         }
                     }

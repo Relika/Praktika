@@ -318,8 +318,8 @@ namespace MicroServiceInstaller3
                     LvDownLoadedConnectionSettings.ItemsSource = connectionStringsCollection;
                     AddRadioButtons(appSettingsCollection);
                     AddRadioButtons(connectionStringsCollection);
-                    HideEmptyTextBox(appSettingsCollection);
-                  //  HideEmptyTextBox(connectionStringsCollection);
+                    HideEmptyValues(appSettingsCollection);
+                    HideEmptyValues(connectionStringsCollection);
                     BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                 }
                 else
@@ -329,21 +329,27 @@ namespace MicroServiceInstaller3
                     string existingConfFileName = System.IO.Path.GetFileName(path: existingConfFilePath);
                     string downloadedConfFileName = System.IO.Path.GetFileName(downloadedConfFilePath);
                     ObservableCollection < AppSettingsConfig > comparedAppSettingsCollection = null;
+                    ObservableCollection<ConnectionStrings> comparedConnectionStringCollection = null;
                     if (existingConfFileName == downloadedConfFileName)
                     {
                         LbDownloadedAppSettingsFilePath.Content = downloadedConfFilePath;
                         try
                         {
                             comparedAppSettingsCollection = ConfFileHandler.CompareAppSettings( existingConfFilePath, downloadedConfFilePath);
+                            comparedConnectionStringCollection = ConfFileHandler.CompareConnectionStrings(existingConfFilePath, downloadedConfFilePath);
+                            //compare connectionsStrings
                         }
                         catch (Exception error)
                         {
-                            LbStatus.Content = "This file dont consist appsettings" + error.Message; // see label on vale
+                            LbStatus.Content = "This file dont consist appsettings or connectinStrings" + error.Message; // see label on vale
                         }
                         LvDownloadedConfigSettings.ItemsSource = comparedAppSettingsCollection;
-                         AddRadioButtons(comparedAppSettingsCollection);
-                        HideEmptyTextBox(comparedAppSettingsCollection);
-                       // AddThickBorder(comparedAppSettingsCollection);
+                        LvDownLoadedConnectionSettings.ItemsSource = comparedConnectionStringCollection;
+                        AddRadioButtons(comparedAppSettingsCollection);
+                        AddRadioButtons(comparedConnectionStringCollection);
+                        HideEmptyValues(comparedAppSettingsCollection);
+                        HideEmptyValues(comparedConnectionStringCollection);
+                        // AddThickBorder(comparedAppSettingsCollection);
                         BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                     }
                     else
@@ -370,16 +376,17 @@ namespace MicroServiceInstaller3
         //    }
         //}
 
-        private void HideEmptyTextBox(ObservableCollection<AppSettingsConfig> appSettings)
+        private void HideEmptyValues(IEnumerable appSettings)
         {
-            foreach (var item in appSettings)
+            foreach (var it in appSettings)
             {
-                if (string.IsNullOrEmpty(item.ExistingValue))
+                Poco.SettingsBase item = it as Poco.SettingsBase;
+                if (!item.IsValueExist)
                 {
                     item.TbExistingValueVisibility = Visibility.Hidden;
                     item.RbExistingValueVisibility = Visibility.Hidden;
                 }
-                if (string.IsNullOrEmpty(item.NewValue))
+                if (!item.IsValueNew)
                 {
                     item.TbValueVisibility = Visibility.Hidden;
                     item.RbNewValueVisibility = Visibility.Hidden;
@@ -393,7 +400,8 @@ namespace MicroServiceInstaller3
             {
                 //if(typeof(ConnectionStrings)== it.GetType()) niimoodi 'ra tee
                 Poco.SettingsBase item = it as Poco.SettingsBase;
-                if (!string.IsNullOrEmpty("test")) //
+
+                if (item.IsValueExist) //
                 {
                     item.RbExistingValue = true;
                 }
@@ -410,6 +418,7 @@ namespace MicroServiceInstaller3
             string existingConfigFileDirectory = LbExistingAppSettingsFilePath.Content.ToString();
             string existingConfFilePath = System.IO.Path.Combine(existingConfigFileDirectory, System.IO.Path.GetFileName(downloadedConfigFilePath));
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
+            ObservableCollection<ConnectionStrings> comparedConnectinStringsCollection = LvDownLoadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
             try
             {
