@@ -95,7 +95,7 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock x:Name="Name" Text="{Binding Name}" />
-                                        <TextBox x:Name="ConnectionString" Text="{Binding ConnectionString}"/>
+                                        <TextBox x:Name="ConnectionString" Text="{Binding NewConnectionString}"/>
                                         <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
                                     </StackPanel>
                                 </DataTemplate>
@@ -195,19 +195,19 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <Label x:Name="LbDownloadedProcessStatus"   Margin="118,20,119,5" HorizontalAlignment="Center" RenderTransformOrigin="-66.4,4.162"/>
+                        
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="4">
                         <Button x:Name="BnConfigDownloadedAppSettings" IsEnabled="False" Content="Config settings"  Click="BnConfigDownloadedAppSettings_Click"  />
                         <Button x:Name="BnSaveDownloadedAppSettingsChanges" IsEnabled="False" Content="Save changes"  Click="BnSaveDownloadedAppSettingsChanges_Click"    />
-
+                        <Label x:Name="LbDownloadedProcessStatus"   HorizontalAlignment="Center" />
                     </StackPanel>
 
 
-                    <Label x:Name="LbTemporaryFolderZipFile" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
-                    <Label x:Name="LbTemporary" HorizontalAlignment="Left"  Margin="10,75,0,-105" Grid.Row="3" VerticalAlignment="Top" RenderTransformOrigin="0.2,7.9" Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
-                    <Label x:Name="LbTemporaryComparedConfFilePath" HorizontalAlignment="Left" Margin="10,75,0,-105" Grid.Row="3" VerticalAlignment="Top" RenderTransformOrigin="0.2,7.9" Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
+                    <Label x:Name="LbTemporaryFolderZipFile" Grid.Column="4" HorizontalAlignment="Left"  Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+                    <Label x:Name="LbTemporary" Grid.Row="3" HorizontalAlignment="Left"    VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
+                    <Label x:Name="LbTemporaryComparedConfFilePath" HorizontalAlignment="Left"  Grid.Row="3" VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
                 </Grid>
             </TabItem>
         </TabControl>

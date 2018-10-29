@@ -107,6 +107,7 @@ namespace MicroServiceInstaller3
             {               
                 BnConfig.IsEnabled = true;
                 LbTemporary.Content = ListFiles.SelectedItem.ToString() ;
+                LbProcessStatus.Content = "";
             }
             else
             {
@@ -149,10 +150,10 @@ namespace MicroServiceInstaller3
                 LbProcessStatus.Content = error.Message;
             }
             ObservableCollection<ConnectionStrings> connectionStringsCollection = LvUploadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
-            //Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateConnectionStringsDicitionary(connectionStringsCollection);
+            Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateConnectionStringsDicitionary(connectionStringsCollection);
             try
             {
-                ConfFileHandler.WriteConnectionStringstoConFile(selectedPath, connectionStringsCollection);
+                ConfFileHandler.WriteConnectionStringstoConFile(selectedPath, connectionStringsDic: connectionStringsDictionary);
 
             }
              catch (Exception error)          
@@ -201,11 +202,12 @@ namespace MicroServiceInstaller3
                 }
                 scope.Complete();
             }
+            BnZip.IsEnabled = false;
         }
 
         private void BnFinishandZip_Click(object sender, RoutedEventArgs e)
         {
-            BnZip.IsEnabled = false;
+
             using (var scope = new TransactionScope())
             {
                 string zipLocation = LbZipFilesFolder.Content.ToString();
@@ -420,10 +422,17 @@ namespace MicroServiceInstaller3
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
             ObservableCollection<ConnectionStrings> comparedConnectinStringsCollection = LvDownLoadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
+            Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectinStringsCollection);
             try
             {
                 ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
-                LbDownloadedProcessStatus.Content = "Changes saved ";             
+                ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
+
+                LbDownloadedProcessStatus.Content = "Changes saved ";
+                LvDownLoadedConnectionSettings.ItemsSource = "";
+                LvDownloadedConfigSettings.ItemsSource = "";
+                LbExistingAppSettingsFilePath.Content = "";
+                BnSaveDownloadedAppSettingsChanges.IsEnabled = false;
             }
             catch (Exception error)
             {
@@ -434,7 +443,10 @@ namespace MicroServiceInstaller3
         private void ListAppSettingsFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             LbDownloadedAppSettingsFilePath.Content = "";
-            LbDownloadedProcessStatus.Content = "";
+            //LbDownloadedProcessStatus.Content = "";
+            LvDownLoadedConnectionSettings.ItemsSource = "";
+            LvDownloadedConfigSettings.ItemsSource = "";
+            LbExistingAppSettingsFilePath.Content = "";
             if (ListAppSettingsFiles.SelectedIndex >= 0)
             {
                 BnConfigDownloadedAppSettings.IsEnabled = true;
@@ -443,6 +455,7 @@ namespace MicroServiceInstaller3
                 string filePath = System.IO.Path.GetDirectoryName(selectedFile);
                 LbTemporary.Content = filePath;
                 LbDownloadedAppSettingsFilePath.Content = filePath;
+                LbDownloadedProcessStatus.Content = filePath;
             }
             else
             {

@@ -162,7 +162,7 @@ namespace MicroServiceInstaller3
             doc.Save(appConfigPath);
         }
 
-        private static void AddNewAppSettingtoConFile(XDocument doc, KeyValuePair<string, AppSettingsConfig> appsettings, AppSettingsConfig conf)
+        public static void AddNewAppSettingtoConFile(XDocument doc, KeyValuePair<string, AppSettingsConfig> appsettings, AppSettingsConfig conf)
         {
             XElement xmlAddElement = new XElement("add");
             XAttribute configValueAttribute = new XAttribute("value", conf.NewValue.ToString());
@@ -262,52 +262,52 @@ namespace MicroServiceInstaller3
 
         public static Dictionary<string, ConnectionStrings> CreateComparedConnectionStringsDicitionary(ObservableCollection<ConnectionStrings> comparedConnectionStringsCollection)
         {
-            Dictionary<string, AppSettingsConfig> newAppSettingsDictionary = new Dictionary<string, AppSettingsConfig>();
-            foreach (var appSetting in comparedAppSettingsCollection)
+            Dictionary<string, ConnectionStrings> newAppSettingsDictionary = new Dictionary<string, ConnectionStrings>();
+            foreach (var connectionString in comparedConnectionStringsCollection)
             {
-                string key = appSetting.Key;
-                newAppSettingsDictionary.Add(key, appSetting);
+                string name = connectionString.Name;
+                newAppSettingsDictionary.Add(name, connectionString);
             }
             return newAppSettingsDictionary;
         }
 
-        public static void WriteConnectionStringstoConFile(string appConfigPath, ObservableCollection<ConnectionStrings> connectionStringsDicitionary)
+        public static void WriteConnectionStringstoConFile(string appConfigPath, Dictionary<string, ConnectionStrings> connectionStringsDic)
         {
             try
             {
                 var doc = XDocument.Load(appConfigPath);
                 var elements = doc.Descendants("connectionStrings").Elements();
-                foreach (var connectionstring in connectionStringsDicitionary)
+                foreach (var connectionString in connectionStringsDic)
                 {
-                    //string key = connectionstring.Name;
-                    //ConnectionStrings conf = connectionstring.Value;
-                    //if (conf.RbExistingValue == true)
-                    //{
-                    //    foreach (var item in elements)
-                    //    {
-                    //        if (connectionstring.Key == (string)item.Attribute("key"))
-                    //        {
-                    //            item.Attribute("value").Value = conf.ExistingValue;
-                    //            break;
-                    //        }
-                    //    }
-                    //}
-                    //if (conf.RbExistingValueVisibility == Visibility.Hidden)
-                    //{
-                    //    //AddKeyToConfFile(appsettings, elements, doc, conf);
-                    //    AddNewAppSettingtoConFile(doc, appsettings, conf);
-                    //}
-                    //else
-                    //{
-                    foreach (var item in elements)
+                    string key = connectionString.Key;
+                    ConnectionStrings conf = connectionString.Value;
+                    if (conf.RbExistingValue == true)
                     {
-                        if (connectionstring.Name == (string)item.Attribute("name"))
+                        foreach (var item in elements)
                         {
-                            item.Attribute("connectionString").Value = connectionstring.NewConnectionString;
-                            break;
+                            if (connectionString.Key == (string)item.Attribute("name"))
+                            {
+                                item.Attribute("connectionString").Value = conf.ExistingConnectionString;
+                                break;
+                            }
                         }
                     }
-                    //}
+                    if (conf.RbExistingValueVisibility == Visibility.Hidden)
+                    {
+                        //AddKeyToConfFile(appsettings, elements, doc, conf);
+                        AddNewConnectionStringtoConFile(doc, connectionString, conf);
+                    }
+                    else
+                    {
+                        foreach (var item in elements)
+                        {
+                            if (connectionString.Key == (string)item.Attribute("name"))
+                            {
+                                item.Attribute("connectionString").Value = conf.NewConnectionString;
+                                break;
+                            }
+                        }
+                    }
                 }
                 doc.Save(appConfigPath);
             }
@@ -315,6 +315,17 @@ namespace MicroServiceInstaller3
             {
 
             }
+        }
+
+        public static void AddNewConnectionStringtoConFile(XDocument doc, KeyValuePair<string, ConnectionStrings> connectionstrings, ConnectionStrings conf)
+        {
+            XElement xmlAddElement = new XElement("add");
+            XAttribute configValueAttribute = new XAttribute("connectionString", conf.NewConnectionString.ToString());
+            XAttribute configKeyAttribute = new XAttribute("name", connectionstrings.Key.ToString());
+            xmlAddElement.Add(configKeyAttribute);
+            xmlAddElement.Add(configValueAttribute);
+            XElement appSettingsElement = doc.Descendants("connectionStrings").First(); //.First()
+            appSettingsElement.Add(xmlAddElement);
         }
     }
 }
