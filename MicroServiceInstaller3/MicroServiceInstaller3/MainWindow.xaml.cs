@@ -429,10 +429,12 @@ namespace MicroServiceInstaller3
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
             Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectinStringsCollection);
             string serviceName = ConfFileHandler.GetServiceName(downloadedConfigFilePath);
-            Poco.ServiceInstaller.StopService(serviceName);
+            
+
 
             try
             {
+                Poco.ServiceInstaller.StopService(serviceName);
                 ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                 ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
 

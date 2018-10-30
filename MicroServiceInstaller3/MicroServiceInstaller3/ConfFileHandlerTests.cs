@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System.IO;
+using MicroServiceInstaller3.Poco;
 
 namespace MicroServiceInstaller3
 {
@@ -87,6 +88,29 @@ namespace MicroServiceInstaller3
             string serviceNameGet = JsonConvert.SerializeObject(serviceName);
 
             Assert.AreEqual(serviceNamestart, serviceNameGet);
+        }
+
+
+
+        [TestMethod]
+        public void TestInstallService()
+        {
+            string serviceName = "TestService";
+            string displayName = "TestService";
+            string fileName = "C:/Users/User/source/repos/Praktika/MicroServiceInstaller3/TestService/bin/Debug/TestService.exe";
+            Poco.ServiceInstaller.InstallAndStart(serviceName, displayName, fileName);
+        }
+
+        [TestMethod]
+        public void TestStopService()
+        {
+            string serviceName = "TestService";
+            Poco.ServiceInstaller.StopService(serviceName);
+            ServiceState serviceStatus= Poco.ServiceInstaller.GetServiceStatus(serviceName);
+            //string expectedValue = JsonConvert.SerializeObject("1");
+            //string actualValue = JsonConvert.SerializeObject(isServiceWorking);
+
+            Assert.AreEqual(ServiceState.Stopped, serviceStatus);
         }
 
 
