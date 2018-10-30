@@ -11,6 +11,8 @@ using System.Configuration;
 using MicroServiceInstaller3.Poco;
 using System.Xml.Linq;
 using System.Collections;
+using System.ServiceProcess;
+
 
 namespace MicroServiceInstaller3
 {
@@ -29,6 +31,7 @@ namespace MicroServiceInstaller3
 
         }
         string randomFileName = "";
+
 
         public static string ChooseFolder(FolderBrowserDialog folderBrowserDialog1, System.Windows.Controls.Label selectedFolderLabel, System.Windows.Controls.Button savebutton)
         {
@@ -272,6 +275,7 @@ namespace MicroServiceInstaller3
                 if (endsIn)
                 {
                     ListAppSettingsFiles.Items.Add($"{value}");
+                    TbGuide.Text = "Please select conffile from the list to config settings";
                     //ListFiles.Items.Add($"{value}");                  
                 }
             }
@@ -287,6 +291,7 @@ namespace MicroServiceInstaller3
 
         private void BnConfigDownloadedAppSettings_Click(object sender, RoutedEventArgs e)
         {
+            TbGuide.Text = "";
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
             folderBrowserDialog1.Description = "Select directory";
             DialogResult result = folderBrowserDialog1.ShowDialog();
@@ -418,11 +423,14 @@ namespace MicroServiceInstaller3
         {
             string downloadedConfigFilePath = LbDownloadedAppSettingsFilePath.Content.ToString();
             string existingConfigFileDirectory = LbExistingAppSettingsFilePath.Content.ToString();
-            string existingConfFilePath = System.IO.Path.Combine(existingConfigFileDirectory, System.IO.Path.GetFileName(downloadedConfigFilePath));
+            string existingConfFilePath = Path.Combine(existingConfigFileDirectory, Path.GetFileName(downloadedConfigFilePath));
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
             ObservableCollection<ConnectionStrings> comparedConnectinStringsCollection = LvDownLoadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
             Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectinStringsCollection);
+            string serviceName = ConfFileHandler.GetServiceName(downloadedConfigFilePath);
+            Poco.ServiceInstaller.StopService(serviceName);
+
             try
             {
                 ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
@@ -440,6 +448,8 @@ namespace MicroServiceInstaller3
             }
         }
 
+
+
         private void ListAppSettingsFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             LbDownloadedAppSettingsFilePath.Content = "";
@@ -452,10 +462,10 @@ namespace MicroServiceInstaller3
                 BnConfigDownloadedAppSettings.IsEnabled = true;
                 LbTemporary.Content = ListAppSettingsFiles.SelectedItem;
                 string selectedFile = LbTemporary.Content.ToString();
-                string filePath = System.IO.Path.GetDirectoryName(selectedFile);
+                string filePath = Path.GetDirectoryName(selectedFile);
                 LbTemporary.Content = filePath;
                 LbDownloadedAppSettingsFilePath.Content = filePath;
-                LbDownloadedProcessStatus.Content = filePath;
+                //LbDownloadedProcessStatus.Content = filePath;
             }
             else
             {
@@ -463,9 +473,22 @@ namespace MicroServiceInstaller3
             }
         }
 
+
+
+
         private void Tab_Drop(object sender, System.Windows.DragEventArgs e)
         {
 
+        }
+
+        private void BnCloseDownload_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
+
+        private void BnCloseUpload_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
         }
     }
 }

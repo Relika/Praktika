@@ -158,42 +158,6 @@ namespace MicroServiceInstaller3
         }
 
 
-        [TestMethod]
-        public void TestFindConnectionsStrings()
-        {
-            //ObservableCollection<ConnectionStrings> ConnectionStringsCollection = new ObservableCollection<ConnectionStrings>();
-            //try
-            //{
-                string fileSystemEntry = "C:\\Users\\User\\Downloads\\test67\\Enics.WiseToSapIntegration.Shipper.exe.config";
-                ObservableCollection<ConnectionStrings> connectionStringsCollection = ConfFileHandler.FindConnectionsStrings(fileSystemEntry);
 
-                //var doc = XDocument.Load(fileSystemEntry);
-                //var elements = doc.Descendants("connectionStrings").Elements();
-
-                //foreach (var element in elements)
-                //{
-                //    ConnectionStrings connectionStrings = new ConnectionStrings();
-                //    connectionStrings.Name = (string)element.Attribute("name");
-                //    connectionStrings.ConnectionString = (string)element.Attribute("connectionString");
-                //    connectionStrings.ProviderName = (string)element.Attribute("providerName");
-                //    ConnectionStringsCollection.Add(connectionStrings);
-                //}
-            //}
-            //catch (Exception error)
-            //{
-                //statusLabel.Content = error.Message;
-                //statusLabel.Content = "This file does not consist connectionSettings, please select another file";
-                Assert.IsNotNull(connectionStringsCollection);
-            //}
-            ////Assert
-            //return ConnectionStringsCollection;
-        }
-
-        // [TestMethod]
-
-        //public static Dictionary<string, MainWindow.ConnectionStrings> CreateConnectionStringsDicitionary()
-        //{
-
-        //}
     }
 }

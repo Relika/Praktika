@@ -327,5 +327,14 @@ namespace MicroServiceInstaller3
             XElement appSettingsElement = doc.Descendants("connectionStrings").First(); //.First()
             appSettingsElement.Add(xmlAddElement);
         }
+
+        public static string GetServiceName(string downloadedConfigFilePath)
+        {
+            string fileName = Path.GetFileName(downloadedConfigFilePath);
+            //string serviceName =
+            string[] substrings = fileName.Split('.');
+            string serviceName = substrings[1];
+            return serviceName;
+        }
     }
 }

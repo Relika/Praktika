@@ -52,7 +52,7 @@
     </Window.Resources>
     <Grid>
         <TabControl x:Name="Tab" >
-            <TabItem Header="Upload"  Selector.IsSelected="{Binding IsTabUploadSelected}" >
+            <TabItem Header="Upload"  Selector.IsSelected="{Binding IsTabUploadSelected}">
                 <Grid x:Name="grid">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -124,6 +124,7 @@
 
                     <StackPanel Grid.Row="3" Grid.Column="4">
                         <Button x:Name="BnFinishandZip" Content="Finish and Zip"   Click="BnFinishandZip_Click" IsEnabled="false" />
+                        <Button x:Name="BnCloseUpload" IsEnabled="True" Content="Close" Margin="5,60,5,5" Click="BnCloseUpload_Click"/>
                     </StackPanel>
 
                     <Label x:Name="LbselectedPath" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
@@ -164,6 +165,10 @@
                                 </GridView>
                             </ListView.View>
                         </ListView>
+                        <Label x:Name="LbGuide" Height="60" >
+                            <TextBlock x:Name="TbGuide" Background="GhostWhite" TextWrapping="Wrap" Height="50" Margin="0" Width="227"></TextBlock>
+                      
+                        </Label>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
                         <Label x:Name="LbDownloadedAppSettingsFilePath" FontWeight="Bold" Background="Yellow"  VerticalAlignment="Top" Visibility="Collapsed"/>
@@ -195,7 +200,6 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="4">
@@ -203,7 +207,9 @@
                         <Button x:Name="BnSaveDownloadedAppSettingsChanges" IsEnabled="False" Content="Save changes"  Click="BnSaveDownloadedAppSettingsChanges_Click"    />
                         <Label x:Name="LbDownloadedProcessStatus"   HorizontalAlignment="Center" />
                     </StackPanel>
-
+                    <StackPanel Grid.Row="2" Grid.Column="4">
+                        <Button x:Name="BnCloseDownload" IsEnabled="True" Content="Close" Margin="5,200,5,5" Click="BnCloseDownload_Click" />
+                    </StackPanel>
 
                     <Label x:Name="LbTemporaryFolderZipFile" Grid.Column="4" HorizontalAlignment="Left"  Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
                     <Label x:Name="LbTemporary" Grid.Row="3" HorizontalAlignment="Left"    VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>

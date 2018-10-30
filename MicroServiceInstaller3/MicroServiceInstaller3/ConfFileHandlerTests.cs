@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace MicroServiceInstaller3
 {
@@ -12,10 +14,12 @@ namespace MicroServiceInstaller3
     public class ConfFileHandlerTests
     {
 
+        [TestInitialize]
+
         [TestMethod]
         public void FindAppSettingsFile()
         {
-            string folderName = "C:/Users/User/Downloads/Test56";
+            string folderName = "C:/Users/User/Downloads/eye";
             string filePath = ConfFileHandler.FindAppSettingsFile(folderName);
             Assert.IsNotNull(filePath);
         }
@@ -23,7 +27,7 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void FindConfSettings()
         {
-            string filePath = "C:/Users/User/Downloads/Test56/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string filePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
             ObservableCollection<Poco.AppSettingsConfig> appSettingsCollection = ConfFileHandler.FindAppSettings(filePath);
             Assert.IsNotNull(appSettingsCollection);
         }
@@ -31,37 +35,61 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void CompareAppSettings ()
         {
-            string existingfFilePath = "C:/Users/User/Downloads/Test56/Enics.WiseToSapIntegration.Shipper.exe.config";
-            string downloadedFilePath = "C:/Users/User/Downloads/Test100/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string existingfFilePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string downloadedFilePath = "C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config";
             ObservableCollection<Poco.AppSettingsConfig> comparedAppSettingsCollection = ConfFileHandler.CompareAppSettings(existingfFilePath, downloadedFilePath);
             Assert.IsNotNull(comparedAppSettingsCollection);
         }
         [TestMethod]
-        public void CompareConnectionStrings()
+        public void CompareConnectionStringsAndWriteToFile()
         {
-            string existingfFilePath = "C:/Users/User/Downloads/Test56/Enics.WiseToSapIntegration.Shipper.exe.config";
-            string downloadedFilePath = "C:/Users/User/Downloads/Test100/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string existingfFilePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string downloadedFilePath = "C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config";
             ObservableCollection<Poco.ConnectionStrings> comparedConnectionStringCollection = ConfFileHandler.CompareConnectionStrings(existingfFilePath, downloadedFilePath);
-            Assert.IsNotNull(comparedConnectionStringCollection);
+            Dictionary<string, Poco.ConnectionStrings> comparedConnectionstringsDicitionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary (comparedConnectionStringCollection);
+            ConfFileHandler.WriteConnectionStringstoConFile(existingfFilePath, comparedConnectionstringsDicitionary);
+            // kontrollin, kas andmed on molemas failis samad
+            
+            ObservableCollection<Poco.ConnectionStrings> writedCollection = ConfFileHandler.FindConnectionsStrings(existingfFilePath);
+            ObservableCollection<Poco.ConnectionStrings> downloadedCollection = ConfFileHandler.FindConnectionsStrings(downloadedFilePath);
+
+            string serializedChainWrited = JsonConvert.SerializeObject(writedCollection);
+            string serializedChainDownloaded = JsonConvert.SerializeObject(downloadedCollection);
+
+            Assert.AreEqual(serializedChainWrited, serializedChainDownloaded);
         }
 
         [TestMethod]
-        public void CreateConnectionStringDicitonary()
+        public void CompareAppSettingsAndWriteToFile()
         {
-            string existingfFilePath = "C:/Users/User/Downloads/Test56/Enics.WiseToSapIntegration.Shipper.exe.config";
-            string downloadedFilePath = "C:/Users/User/Downloads/Test100/Enics.WiseToSapIntegration.Shipper.exe.config";
-            ObservableCollection<Poco.ConnectionStrings> comparedConnectionStringCollection = ConfFileHandler.CompareConnectionStrings(existingfFilePath, downloadedFilePath);
-            //teisendan collectioni dictionaryks
-            //kirjutan dicitionaryst andmed testfaili.
+            string existingfFilePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string downloadedFilePath = "C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config";
+            ObservableCollection<Poco.AppSettingsConfig> comparedAppSettingsCollection = ConfFileHandler.CompareAppSettings(existingfFilePath, downloadedFilePath);
+            Dictionary<string, Poco.AppSettingsConfig> comparedAppSettingsDicitionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
+            ConfFileHandler.WriteSettingsToConfFile(existingfFilePath, comparedAppSettingsDicitionary);
+            // kontrollin, kas andmed on molemas failis samad
+
+            ObservableCollection<Poco.AppSettingsConfig> writedCollection = ConfFileHandler.FindAppSettings(existingfFilePath);
+            ObservableCollection<Poco.AppSettingsConfig> downloadedCollection = ConfFileHandler.FindAppSettings(downloadedFilePath);
+
+            string serializedChainWrited = JsonConvert.SerializeObject(writedCollection);
+            string serializedChainDownloaded = JsonConvert.SerializeObject(downloadedCollection);
+
+            Assert.AreEqual(serializedChainWrited, serializedChainDownloaded);
         }
 
         [TestMethod]
-        public void WriteConnectionStringToConFile ()
+        public void TestGetServiceName()
         {
-            string appConfigPath = 
-            Dictionary< string, ConnectionStrings > connectionStringsDic = 
+            string fileName = Path.GetFileName("C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config");
+            string serviceName = ConfFileHandler.GetServiceName(fileName);
+            string serviceNamestart = JsonConvert.SerializeObject("WiseToSapIntegration");
+            string serviceNameGet = JsonConvert.SerializeObject(serviceName);
 
+            Assert.AreEqual(serviceNamestart, serviceNameGet);
         }
+
+
 
     }
 }
