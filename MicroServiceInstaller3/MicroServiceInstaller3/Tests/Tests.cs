@@ -3,14 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
 using System.Xml;
 using System.Xml.Linq;
-using System.IO.Compression;
-using System.Collections.ObjectModel;
-using MicroServiceInstaller3.Poco;
 
 namespace MicroServiceInstaller3
 {

@@ -9,9 +9,8 @@ using System.Transactions;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using MicroServiceInstaller3.Poco;
-using System.Xml.Linq;
 using System.Collections;
-using System.ServiceProcess;
+
 
 
 namespace MicroServiceInstaller3
@@ -356,7 +355,7 @@ namespace MicroServiceInstaller3
                         AddRadioButtons(comparedConnectionStringCollection);
                         HideEmptyValues(comparedAppSettingsCollection);
                         HideEmptyValues(comparedConnectionStringCollection);
-                        // AddThickBorder(comparedAppSettingsCollection);
+                        AddThickBorder(comparedAppSettingsCollection);
                         BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                     }
                     else
@@ -368,20 +367,24 @@ namespace MicroServiceInstaller3
             }
         }
 
-        //private void AddThickBorder(ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection)
-        //{
-        //    foreach (var item in comparedAppSettingsCollection)
-        //    {
-        //        if (item.RbExistingValue == true)
-        //        {
-        //            item.TbExistigValueBorder = new Thickness(3);
-        //        }
-        //        if (item.RbNewValue == true)
-        //        {
-        //            item.TbNewValueBorder = new Thickness(3);
-        //        }
-        //    }
-        //}
+        private void AddThickBorder(ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection)
+        {
+            //BorderThickness = new Thickness(3);
+            foreach (var it in comparedAppSettingsCollection)
+            {
+                AppSettingsConfig item = it as AppSettingsConfig;
+                if (item.RbExistingValue == true)
+                {
+                    item.TbExistigValueBorder = new Thickness(3.0);
+                    item.TbNewValueBorder = new Thickness(1.0);
+                }
+                if (item.RbNewValue == true)
+                {
+                    item.TbNewValueBorder = new Thickness(3.0);
+                    item.TbExistigValueBorder = new Thickness(1.0);
+                }
+            }
+        }
 
         private void HideEmptyValues(IEnumerable appSettings)
         {
@@ -434,11 +437,16 @@ namespace MicroServiceInstaller3
 
             try
             {
-                Poco.ServiceInstaller.StopService(serviceName);
+                ServiceState serviceStatusbefore = Poco.ServiceInstaller.GetServiceStatus(serviceName);
+                if (serviceStatusbefore == ServiceState.Running)
+                {
+                        Poco.ServiceInstaller.StopService(serviceName);
+                }              
                 ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                 ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-
-                LbDownloadedProcessStatus.Content = "Changes saved ";
+                Poco.ServiceInstaller.StartService(serviceName);
+                ServiceState serviceStatusafter = Poco.ServiceInstaller.GetServiceStatus(serviceName);
+                LbDownloadedProcessStatus.Content = "Changes saved "+serviceStatusafter;
                 LvDownLoadedConnectionSettings.ItemsSource = "";
                 LvDownloadedConfigSettings.ItemsSource = "";
                 LbExistingAppSettingsFilePath.Content = "";
@@ -449,8 +457,6 @@ namespace MicroServiceInstaller3
                 LbDownloadedProcessStatus.Content = error.Message;
             }
         }
-
-
 
         private void ListAppSettingsFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -475,9 +481,6 @@ namespace MicroServiceInstaller3
             }
         }
 
-
-
-
         private void Tab_Drop(object sender, System.Windows.DragEventArgs e)
         {
 
@@ -491,6 +494,27 @@ namespace MicroServiceInstaller3
         private void BnCloseUpload_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();
+        }
+
+        private void RbNewValue_Checked(object sender, RoutedEventArgs e)
+        {
+
+            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
+
+            foreach (var item in comparedAppSettingsCollection)
+            {
+                //AppSettingsConfig item = it as AppSettingsConfig;
+                if (true)
+                {
+                    item.TbNewValueBorder = new Thickness(3.0);
+                    item.TbExistigValueBorder = new Thickness(1.0);
+                }
+                if (false)
+                {
+                    item.TbNewValueBorder = new Thickness(1.0);
+                    item.TbExistigValueBorder = new Thickness(3.0);
+                }
+            }
         }
     }
 }

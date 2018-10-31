@@ -27,6 +27,7 @@
         <Style TargetType="ListView">
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Height" Value="200" />
+            <Setter Property="Margin" Value="3,3,3,3" />
         </Style>
         <Style TargetType="TabItem">
             <Setter Property="FontSize" Value="20" />
@@ -42,7 +43,7 @@
             <Setter Property="Margin" Value="5" />
             <Setter Property="Width" Value="180" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Background" Value="Red" />
+            <!--<Setter Property="Background" Value="Red" />-->
             <!--FontWeight="Bold" Margin="5"-->
         </Style>
         <Style TargetType="TextBox">
@@ -80,17 +81,17 @@
 
                     <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
                         <Label x:Name="LbappSettingsPath" FontWeight="Bold"  VerticalAlignment="Top"/>
-                        <ListView x:Name="LvUploadedConfigSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" >
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock x:Name="Key" Text="{Binding Key}" />
-                                        <TextBox x:Name="NewValue" Text="{Binding NewValue}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
+                        <ListView x:Name="LvUploadedConfigSettings"   Grid.Row="1" Grid.Column="0" >
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock x:Name="Key" Text="{Binding Key}" />
+                                    <TextBox x:Name="NewValue" Text="{Binding NewValue}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
                         </ListView>
-                        <ListView x:Name="LvUploadedConnectionSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" Height="100" >
+                        <ListView x:Name="LvUploadedConnectionSettings"   Grid.Row="1" Grid.Column="0" Height="100" >
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -166,27 +167,27 @@
                             </ListView.View>
                         </ListView>
                         <Label x:Name="LbGuide" Height="60" >
-                            <TextBlock x:Name="TbGuide" Background="GhostWhite" TextWrapping="Wrap" Height="50" Margin="0" Width="227"></TextBlock>
+                            <TextBlock x:Name="TbGuide"  TextWrapping="Wrap" Height="50" Margin="0" Width="227" FontWeight="Regular"/>
                       
                         </Label>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
-                        <Label x:Name="LbDownloadedAppSettingsFilePath" FontWeight="Bold" Background="Yellow"  VerticalAlignment="Top" Visibility="Collapsed"/>
+                        <Label x:Name="LbDownloadedAppSettingsFilePath" FontWeight="Bold"  VerticalAlignment="Top" Visibility="Collapsed"/>
                         <Label x:Name="LbExistingAppSettingsFilePath"  FontWeight="Bold"  VerticalAlignment="Top"/>
-                        <ListView x:Name="LvDownloadedConfigSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" >
+                        <ListView x:Name="LvDownloadedConfigSettings"   Grid.Row="1" Grid.Column="0" >
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding RbNewValueVisibility}"/>
+                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding RbNewValueVisibility}" Checked="RbNewValue_Checked"/>
                                         <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding RbExistingValueVisibility}"/>
                                         <TextBlock x:Name="Key" Text="{Binding Key}"/>
-                                        <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding TbValueVisibility}"  BorderThickness="{Binding TbNewValueBorder}"/>
-                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding TbExistingValueVisibility}" BorderThickness="{Binding TbExistingValueBorder}"/>
+                                        <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding TbValueVisibility}" BorderThickness="{Binding TbNewValueBorder}"/>
+                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding TbExistingValueVisibility}" BorderThickness="{Binding TbExistigValueBorder}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <ListView x:Name="LvDownLoadedConnectionSettings"   Grid.Row="1" Grid.Column="0"  Margin="3,3,3,3" Height="100" >
+                        <ListView x:Name="LvDownLoadedConnectionSettings"   Grid.Row="1" Grid.Column="0" Height="100" >
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">

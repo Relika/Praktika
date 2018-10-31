@@ -74,15 +74,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ConfFileHandler.cs" />
-    <Compile Include="ConfFileHandlerTests.cs" />
-    <Compile Include="FileListHandler.cs" />
-    <Compile Include="FShandlerTests.cs" />
+    <Compile Include="Handlers\ConfFileHandler.cs" />
+    <Compile Include="Tests\ConfFileHandlerTests.cs" />
+    <Compile Include="Tests\FShandlerTests.cs" />
     <Compile Include="Poco\AppSettingsConfig.cs" />
     <Compile Include="Poco\ConnectionStrings.cs" />
-    <Compile Include="Poco\ServiceInstaller.cs" />
+    <Compile Include="ServiceInstaller.cs" />
     <Compile Include="Poco\SettingsBase.cs" />
-    <Compile Include="Tests.cs" />
+    <Compile Include="Tests\Tests.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -91,7 +90,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="FShandler.cs" />
+    <Compile Include="Handlers\FShandler.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -124,5 +123,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

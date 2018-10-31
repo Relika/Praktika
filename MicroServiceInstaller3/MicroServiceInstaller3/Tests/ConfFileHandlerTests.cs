@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System.IO;
@@ -34,7 +30,7 @@ namespace MicroServiceInstaller3
         }
 
         [TestMethod]
-        public void CompareAppSettings ()
+        public void CompareAppSettings()
         {
             string existingfFilePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
             string downloadedFilePath = "C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config";
@@ -47,10 +43,10 @@ namespace MicroServiceInstaller3
             string existingfFilePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
             string downloadedFilePath = "C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config";
             ObservableCollection<Poco.ConnectionStrings> comparedConnectionStringCollection = ConfFileHandler.CompareConnectionStrings(existingfFilePath, downloadedFilePath);
-            Dictionary<string, Poco.ConnectionStrings> comparedConnectionstringsDicitionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary (comparedConnectionStringCollection);
+            Dictionary<string, Poco.ConnectionStrings> comparedConnectionstringsDicitionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectionStringCollection);
             ConfFileHandler.WriteConnectionStringstoConFile(existingfFilePath, comparedConnectionstringsDicitionary);
             // kontrollin, kas andmed on molemas failis samad
-            
+
             ObservableCollection<Poco.ConnectionStrings> writedCollection = ConfFileHandler.FindConnectionsStrings(existingfFilePath);
             ObservableCollection<Poco.ConnectionStrings> downloadedCollection = ConfFileHandler.FindConnectionsStrings(downloadedFilePath);
 
@@ -106,13 +102,21 @@ namespace MicroServiceInstaller3
         {
             string serviceName = "TestService";
             Poco.ServiceInstaller.StopService(serviceName);
-            ServiceState serviceStatus= Poco.ServiceInstaller.GetServiceStatus(serviceName);
+            ServiceState serviceStatus = Poco.ServiceInstaller.GetServiceStatus(serviceName);
             //string expectedValue = JsonConvert.SerializeObject("1");
             //string actualValue = JsonConvert.SerializeObject(isServiceWorking);
 
             Assert.AreEqual(ServiceState.Stopped, serviceStatus);
         }
+        [TestMethod]
+        public void TestStartService ()
+        {
+            string serviceName = "TestService";
+            Poco.ServiceInstaller.StartService(serviceName);
+            ServiceState serviceStatus = Poco.ServiceInstaller.GetServiceStatus(serviceName);
+            Assert.AreEqual(ServiceState.Running, serviceStatus);
 
+        }
 
 
     }
