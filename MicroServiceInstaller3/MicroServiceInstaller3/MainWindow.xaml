@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="Service Installer" Height="1000" Width="1000">
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="B2VConverter"/>
         <Style TargetType="Label">
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Content" Value="" />
@@ -178,11 +179,11 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding RbNewValueVisibility}" Checked="RbNewValue_Checked"/>
-                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding RbExistingValueVisibility}"/>
+                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding ElementName=Value, Path=Text, Converter={StaticResource B2VConverter}}" Checked="RbNewValue_Checked"/>
+                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding ElementName=ExistingValue, Path=Text, Converter={StaticResource B2VConverter}}"/>
                                         <TextBlock x:Name="Key" Text="{Binding Key}"/>
-                                        <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding TbValueVisibility}" BorderThickness="{Binding TbNewValueBorder}"/>
-                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding TbExistingValueVisibility}" BorderThickness="{Binding TbExistigValueBorder}"/>
+                                        <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding Path=Text, Converter={StaticResource B2VConverter}}" BorderThickness="{Binding TbNewValueBorder}"/>
+                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding Path=Text, Converter={StaticResource B2VConverter}}" BorderThickness="{Binding TbExistigValueBorder}"/>
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -191,11 +192,11 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding RbNewValueVisibility}"/>
-                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding RbExistingValueVisibility}"/>
+                                        <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding ElementName=ConnectionString, Path=Text, Converter={StaticResource B2VConverter}}" Checked="RbNewValue_Checked_1" />
+                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding ElementName=ExistingConnectionString, Path=Text, Converter={StaticResource B2VConverter}}"/>
                                         <TextBlock x:Name="Name" Text="{Binding Name}" />
-                                        <TextBox x:Name="ConnectionString" Text="{Binding NewConnectionString}"/>
-                                        <TextBox x:Name="ExistingConnectionString" Text="{Binding ExistingConnectionString}"/>
+                                        <TextBox x:Name="ConnectionString" Text="{Binding NewConnectionString}" Visibility="{Binding Path=Text, Converter={StaticResource B2VConverter}}" BorderThickness="{Binding TbNewValueBorder}"/>
+                                        <TextBox x:Name="ExistingConnectionString" Text="{Binding ExistingConnectionString}" Visibility="{Binding Path=Text, Converter={StaticResource B2VConverter} }" BorderThickness="{Binding TbExistigValueBorder}"/>
                                         <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
                                     </StackPanel>
                                 </DataTemplate>

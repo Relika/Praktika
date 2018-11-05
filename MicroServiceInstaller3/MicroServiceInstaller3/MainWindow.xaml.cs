@@ -322,10 +322,10 @@ namespace MicroServiceInstaller3
                     }
                     LvDownloadedConfigSettings.ItemsSource = appSettingsCollection;
                     LvDownLoadedConnectionSettings.ItemsSource = connectionStringsCollection;
-                    AddRadioButtons(appSettingsCollection);
-                    AddRadioButtons(connectionStringsCollection);
-                    HideEmptyValues(appSettingsCollection);
-                    HideEmptyValues(connectionStringsCollection);
+                    //AddRadioButtons(appSettingsCollection);
+                    //AddRadioButtons(connectionStringsCollection);
+                    //HideEmptyValues(appSettingsCollection);
+                    //HideEmptyValues(connectionStringsCollection);
                     BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                 }
                 else
@@ -351,11 +351,12 @@ namespace MicroServiceInstaller3
                         }
                         LvDownloadedConfigSettings.ItemsSource = comparedAppSettingsCollection;
                         LvDownLoadedConnectionSettings.ItemsSource = comparedConnectionStringCollection;
-                        AddRadioButtons(comparedAppSettingsCollection);
-                        AddRadioButtons(comparedConnectionStringCollection);
-                        HideEmptyValues(comparedAppSettingsCollection);
-                        HideEmptyValues(comparedConnectionStringCollection);
+                        //AddRadioButtons(comparedAppSettingsCollection);
+                        //AddRadioButtons(comparedConnectionStringCollection);
+                        //HideEmptyValues(comparedAppSettingsCollection);
+                        //HideEmptyValues(comparedConnectionStringCollection);
                         AddThickBorder(comparedAppSettingsCollection);
+                        AddThickBorder(comparedConnectionStringCollection);
                         BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                     }
                     else
@@ -367,12 +368,13 @@ namespace MicroServiceInstaller3
             }
         }
 
-        private void AddThickBorder(ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection)
+        private void AddThickBorder(IEnumerable appSettings)
         {
-            //BorderThickness = new Thickness(3);
-            foreach (var it in comparedAppSettingsCollection)
+            //BorderThickness = new Thickness(3);         
+            foreach (var it in appSettings)        
             {
-                AppSettingsConfig item = it as AppSettingsConfig;
+                Poco.SettingsBase item = it as Poco.SettingsBase;
+                //AppSettingsConfig item = it as AppSettingsConfig;
                 if (item.RbExistingValue == true)
                 {
                     item.TbExistigValueBorder = new Thickness(3.0);
@@ -386,41 +388,41 @@ namespace MicroServiceInstaller3
             }
         }
 
-        private void HideEmptyValues(IEnumerable appSettings)
-        {
-            foreach (var it in appSettings)
-            {
-                Poco.SettingsBase item = it as Poco.SettingsBase;
-                if (!item.IsValueExist)
-                {
-                    item.TbExistingValueVisibility = Visibility.Hidden;
-                    item.RbExistingValueVisibility = Visibility.Hidden;
-                }
-                if (!item.IsValueNew)
-                {
-                    item.TbValueVisibility = Visibility.Hidden;
-                    item.RbNewValueVisibility = Visibility.Hidden;
-                }
-            }
-        }
+        //private void HideEmptyValues(IEnumerable appSettings)
+        //{
+        //    foreach (var it in appSettings)
+        //    {
+        //        Poco.SettingsBase item = it as Poco.SettingsBase;
+        //        if (!item.IsValueExist)
+        //        {
+        //            //item.TbExistingValueVisibility = Visibility.Hidden;
+        //            item.RbExistingValueVisibility = Visibility.Hidden;
+        //        }
+        //        if (!item.IsValueNew)
+        //        {
+        //            //item.TbValueVisibility = Visibility.Hidden;
+        //            item.RbNewValueVisibility = Visibility.Hidden;
+        //        }
+        //    }
+        //}
 
-        private void AddRadioButtons(IEnumerable appSettings)
-        {
-            foreach (var it in appSettings)
-            {
-                //if(typeof(ConnectionStrings)== it.GetType()) niimoodi 'ra tee
-                Poco.SettingsBase item = it as Poco.SettingsBase;
+        //private void AddRadioButtons(IEnumerable appSettings)
+        //{
+        //    foreach (var it in appSettings)
+        //    {
+        //        //if(typeof(ConnectionStrings)== it.GetType()) niimoodi 'ra tee
+        //        Poco.SettingsBase item = it as Poco.SettingsBase;
 
-                if (item.IsValueExist) //
-                {
-                    item.RbExistingValue = true;
-                }
-                else
-                {
-                    item.RbNewValue = true;
-                }
-            }
-        }
+        //        if (item.IsValueExist) //
+        //        {
+        //            item.RbExistingValue = true;
+        //        }
+        //        else
+        //        {
+        //            item.RbNewValue = true;
+        //        }
+        //    }
+        //}
 
         private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
         {
@@ -504,12 +506,32 @@ namespace MicroServiceInstaller3
             foreach (var item in comparedAppSettingsCollection)
             {
                 //AppSettingsConfig item = it as AppSettingsConfig;
-                if (true)
+                if (item.RbNewValue == true)
                 {
                     item.TbNewValueBorder = new Thickness(3.0);
                     item.TbExistigValueBorder = new Thickness(1.0);
                 }
-                if (false)
+                else
+                {
+                    item.TbNewValueBorder = new Thickness(1.0);
+                    item.TbExistigValueBorder = new Thickness(3.0);
+                }
+            }
+        }
+
+        private void RbNewValue_Checked_1(object sender, RoutedEventArgs e)
+        {
+            ObservableCollection<ConnectionStrings> comparedConnectionStringsCollection = LvDownLoadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
+
+            foreach (var item in comparedConnectionStringsCollection)
+            {
+                //AppSettingsConfig item = it as AppSettingsConfig;
+                if (item.RbNewValue == true)
+                {
+                    item.TbNewValueBorder = new Thickness(3.0);
+                    item.TbExistigValueBorder = new Thickness(1.0);
+                }
+                else
                 {
                     item.TbNewValueBorder = new Thickness(1.0);
                     item.TbExistigValueBorder = new Thickness(3.0);

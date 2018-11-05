@@ -139,7 +139,7 @@ namespace MicroServiceInstaller3
                         }
                     }
                 }
-                if (conf.RbExistingValueVisibility == Visibility.Hidden)
+                if (conf.ExistingValue.Length == 0)
                 {
                     //AddKeyToConfFile(appsettings, elements, doc, conf);
                     AddNewAppSettingtoConFile(doc, appsettings, conf);
@@ -289,7 +289,7 @@ namespace MicroServiceInstaller3
                             }
                         }
                     }
-                    if (conf.RbExistingValueVisibility == Visibility.Hidden)
+                    if (conf.ExistingConnectionString =="")
                     {
                         //AddKeyToConfFile(appsettings, elements, doc, conf);
                         AddNewConnectionStringtoConFile(doc, connectionString, conf);
