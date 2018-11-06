@@ -351,8 +351,8 @@ namespace MicroServiceInstaller3
                         }
                         LvDownloadedConfigSettings.ItemsSource = comparedAppSettingsCollection;
                         LvDownLoadedConnectionSettings.ItemsSource = comparedConnectionStringCollection;
-                        //AddRadioButtons(comparedAppSettingsCollection);
-                        //AddRadioButtons(comparedConnectionStringCollection);
+                        AddRadioButtons(comparedAppSettingsCollection);
+                        AddRadioButtons(comparedConnectionStringCollection);
                         //HideEmptyValues(comparedAppSettingsCollection);
                         //HideEmptyValues(comparedConnectionStringCollection);
                         AddThickBorder(comparedAppSettingsCollection);
@@ -406,23 +406,23 @@ namespace MicroServiceInstaller3
         //    }
         //}
 
-        //private void AddRadioButtons(IEnumerable appSettings)
-        //{
-        //    foreach (var it in appSettings)
-        //    {
-        //        //if(typeof(ConnectionStrings)== it.GetType()) niimoodi 'ra tee
-        //        Poco.SettingsBase item = it as Poco.SettingsBase;
+        private void AddRadioButtons(IEnumerable appSettings)
+        {
+            foreach (var it in appSettings)
+            {
+                //if(typeof(ConnectionStrings)== it.GetType()) niimoodi 'ra tee
+                Poco.SettingsBase item = it as Poco.SettingsBase;
 
-        //        if (item.IsValueExist) //
-        //        {
-        //            item.RbExistingValue = true;
-        //        }
-        //        else
-        //        {
-        //            item.RbNewValue = true;
-        //        }
-        //    }
-        //}
+                if (item.IsValueExist) //
+                {
+                    item.RbExistingValue = true;
+                }
+                else
+                {
+                    item.RbNewValue = true;
+                }
+            }
+        }
 
         private void BnSaveDownloadedAppSettingsChanges_Click(object sender, RoutedEventArgs e)
         {
