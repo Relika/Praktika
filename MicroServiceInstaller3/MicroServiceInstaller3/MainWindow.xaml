@@ -10,8 +10,7 @@
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="B2VConverter"/>
         <c:StringNullOrEmptyToVisibilityConverter x:Key="S2VConverter"/>
-        <c:BorderThicknessConverter x:Key="ThicknessConverter"/>
-		<c:StringNullOrEmptyToChekedConverter x:Key="EmptyIsChecked"/>
+		<c:BorderThicknessConverter x:Key="ThicknessConverter"/>
 		<Style TargetType="Label">
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Content" Value="" />
@@ -183,7 +182,7 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-										<RadioButton x:Name="RbNewValue"  IsChecked="{Binding ElementName=ExistingValue, Path=Text, Converter={StaticResource EmptyIsChecked}}" Visibility="{Binding ElementName=Value, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
+										<RadioButton x:Name="RbNewValue"  IsChecked="{Binding RbNewValue}" Visibility="{Binding ElementName=Value, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
                                         <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding ElementName=ExistingValue, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
                                         <TextBlock x:Name="Key" Text="{Binding Key}"/>
                                         <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding NewValue, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbNewValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
@@ -196,11 +195,11 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-										<RadioButton x:Name="RbNewValue" IsChecked="{Binding ElementName=ExistingConnectionString, Path=Text, Converter={StaticResource EmptyIsChecked}}" Visibility="{Binding ElementName=ConnectionString, Path=IsVisible, Converter={StaticResource B2VConverter}}" />
+										<RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding ElementName=ConnectionString, Path=IsVisible, Converter={StaticResource B2VConverter}}" />
                                         <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding ElementName=ExistingConnectionString, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
                                         <TextBlock x:Name="Name" Text="{Binding Name}" />
                                         <TextBox x:Name="ConnectionString" Text="{Binding NewConnectionString}" Visibility="{Binding NewConnectionString, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbNewValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
-                                        <TextBox x:Name="ExistingConnectionString" Text="{Binding ExistingConnectionString}" Visibility="{Binding ExistingConnectionString, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbNewValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
+										<TextBox x:Name="ExistingConnectionString" Text="{Binding ExistingConnectionString}" Visibility="{Binding ExistingConnectionString, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbExistingValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
                                         <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
                                     </StackPanel>
                                 </DataTemplate>

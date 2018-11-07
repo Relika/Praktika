@@ -19,11 +19,11 @@ namespace MicroServiceInstaller3.Converters
 			//return (isCheked == true) ? return Thickness.Equals(3.0, 3.0): Thickness.Equals(1.0, 1.0);
 			if (isChecked == true)
 			{
-				return Thickness.Equals(3.0, 3.0);
+				return new Thickness(3.0);
 			}
 			else
 			{
-				return Thickness.Equals(1.0, 1.0);
+				return new Thickness(1.0);
 			}
 
 			//value.GetType().ToString();

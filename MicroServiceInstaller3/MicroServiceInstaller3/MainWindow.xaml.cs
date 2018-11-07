@@ -58,10 +58,6 @@ namespace MicroServiceInstaller3
                 IEnumerable<string> unFilteredFileList = CreateUnFilteredFileList(workFilesFolderPath);
                 //string value = 
                 FilterFileList(unFilteredFileList);
-                //if (value != null)
-                //{
-                    
-                //}
                 FShandler.CreateMetaDataFile(selectedPath, workFilesFolderPath);
             }
         }
@@ -215,13 +211,7 @@ namespace MicroServiceInstaller3
                 string zipLocation = LbZipFilesFolder.Content.ToString();
                 string finalZipPath = ConfigurationManager.AppSettings["finalZipDirectory"];
                 FShandler.MakeDirectory(finalZipPath);
-                //LbFinalZipFolder.Content = finalZipPath;
-
                 string finalZipFileName = System.IO.Path.Combine(finalZipPath, "final.zip");
-                //if (File.Exists(finalZipFileName))
-                //{
-                //    File.Delete(finalZipFileName);
-                //}
                 ZipFile.CreateFromDirectory(zipLocation, finalZipFileName);
                 string finalLocation = System.IO.Path.Combine(zipLocation, finalZipFileName);
 
@@ -322,11 +312,9 @@ namespace MicroServiceInstaller3
                     }
                     LvDownloadedConfigSettings.ItemsSource = appSettingsCollection;
                     LvDownLoadedConnectionSettings.ItemsSource = connectionStringsCollection;
-                    //AddRadioButtons(appSettingsCollection);
-                    //AddRadioButtons(connectionStringsCollection);
-                    //HideEmptyValues(appSettingsCollection);
-                    //HideEmptyValues(connectionStringsCollection);
-                    BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
+					AddRadioButtons(appSettingsCollection);
+					AddRadioButtons(connectionStringsCollection);
+					BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                 }
                 else
                 {
@@ -353,10 +341,6 @@ namespace MicroServiceInstaller3
                         LvDownLoadedConnectionSettings.ItemsSource = comparedConnectionStringCollection;
                         AddRadioButtons(comparedAppSettingsCollection);
                         AddRadioButtons(comparedConnectionStringCollection);
-                        //HideEmptyValues(comparedAppSettingsCollection);
-                        //HideEmptyValues(comparedConnectionStringCollection);
-                        AddThickBorder(comparedAppSettingsCollection);
-                        AddThickBorder(comparedConnectionStringCollection);
                         BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
                     }
                     else
@@ -367,44 +351,6 @@ namespace MicroServiceInstaller3
                 }
             }
         }
-
-        private void AddThickBorder(IEnumerable appSettings)
-        {
-            //BorderThickness = new Thickness(3);         
-            foreach (var it in appSettings)        
-            {
-                Poco.SettingsBase item = it as Poco.SettingsBase;
-                //AppSettingsConfig item = it as AppSettingsConfig;
-                if (item.RbExistingValue == true)
-                {
-                    item.TbExistigValueBorder = new Thickness(3.0);
-                    item.TbNewValueBorder = new Thickness(1.0);
-                }
-                if (item.RbNewValue == true)
-                {
-                    item.TbNewValueBorder = new Thickness(3.0);
-                    item.TbExistigValueBorder = new Thickness(1.0);
-                }
-            }
-        }
-
-        //private void HideEmptyValues(IEnumerable appSettings)
-        //{
-        //    foreach (var it in appSettings)
-        //    {
-        //        Poco.SettingsBase item = it as Poco.SettingsBase;
-        //        if (!item.IsValueExist)
-        //        {
-        //            //item.TbExistingValueVisibility = Visibility.Hidden;
-        //            item.RbExistingValueVisibility = Visibility.Hidden;
-        //        }
-        //        if (!item.IsValueNew)
-        //        {
-        //            //item.TbValueVisibility = Visibility.Hidden;
-        //            item.RbNewValueVisibility = Visibility.Hidden;
-        //        }
-        //    }
-        //}
 
         private void AddRadioButtons(IEnumerable appSettings)
         {
@@ -433,20 +379,25 @@ namespace MicroServiceInstaller3
             ObservableCollection<ConnectionStrings> comparedConnectinStringsCollection = LvDownLoadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
             Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectinStringsCollection);
-            string serviceName = ConfFileHandler.GetServiceName(downloadedConfigFilePath);
-            
-
-
+            string serviceName = ConfFileHandler.GetServiceName(downloadedConfigFilePath);          
             try
             {
                 ServiceState serviceStatusbefore = Poco.ServiceInstaller.GetServiceStatus(serviceName);
                 if (serviceStatusbefore == ServiceState.Running)
                 {
                         Poco.ServiceInstaller.StopService(serviceName);
-                }              
-                ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
-                ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                Poco.ServiceInstaller.StartService(serviceName);
+                        ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                        ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
+                        Poco.ServiceInstaller.StartService(serviceName);
+                }
+                else
+                {
+                    ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                    ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
+                    ServiceInstaller.InstallAndStart(serviceName, serviceName, downloadedConfigFilePath);
+                    Poco.ServiceInstaller.StartService(serviceName);
+                }
+
                 ServiceState serviceStatusafter = Poco.ServiceInstaller.GetServiceStatus(serviceName);
                 LbDownloadedProcessStatus.Content = "Changes saved "+serviceStatusafter;
                 LvDownLoadedConnectionSettings.ItemsSource = "";
@@ -463,7 +414,6 @@ namespace MicroServiceInstaller3
         private void ListAppSettingsFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             LbDownloadedAppSettingsFilePath.Content = "";
-            //LbDownloadedProcessStatus.Content = "";
             LvDownLoadedConnectionSettings.ItemsSource = "";
             LvDownloadedConfigSettings.ItemsSource = "";
             LbExistingAppSettingsFilePath.Content = "";
@@ -475,7 +425,6 @@ namespace MicroServiceInstaller3
                 string filePath = Path.GetDirectoryName(selectedFile);
                 LbTemporary.Content = filePath;
                 LbDownloadedAppSettingsFilePath.Content = selectedFile;
-                //LbDownloadedProcessStatus.Content = filePath;
             }
             else
             {
@@ -497,46 +446,5 @@ namespace MicroServiceInstaller3
         {
             System.Windows.Application.Current.Shutdown();
         }
-
-        //private void RbNewValue_Checked(object sender, RoutedEventArgs e)
-        //{
-
-        //    ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
-
-        //    foreach (var item in comparedAppSettingsCollection)
-        //    {
-        //        //AppSettingsConfig item = it as AppSettingsConfig;
-        //        if (item.RbNewValue == true)
-        //        {
-        //            item.TbNewValueBorder = new Thickness(3.0);
-        //            item.TbExistigValueBorder = new Thickness(1.0);
-        //        }
-        //        else
-        //        {
-        //            item.TbNewValueBorder = new Thickness(1.0);
-        //            item.TbExistigValueBorder = new Thickness(3.0);
-        //        }
-        //    }
-        //}
-
-        //private void RbNewValue_Checked_1(object sender, RoutedEventArgs e)
-        //{
-        //    ObservableCollection<ConnectionStrings> comparedConnectionStringsCollection = LvDownLoadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
-
-        //    foreach (var item in comparedConnectionStringsCollection)
-        //    {
-        //        //AppSettingsConfig item = it as AppSettingsConfig;
-        //        if (item.RbNewValue == true)
-        //        {
-        //            item.TbNewValueBorder = new Thickness(3.0);
-        //            item.TbExistigValueBorder = new Thickness(1.0);
-        //        }
-        //        else
-        //        {
-        //            item.TbNewValueBorder = new Thickness(1.0);
-        //            item.TbExistigValueBorder = new Thickness(3.0);
-        //        }
-        //    }
-        //}
     }
 }

@@ -128,6 +128,7 @@ namespace MicroServiceInstaller3
             {
                 string key = appsettings.Key;
                 AppSettingsConfig conf = appsettings.Value;
+                //Kui on  RbExisting value on true, siis otsib key ja kirjutab Existing v''rtuse faili
                 if (conf.RbExistingValue == true)
                 {
                     foreach (var item in elements)
@@ -139,11 +140,13 @@ namespace MicroServiceInstaller3
                         }
                     }
                 }
-                if (conf.ExistingValue.Length == 0)
+                //lisab uue juhul, kui existing elementi ei olnud
+                if (conf.RbNewValue == true && conf.ExistingValue == null) //parandasin 0 asemele null
                 {
                     //AddKeyToConfFile(appsettings, elements, doc, conf);
                     AddNewAppSettingtoConFile(doc, appsettings, conf);
                 }
+                //Kui on  RbNewValue value on true, siis kirjutab valitud v''rtuse faili
                 else
                 {
                     foreach (var item in elements)

@@ -76,7 +76,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\BorderThicknessConverter.cs" />
-    <Compile Include="Converters\StringNullOrEmptyToChekedConverter.cs" />
     <Compile Include="Converters\StringNullOrEmptyToVisibilityConverter.cs" />
     <Compile Include="Handlers\ConfFileHandler.cs" />
     <Compile Include="Tests\ConfFileHandlerTests.cs" />

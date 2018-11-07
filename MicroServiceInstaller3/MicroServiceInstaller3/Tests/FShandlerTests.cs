@@ -37,8 +37,8 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void DirectoryCopy()
         {
-            string sourceDirName = "C:\\Users\\User\\Downloads\\Test56";
-            string destDirName = "C:\\Users\\User\\Downloads\\Test100";
+            string sourceDirName = "C:\\Users\\IEUser\\Downloads\\ddd";
+            string destDirName = "C:\\Users\\IEUser\\Downloads\\sss";
             bool copySubDirs = true;
             FShandler.DirectoryCopy(sourceDirName, destDirName, copySubDirs);
             Assert.IsNotNull(destDirName);
@@ -47,8 +47,8 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void CreateMetaDataFile()
         {
-            string selectedPath = "C:\\Users\\User\\AppData\\Local\\Temp\\TestFiles";
-            string workFilesFolderPath = "C:\\Users\\User\\AppData\\Local\\Temp\\TestFiles";
+            string selectedPath = "C:\\Users\\IEUser\\AppData\\Local\\Temp\\TestFiles";
+            string workFilesFolderPath = "C:\\Users\\IEUser\\AppData\\Local\\Temp\\TestFiles";
             FShandler.CreateMetaDataFile(selectedPath, workFilesFolderPath);
             Assert.IsNotNull(workFilesFolderPath);
         }

@@ -16,7 +16,7 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void FindAppSettingsFile()
         {
-            string folderName = "C:/Users/User/Downloads/eye";
+            string folderName = "C:/Users/IEUser/Downloads/sss";
             string filePath = ConfFileHandler.FindAppSettingsFile(folderName);
             Assert.IsNotNull(filePath);
         }
@@ -24,7 +24,7 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void FindConfSettings()
         {
-            string filePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string filePath = "C:/Users/IEUser/Downloads/sss/Enics.WiseToSapIntegration.Shipper.exe.config";
             ObservableCollection<Poco.AppSettingsConfig> appSettingsCollection = ConfFileHandler.FindAppSettings(filePath);
             Assert.IsNotNull(appSettingsCollection);
         }
@@ -32,16 +32,16 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void CompareAppSettings()
         {
-            string existingfFilePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
-            string downloadedFilePath = "C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string existingfFilePath = "C:/Users/IEUser/Downloads/sss/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string downloadedFilePath = "C:/Users/IEUser/Downloads/ddd/Enics.WiseToSapIntegration.Shipper.exe.config";
             ObservableCollection<Poco.AppSettingsConfig> comparedAppSettingsCollection = ConfFileHandler.CompareAppSettings(existingfFilePath, downloadedFilePath);
             Assert.IsNotNull(comparedAppSettingsCollection);
         }
         [TestMethod]
         public void CompareConnectionStringsAndWriteToFile()
         {
-            string existingfFilePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
-            string downloadedFilePath = "C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string existingfFilePath = "C:/Users/IEUser/Downloads/sss/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string downloadedFilePath = "C:/Users/IEUser/Downloads/ddd/Enics.WiseToSapIntegration.Shipper.exe.config";
             ObservableCollection<Poco.ConnectionStrings> comparedConnectionStringCollection = ConfFileHandler.CompareConnectionStrings(existingfFilePath, downloadedFilePath);
             Dictionary<string, Poco.ConnectionStrings> comparedConnectionstringsDicitionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectionStringCollection);
             ConfFileHandler.WriteConnectionStringstoConFile(existingfFilePath, comparedConnectionstringsDicitionary);
@@ -59,8 +59,8 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void CompareAppSettingsAndWriteToFile()
         {
-            string existingfFilePath = "C:/Users/User/Downloads/eye/Enics.WiseToSapIntegration.Shipper.exe.config";
-            string downloadedFilePath = "C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string existingfFilePath = "C:/Users/IEUser/Downloads/sss/Enics.WiseToSapIntegration.Shipper.exe.config";
+            string downloadedFilePath = "C:/Users/IEUser/Downloads/ddd/Enics.WiseToSapIntegration.Shipper.exe.config";
             ObservableCollection<Poco.AppSettingsConfig> comparedAppSettingsCollection = ConfFileHandler.CompareAppSettings(existingfFilePath, downloadedFilePath);
             Dictionary<string, Poco.AppSettingsConfig> comparedAppSettingsDicitionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
             ConfFileHandler.WriteSettingsToConfFile(existingfFilePath, comparedAppSettingsDicitionary);
@@ -78,7 +78,7 @@ namespace MicroServiceInstaller3
         [TestMethod]
         public void TestGetServiceName()
         {
-            string fileName = Path.GetFileName("C:/Users/User/Downloads/dddd/Enics.WiseToSapIntegration.Shipper.exe.config");
+            string fileName = Path.GetFileName("C:/Users/IEUser/Downloads/ddd/Enics.WiseToSapIntegration.Shipper.exe.config");
             string serviceName = ConfFileHandler.GetServiceName(fileName);
             string serviceNamestart = JsonConvert.SerializeObject("WiseToSapIntegration");
             string serviceNameGet = JsonConvert.SerializeObject(serviceName);
@@ -93,7 +93,7 @@ namespace MicroServiceInstaller3
         {
             string serviceName = "TestService";
             string displayName = "TestService";
-            string fileName = "C:/Users/User/source/repos/Praktika/MicroServiceInstaller3/TestService/bin/Debug/TestService.exe";
+            string fileName = "C:/Users/IEUser/source/repos/Relika/Praktika/Praktika/MicroServiceInstaller3/TestService/bin/Debug/TestService.exe";
             Poco.ServiceInstaller.InstallAndStart(serviceName, displayName, fileName);
         }
 
