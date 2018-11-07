@@ -13,15 +13,26 @@ namespace MicroServiceInstaller3.Converters
 {
     public class BorderThicknessConverter : System.Windows.Markup.MarkupExtension, IValueConverter
     {
-        public object Convert(Boolean value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(Object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+			bool isChecked = (bool)value;
+			//return (isCheked == true) ? return Thickness.Equals(3.0, 3.0): Thickness.Equals(1.0, 1.0);
+			if (isChecked == true)
+			{
+				return Thickness.Equals(3.0, 3.0);
+			}
+			else
+			{
+				return Thickness.Equals(1.0, 1.0);
+			}
 
-            if (value == true) {
-                return Thickness.Equals(3.0, 3.0);
-            }
-            else {
-                return Thickness.Equals(1.0, 1.0);
-            }//(value as ToggleButton)
+			//value.GetType().ToString();
+   //         if (bool.TrueString(value as bool)) {
+   //             return Thickness.Equals(3.0, 3.0);
+   //         }
+   //         else {
+   //             return Thickness.Equals(1.0, 1.0);
+            //}//(value as ToggleButton)
             //    ? BorderThickness. : Visibility.Visible;
 
             //item.TbExistigValueBorder = new Thickness(3.0);
@@ -31,7 +42,7 @@ namespace MicroServiceInstaller3.Converters
             // ? Visibility.Hidden : Visibility.Visible;
         }
 
-        public object ConvertBack(Boolean value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object ConvertBack(Object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             return null;
         }

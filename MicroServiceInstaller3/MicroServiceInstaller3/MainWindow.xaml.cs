@@ -474,7 +474,7 @@ namespace MicroServiceInstaller3
                 string selectedFile = LbTemporary.Content.ToString();
                 string filePath = Path.GetDirectoryName(selectedFile);
                 LbTemporary.Content = filePath;
-                LbDownloadedAppSettingsFilePath.Content = filePath;
+                LbDownloadedAppSettingsFilePath.Content = selectedFile;
                 //LbDownloadedProcessStatus.Content = filePath;
             }
             else
@@ -498,45 +498,45 @@ namespace MicroServiceInstaller3
             System.Windows.Application.Current.Shutdown();
         }
 
-        private void RbNewValue_Checked(object sender, RoutedEventArgs e)
-        {
+        //private void RbNewValue_Checked(object sender, RoutedEventArgs e)
+        //{
 
-            ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
+        //    ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
 
-            foreach (var item in comparedAppSettingsCollection)
-            {
-                //AppSettingsConfig item = it as AppSettingsConfig;
-                if (item.RbNewValue == true)
-                {
-                    item.TbNewValueBorder = new Thickness(3.0);
-                    item.TbExistigValueBorder = new Thickness(1.0);
-                }
-                else
-                {
-                    item.TbNewValueBorder = new Thickness(1.0);
-                    item.TbExistigValueBorder = new Thickness(3.0);
-                }
-            }
-        }
+        //    foreach (var item in comparedAppSettingsCollection)
+        //    {
+        //        //AppSettingsConfig item = it as AppSettingsConfig;
+        //        if (item.RbNewValue == true)
+        //        {
+        //            item.TbNewValueBorder = new Thickness(3.0);
+        //            item.TbExistigValueBorder = new Thickness(1.0);
+        //        }
+        //        else
+        //        {
+        //            item.TbNewValueBorder = new Thickness(1.0);
+        //            item.TbExistigValueBorder = new Thickness(3.0);
+        //        }
+        //    }
+        //}
 
-        private void RbNewValue_Checked_1(object sender, RoutedEventArgs e)
-        {
-            ObservableCollection<ConnectionStrings> comparedConnectionStringsCollection = LvDownLoadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
+        //private void RbNewValue_Checked_1(object sender, RoutedEventArgs e)
+        //{
+        //    ObservableCollection<ConnectionStrings> comparedConnectionStringsCollection = LvDownLoadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
 
-            foreach (var item in comparedConnectionStringsCollection)
-            {
-                //AppSettingsConfig item = it as AppSettingsConfig;
-                if (item.RbNewValue == true)
-                {
-                    item.TbNewValueBorder = new Thickness(3.0);
-                    item.TbExistigValueBorder = new Thickness(1.0);
-                }
-                else
-                {
-                    item.TbNewValueBorder = new Thickness(1.0);
-                    item.TbExistigValueBorder = new Thickness(3.0);
-                }
-            }
-        }
+        //    foreach (var item in comparedConnectionStringsCollection)
+        //    {
+        //        //AppSettingsConfig item = it as AppSettingsConfig;
+        //        if (item.RbNewValue == true)
+        //        {
+        //            item.TbNewValueBorder = new Thickness(3.0);
+        //            item.TbExistigValueBorder = new Thickness(1.0);
+        //        }
+        //        else
+        //        {
+        //            item.TbNewValueBorder = new Thickness(1.0);
+        //            item.TbExistigValueBorder = new Thickness(3.0);
+        //        }
+        //    }
+        //}
     }
 }
