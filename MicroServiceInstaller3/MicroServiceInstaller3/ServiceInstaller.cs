@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MicroServiceInstaller3.Poco
+namespace MicroServiceInstaller3
 {
     public static class ServiceInstaller
     {

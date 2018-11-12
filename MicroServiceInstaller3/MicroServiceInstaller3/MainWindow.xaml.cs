@@ -8,8 +8,9 @@ using System.IO.Compression;
 using System.Transactions;
 using System.Collections.ObjectModel;
 using System.Configuration;
-using MicroServiceInstaller3.Poco;
 using System.Collections;
+using CommonLibary.Poco;
+using CommonLibary.Handlers;
 
 
 
@@ -359,7 +360,7 @@ namespace MicroServiceInstaller3
             foreach (var it in appSettings)
             {
                 //if(typeof(ConnectionStrings)== it.GetType()) niimoodi 'ra tee
-                Poco.SettingsBase item = it as Poco.SettingsBase;
+                CommonLibary.Poco.SettingsBase item = it as CommonLibary.Poco.SettingsBase;
 
                 if (item.IsValueExist) //
                 {
@@ -384,13 +385,13 @@ namespace MicroServiceInstaller3
             string serviceName = ConfFileHandler.GetServiceName(downloadedConfigFilePath);          
             try
             {
-                ServiceState serviceStatusbefore = Poco.ServiceInstaller.GetServiceStatus(serviceName);
+                ServiceState serviceStatusbefore = ServiceInstaller.GetServiceStatus(serviceName);
                 if (serviceStatusbefore == ServiceState.Running)
                 {
-                        Poco.ServiceInstaller.StopService(serviceName);
+                        ServiceInstaller.StopService(serviceName);
                         ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                         ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                        Poco.ServiceInstaller.StartService(serviceName);
+                        ServiceInstaller.StartService(serviceName);
                 }
                 if (serviceStatusbefore == ServiceState.NotFound)
                 {
@@ -403,10 +404,10 @@ namespace MicroServiceInstaller3
                 {
                     ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                     ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                    Poco.ServiceInstaller.StartService(serviceName);
+                    ServiceInstaller.StartService(serviceName);
                 }
 
-                ServiceState serviceStatusafter = Poco.ServiceInstaller.GetServiceStatus(serviceName);
+                ServiceState serviceStatusafter = ServiceInstaller.GetServiceStatus(serviceName);
                 LbDownloadedProcessStatus.Content = "Changes saved, service status: "+serviceStatusafter;
                 LvDownLoadedConnectionSettings.ItemsSource = "";
                 LvDownloadedConfigSettings.ItemsSource = "";

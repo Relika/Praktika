@@ -4,13 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MicroServiceInstaller3"
-        xmlns:c="clr-namespace:MicroServiceInstaller3.Converters"
+        xmlns:converters="clr-namespace:CommonLibary.Converters;assembly=CommonLibary"
         mc:Ignorable="d"
         Title="Service Installer" Height="1000" Width="1000">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="B2VConverter"/>
-        <c:StringNullOrEmptyToVisibilityConverter x:Key="S2VConverter"/>
-		<c:BorderThicknessConverter x:Key="ThicknessConverter"/>
+        <converters:StringNullOrEmptyToVisibilityConverter x:Key="S2VConverter"/>
+		<converters:BorderThicknessConverter x:Key="ThicknessConverter"/>
 		<Style TargetType="Label">
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Content" Value="" />
