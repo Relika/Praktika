@@ -1,4 +1,5 @@
 ﻿using MicroServiceInstaller3.Poco;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -115,7 +116,15 @@ namespace MicroServiceInstaller3
             foreach (var item in modifiedAppSettings)
             {
                 AppSettingsConfig appSetting = item as AppSettingsConfig;
+                try
+                {
                 appSettingsDictionary.Add(appSetting.Key, appSetting);
+                }
+                catch (Exception error)
+                {
+                    //return error;
+                }
+
             }
             return appSettingsDictionary;
         }
@@ -141,23 +150,43 @@ namespace MicroServiceInstaller3
                     }
                 }
                 //lisab uue juhul, kui existing elementi ei olnud
-                if (conf.RbNewValue == true && conf.ExistingValue == null) //parandasin 0 asemele null
+                else  //parandasin 0 asemele null
                 {
-                    //AddKeyToConfFile(appsettings, elements, doc, conf);
-                    AddNewAppSettingtoConFile(doc, appsettings, conf);
+                    if (conf.ExistingValue == null)
+                    {
+                        //AddKeyToConfFile(appsettings, elements, doc, conf);
+                        if (conf.IsValueNew)
+                        {
+                            foreach (var item in elements)
+                            {
+                                if (appsettings.Key == (string)item.Attribute("key"))
+                                {
+                                    item.Attribute("value").Value = conf.NewValue;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            AddNewAppSettingtoConFile(doc, appsettings, conf);
+                        }
+
+                    }
+                     else
+                    {
+                        foreach (var item in elements)
+                        {
+                            if (appsettings.Key == (string)item.Attribute("key"))
+                            {
+                                item.Attribute("value").Value = conf.NewValue;
+                                break;
+                            }
+                        }
+                    }                   
+
                 }
                 //Kui on  RbNewValue value on true, siis kirjutab valitud v''rtuse faili
-                else
-                {
-                    foreach (var item in elements)
-                    {
-                        if (appsettings.Key == (string)item.Attribute("key"))
-                        {
-                            item.Attribute("value").Value = conf.NewValue;
-                            break;
-                        }
-                    }
-                }
+
             }
             doc.Save(appConfigPath);
         }

@@ -31,7 +31,7 @@ namespace MicroServiceInstaller3
                 xmlWriter.WriteStartElement("appSettings");
 
                 xmlWriter.WriteStartElement("add");
-              //  xmlWriter.WriteAttributeString("key", "Wisesite");
+                xmlWriter.WriteAttributeString("key", "Wisesite");
                 xmlWriter.WriteAttributeString("value", "SE_30");
 
                 xmlWriter.WriteEndElement();

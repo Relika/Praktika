@@ -123,6 +123,8 @@ namespace MicroServiceInstaller3
                 LvUploadedConfigSettings.ItemsSource = appsettingsCollection;
                 ObservableCollection<ConnectionStrings> ConnectionStringsCollection = ConfFileHandler.FindConnectionsStrings(confFilePath);
                 LvUploadedConnectionSettings.ItemsSource = ConnectionStringsCollection;
+                //AddRadioButtons(appSettingsCollection);
+                //AddRadioButtons(connectionStringsCollection);
             }
             catch (Exception error)
             {
@@ -390,16 +392,22 @@ namespace MicroServiceInstaller3
                         ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
                         Poco.ServiceInstaller.StartService(serviceName);
                 }
-                else
+                if (serviceStatusbefore == ServiceState.NotFound)
                 {
                     ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                     ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
                     ServiceInstaller.InstallAndStart(serviceName, serviceName, downloadedConfigFilePath);
+                    //Poco.ServiceInstaller.StartService(serviceName);
+                }
+                else
+                {
+                    ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                    ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
                     Poco.ServiceInstaller.StartService(serviceName);
                 }
 
                 ServiceState serviceStatusafter = Poco.ServiceInstaller.GetServiceStatus(serviceName);
-                LbDownloadedProcessStatus.Content = "Changes saved "+serviceStatusafter;
+                LbDownloadedProcessStatus.Content = "Changes saved, service status: "+serviceStatusafter;
                 LvDownLoadedConnectionSettings.ItemsSource = "";
                 LvDownloadedConfigSettings.ItemsSource = "";
                 LbExistingAppSettingsFilePath.Content = "";
