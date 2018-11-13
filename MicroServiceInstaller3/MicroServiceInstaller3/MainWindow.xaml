@@ -6,12 +6,12 @@
         xmlns:local="clr-namespace:MicroServiceInstaller3"
         xmlns:converters="clr-namespace:CommonLibary.Converters;assembly=CommonLibary"
         mc:Ignorable="d"
-        Title="Service Installer" Height="1000" Width="1000">
+        Title="Service Installer Developer" Height="1000" Width="1000">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="B2VConverter"/>
         <converters:StringNullOrEmptyToVisibilityConverter x:Key="S2VConverter"/>
-		<converters:BorderThicknessConverter x:Key="ThicknessConverter"/>
-		<Style TargetType="Label">
+        <converters:BorderThicknessConverter x:Key="ThicknessConverter"/>
+        <Style TargetType="Label">
             <Setter Property="FontSize" Value="12" />
             <Setter Property="Content" Value="" />
             <Setter Property="Margin" Value="5" />
@@ -40,7 +40,7 @@
         </Style>
         <Style TargetType="RadioButton">
             <Setter Property="Margin" Value="5" />
-            
+
         </Style>
         <Style TargetType="TextBlock">
             <Setter Property="FontSize" Value="12" />
@@ -56,172 +56,93 @@
         </Style>
     </Window.Resources>
     <Grid>
-        <TabControl x:Name="Tab" >
-            <TabItem Header="Upload"  Selector.IsSelected="{Binding IsTabUploadSelected}">
-                <Grid x:Name="grid">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="148*" />
-                        <ColumnDefinition Width="15*"/>
-                        <ColumnDefinition Width="75*"/>
-                        <ColumnDefinition Width="501*"/>
-                        <ColumnDefinition Width="247*" />
-                    </Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="101*"/>
+            <ColumnDefinition Width="891*"/>
+        </Grid.ColumnDefinitions>
+        <!--<TabControl x:Name="Tab" SelectionChanged="Tab_SelectionChanged" >
+            <TabItem Header="Upload"  Selector.IsSelected="{Binding IsTabUploadSelected}">-->
+        <Grid x:Name="grid" Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="148*" />
+                <ColumnDefinition Width="15*"/>
+                <ColumnDefinition Width="75*"/>
+                <ColumnDefinition Width="501*"/>
+                <ColumnDefinition Width="247*" />
+            </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Row="0" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
-                        <Label x:Name="LbSelectedFolder" FontWeight="Bold" VerticalAlignment="Top"/>
-                        <ListBox x:Name="ListFiles"   Grid.Row="0" Grid.Column="0"   SelectionChanged="ListFiles_SelectionChanged" SelectionMode="Single">
-                        </ListBox>
-                    </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
+                <Label x:Name="LbSelectedFolder" FontWeight="Bold" VerticalAlignment="Top"/>
+                <ListBox x:Name="ListFiles"   Grid.Row="0" Grid.Column="0"   SelectionChanged="ListFiles_SelectionChanged" SelectionMode="Single">
+                </ListBox>
+            </StackPanel>
 
-                    <StackPanel Grid.Row="0" Grid.Column="4"  Background="GhostWhite">
-                        <Button x:Name="BSelectFolder" Content="Select folder"  Click="BSelectFolder_Click"/>
-                    </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="4"  Background="GhostWhite">
+                <Button x:Name="BSelectFolder" Content="Select folder"  Click="BSelectFolder_Click"/>
+            </StackPanel>
 
-                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
-                        <Label x:Name="LbappSettingsPath" FontWeight="Bold"  VerticalAlignment="Top"/>
-                        <ListView x:Name="LvUploadedConfigSettings"   Grid.Row="1" Grid.Column="0" >
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock x:Name="Key" Text="{Binding Key}" />
-                                    <TextBox x:Name="NewValue" Text="{Binding NewValue}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                        </ListView>
-                        <ListView x:Name="LvUploadedConnectionSettings"   Grid.Row="1" Grid.Column="0" Height="100" >
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock x:Name="Name" Text="{Binding Name}" />
-                                        <TextBox x:Name="ConnectionString" Text="{Binding NewConnectionString}"/>
-                                        <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
+                <Label x:Name="LbappSettingsPath" FontWeight="Bold"  VerticalAlignment="Top"/>
+                <ListView x:Name="LvUploadedConfigSettings"   Grid.Row="1" Grid.Column="0" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="Key" Text="{Binding Key}" />
+                                <TextBox x:Name="NewValue" Text="{Binding NewValue}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <ListView x:Name="LvUploadedConnectionSettings"   Grid.Row="1" Grid.Column="0" Height="100" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="Name" Text="{Binding Name}" />
+                                <TextBox x:Name="ConnectionString" Text="{Binding NewConnectionString}"/>
+                                <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
 
-                    <StackPanel Grid.Row="1" Grid.Column="4">
-                        <Button x:Name="BnConfig" IsEnabled="False" Content="Config settings"  Click="BnConfig_Click" />
-                        <Button x:Name="BnSaveChanges" IsEnabled="False" Content="Save changes"     Click="BnSaveChanges_Click"/>
-                        <Label x:Name="LbProcessStatus"   Margin="5,20,5,5" HorizontalAlignment="Center" />
-                        <Label x:Name="ggyg"   Margin="5,20,5,5" HorizontalAlignment="Center"/>
-                    </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="4">
+                <Button x:Name="BnConfig" IsEnabled="False" Content="Config settings"  Click="BnConfig_Click" />
+                <Button x:Name="BnSaveChanges" IsEnabled="False" Content="Save changes"     Click="BnSaveChanges_Click"/>
+                <Label x:Name="LbProcessStatus"   Margin="5,20,5,5" HorizontalAlignment="Center" />
+                <Label x:Name="ggyg"   Margin="5,20,5,5" HorizontalAlignment="Center"/>
+            </StackPanel>
 
-                    <StackPanel Grid.Row="2" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
-                        <ListBox x:Name="ListZipFiles"  Height="70"/>
-                    </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
+                <ListBox x:Name="ListZipFiles"  Height="70"/>
+            </StackPanel>
 
-                    <StackPanel Grid.Row="2" Grid.Column="4" Background="GhostWhite" >
-                        <Button x:Name="BnZip" IsEnabled="False" Content="Zip files"   Click="BnZip_Click"/>
-                    </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="4" Background="GhostWhite" >
+                <Button x:Name="BnZip" IsEnabled="False" Content="Zip files"   Click="BnZip_Click"/>
+            </StackPanel>
 
-                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
-                        <Label x:Name="LbStatus"   FontWeight="Bold" VerticalAlignment="Top" />
-                    </StackPanel>
+            <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4">
+                <Label x:Name="LbStatus"   FontWeight="Bold" VerticalAlignment="Top" />
+            </StackPanel>
 
-                    <StackPanel Grid.Row="3" Grid.Column="4">
-                        <Button x:Name="BnFinishandZip" Content="Finish and Zip"   Click="BnFinishandZip_Click" IsEnabled="false" />
-                        <Button x:Name="BnCloseUpload" IsEnabled="True" Content="Close" Margin="5,60,5,5" Click="BnCloseUpload_Click"/>
-                    </StackPanel>
+            <StackPanel Grid.Row="3" Grid.Column="4">
+                <Button x:Name="BnFinishandZip" Content="Finish and Zip"   Click="BnFinishandZip_Click" IsEnabled="false" />
+                <Button x:Name="BnCloseUpload" IsEnabled="True" Content="Close" Margin="5,60,5,5" Click="BnCloseUpload_Click"/>
+            </StackPanel>
 
-                    <Label x:Name="LbselectedPath" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
-                    <Label x:Name="LbselectedFileName" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
-                    <Label x:Name="LbworkFilesFolder" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
-                    <Label x:Name="LbZipFilesFolder" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
-                    <Label x:Name="LbFinalZipFolder" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Download" Selector.IsSelected="{Binding IsTabDownloadSelected}"  >
-                <Grid x:Name="downloadgrid">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="197*" />
-                        <ColumnDefinition Width="58*"/>
-                        <ColumnDefinition Width="390*"/>
-                        <ColumnDefinition Width="94*"/>
-                        <ColumnDefinition Width="247*" />
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Row="0" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
-                        <Label x:Name="LbSelectedZipFile" FontWeight="Bold" VerticalAlignment="Top"/>
-                        <ListBox x:Name="ListAppSettingsFiles"   Grid.Row="0" Grid.Column="0"   SelectionChanged="ListAppSettingsFiles_SelectionChanged" SelectionMode="Single">
-                        </ListBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="0" Grid.Column="4"  Background="GhostWhite">
-                        <Button x:Name="BSelectZipFile" Content="Select Zip file"  Click="BSelectZipFile_Click"/>
-                        <ListView x:Name="ListUnPackedZipFiles" Height="100" Width="100" Visibility="Hidden">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                        <Label x:Name="LbGuide" Height="60" >
-                            <TextBlock x:Name="TbGuide"  TextWrapping="Wrap" Height="50" Margin="0" Width="227" FontWeight="Regular"/>
-                      
-                        </Label>
-                    </StackPanel>
-                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
-                        <Label x:Name="LbDownloadedAppSettingsFilePath" FontWeight="Bold"  VerticalAlignment="Top" Visibility="Collapsed"/>
-                        <Label x:Name="LbExistingAppSettingsFilePath"  FontWeight="Bold"  VerticalAlignment="Top"/>
-                        <ListView x:Name="LvDownloadedConfigSettings"   Grid.Row="1" Grid.Column="0" >
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-										<RadioButton x:Name="RbNewValue"  IsChecked="{Binding RbNewValue}" Visibility="{Binding ElementName=Value, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
-                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding ElementName=ExistingValue, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
-                                        <TextBlock x:Name="Key" Text="{Binding Key}"/>
-                                        <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding NewValue, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbNewValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
-                                        <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding ExistingValue, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbExistingValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                        <ListView x:Name="LvDownLoadedConnectionSettings"   Grid.Row="1" Grid.Column="0" Height="100" >
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-										<RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding ElementName=ConnectionString, Path=IsVisible, Converter={StaticResource B2VConverter}}" />
-                                        <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding ElementName=ExistingConnectionString, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
-                                        <TextBlock x:Name="Name" Text="{Binding Name}" />
-                                        <TextBox x:Name="ConnectionString" Text="{Binding NewConnectionString}" Visibility="{Binding NewConnectionString, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbNewValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
-										<TextBox x:Name="ExistingConnectionString" Text="{Binding ExistingConnectionString}" Visibility="{Binding ExistingConnectionString, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbExistingValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
-                                        <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="1" Grid.Column="4">
-                        <Button x:Name="BnConfigDownloadedAppSettings" IsEnabled="False" Content="Config settings"  Click="BnConfigDownloadedAppSettings_Click"  />
-                        <Button x:Name="BnSaveDownloadedAppSettingsChanges" IsEnabled="False" Content="Save changes"  Click="BnSaveDownloadedAppSettingsChanges_Click"    />
-                        <Label x:Name="LbDownloadedProcessStatus"   HorizontalAlignment="Center" />
-                    </StackPanel>
-                    <StackPanel Grid.Row="2" Grid.Column="4">
-                        <Button x:Name="BnCloseDownload" IsEnabled="True" Content="Close" Margin="5,200,5,5" Click="BnCloseDownload_Click" />
-                    </StackPanel>
-
-                    <Label x:Name="LbTemporaryFolderZipFile" Grid.Column="4" HorizontalAlignment="Left"  Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
-                    <Label x:Name="LbTemporary" Grid.Row="3" HorizontalAlignment="Left"    VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
-                    <Label x:Name="LbTemporaryComparedConfFilePath" HorizontalAlignment="Left"  Grid.Row="3" VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
-                </Grid>
-            </TabItem>
-        </TabControl>
+            <Label x:Name="LbselectedPath" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+            <Label x:Name="LbselectedFileName" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+            <Label x:Name="LbworkFilesFolder" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+            <Label x:Name="LbZipFilesFolder" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+            <Label x:Name="LbFinalZipFolder" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+            <Label x:Name="LbTemporary" Grid.Row="3" HorizontalAlignment="Left"    VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
+        </Grid>
     </Grid>
 
 </Window>

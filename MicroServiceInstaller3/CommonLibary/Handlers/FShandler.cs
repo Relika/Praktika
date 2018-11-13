@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows.Forms;
 
 namespace CommonLibary.Handlers
 {
@@ -12,6 +13,17 @@ namespace CommonLibary.Handlers
         /// </summary>
         /// <param name="fullPath"></param>
         /// <returns></returns>
+        public static string ChooseFolder(FolderBrowserDialog folderBrowserDialog1, System.Windows.Controls.Label selectedFolderLabel, System.Windows.Controls.Button savebutton)
+        {
+            string selectedPath = folderBrowserDialog1.SelectedPath; // Loob muutuja, mis vastab valitud kaustale
+            selectedFolderLabel.Content = selectedPath;// M''rab, kuhu kuvatakse valitud kausta sisu
+            if (selectedFolderLabel.HasContent)
+            {
+                savebutton.IsEnabled = true;
+            }
+            return selectedPath;
+        }
+
         public static string MakeRandomDirectorytoTemp()
         {
             string directoryName = Guid.NewGuid().ToString();

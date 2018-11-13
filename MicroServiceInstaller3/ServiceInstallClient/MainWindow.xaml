@@ -1,0 +1,140 @@
+﻿<Window x:Class="ServiceInstallClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ServiceInstallClient"
+        xmlns:converters="clr-namespace:CommonLibary.Converters;assembly=CommonLibary"
+        mc:Ignorable="d"
+        Title="Service Installer Client" Height="1000" Width="1000">
+    <Window.Resources>
+            <BooleanToVisibilityConverter x:Key="B2VConverter"/>
+            <converters:StringNullOrEmptyToVisibilityConverter x:Key="S2VConverter"/>
+            <converters:BorderThicknessConverter x:Key="ThicknessConverter"/>
+            <Style TargetType="Label">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Content" Value="" />
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Height" Value="30" />
+            </Style>
+            <Style TargetType="ListBox">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Height" Value="200" />
+                <Setter Property="Margin" Value="3,3,3,3" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="Width" Value="200" />
+                <Setter Property="Height" Value="50" />
+                <Setter Property="Margin" Value="5,20,5,5" />
+            </Style>
+            <Style TargetType="ListView">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Height" Value="200" />
+                <Setter Property="Margin" Value="3,3,3,3" />
+            </Style>
+            <Style TargetType="TabItem">
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="Height" Value="50" />
+                <Setter Property="Width" Value="490" />
+            </Style>
+            <Style TargetType="RadioButton">
+                <Setter Property="Margin" Value="5" />
+
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Width" Value="180" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <!--<Setter Property="Background" Value="Red" />-->
+                <!--FontWeight="Bold" Margin="5"-->
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Margin" Value="5" />
+            </Style>
+        </Window.Resources>
+    <Grid>
+        <Grid x:Name="downloadgrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="197*" />
+                <ColumnDefinition Width="58*"/>
+                <ColumnDefinition Width="390*"/>
+                <ColumnDefinition Width="94*"/>
+                <ColumnDefinition Width="247*" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
+                <Label x:Name="LbSelectedZipFile" FontWeight="Bold" VerticalAlignment="Top"/>
+                <ListBox x:Name="ListAppSettingsFiles"   Grid.Row="0" Grid.Column="0"   SelectionMode="Single" SelectionChanged="ListAppSettingsFiles_SelectionChanged">
+                </ListBox>
+            </StackPanel>
+
+            <StackPanel Grid.Row="0" Grid.Column="4"  Background="GhostWhite">
+                <Button x:Name="BSelectZipFile" Content="Select Zip file" Click="BSelectZipFile_Click" />
+                <ListView x:Name="ListUnPackedZipFiles" Height="100" Width="100" Visibility="Hidden">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <Label x:Name="LbGuide" Height="60" >
+                    <TextBlock x:Name="TbGuide"  TextWrapping="Wrap" Height="50" Margin="0" Width="227" FontWeight="Regular"/>
+
+                </Label>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
+                <Label x:Name="LbDownloadedAppSettingsFilePath" FontWeight="Bold"  VerticalAlignment="Top" Visibility="Collapsed"/>
+                <Label x:Name="LbExistingAppSettingsFilePath"  FontWeight="Bold"  VerticalAlignment="Top"/>
+                <ListView x:Name="LvDownloadedConfigSettings"   Grid.Row="1" Grid.Column="0" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton x:Name="RbNewValue"  IsChecked="{Binding RbNewValue}" Visibility="{Binding ElementName=Value, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
+                                <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding ElementName=ExistingValue, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
+                                <TextBlock x:Name="Key" Text="{Binding Key}"/>
+                                <TextBox x:Name="Value" Text="{Binding NewValue}" Visibility="{Binding NewValue, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbNewValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
+                                <TextBox x:Name="ExistingValue" Text="{Binding ExistingValue}" Visibility="{Binding ExistingValue, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbExistingValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <ListView x:Name="LvDownLoadedConnectionSettings"   Grid.Row="1" Grid.Column="0" Height="100" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton x:Name="RbNewValue" IsChecked="{Binding RbNewValue}" Visibility="{Binding ElementName=ConnectionString, Path=IsVisible, Converter={StaticResource B2VConverter}}" />
+                                <RadioButton x:Name="RbExistingValue" IsChecked="{Binding RbExistingValue}" Visibility="{Binding ElementName=ExistingConnectionString, Path=IsVisible, Converter={StaticResource B2VConverter}}"/>
+                                <TextBlock x:Name="Name" Text="{Binding Name}" />
+                                <TextBox x:Name="ConnectionString" Text="{Binding NewConnectionString}" Visibility="{Binding NewConnectionString, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbNewValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
+                                <TextBox x:Name="ExistingConnectionString" Text="{Binding ExistingConnectionString}" Visibility="{Binding ExistingConnectionString, Converter={StaticResource S2VConverter}}" BorderThickness="{Binding ElementName=RbExistingValue, Path=IsChecked, Converter={StaticResource ThicknessConverter}}"/>
+                                <TextBlock x:Name="ProviderName" Text="{Binding ProviderName}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
+
+            <StackPanel Grid.Row="1" Grid.Column="4">
+                <Button x:Name="BnConfigDownloadedAppSettings" IsEnabled="False" Content="Config settings" Click="BnConfigDownloadedAppSettings_Click"   />
+                <Button x:Name="BnSaveDownloadedAppSettingsChanges" IsEnabled="False" Content="Save changes" Click="BnSaveDownloadedAppSettingsChanges_Click"   />
+                <Label x:Name="LbDownloadedProcessStatus"   HorizontalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Grid.Row="2" Grid.Column="4">
+                <Button x:Name="BnCloseDownload" IsEnabled="True" Content="Close" Margin="5,200,5,5" Click="BnCloseDownload_Click" />
+            </StackPanel>
+
+            <Label x:Name="LbTemporaryFolderZipFile" Grid.Column="4" HorizontalAlignment="Left"  Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
+            <Label x:Name="LbTemporary" Grid.Row="3" HorizontalAlignment="Left"    VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
+            <Label x:Name="LbTemporaryComparedConfFilePath" HorizontalAlignment="Left"  Grid.Row="3" VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
+        </Grid>
+    </Grid>
+</Window>
