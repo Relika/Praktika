@@ -12,6 +12,9 @@ using CommonLibary.Poco;
 using System.Collections.ObjectModel;
 using System.Collections;
 using MicroServiceInstaller3;
+using System.Reflection;
+using System.Resources;
+using System.Linq;
 
 namespace ServiceInstallClient
 {
@@ -24,6 +27,8 @@ namespace ServiceInstallClient
         {
             InitializeComponent();
         }
+
+
 
         private void ListAppSettingsFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -237,6 +242,37 @@ namespace ServiceInstallClient
         private void BnCloseDownload_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Application.Current.Shutdown();
+        }
+
+        private void BTestSelectZipFile_Click(object sender, RoutedEventArgs e)
+        {
+            GetResourcesUnder("Resources");
+        }
+        public void GetResourcesUnder(string folder)
+        {
+            folder = folder.ToLower() + "/";
+
+            var assembly = Assembly.GetCallingAssembly();
+            var resourcesName = assembly.GetName().Name + ".g.resources";
+            var stream = assembly.GetManifestResourceStream(resourcesName);
+            var resourceReader = new ResourceReader(stream);
+            string resourceType;
+            byte[] resourceData;
+
+           // resourceReader.GetResourceData("Debug.zip", out resourceType, out resourceData);
+            resourceReader.GetResourceData("Test", out resourceType, out resourceData);
+            var resources =
+                from p in resourceReader.OfType<DictionaryEntry>()
+                let theme = (string)p.Key
+                where theme.StartsWith(folder)
+                select theme.Substring(folder.Length);
+
+            foreach (var item in resources.ToArray())
+            {
+
+                ListAppSettingsFiles.Items.Add(item);
+            }
+            //return resources.ToArray();
         }
     }
 }

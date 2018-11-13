@@ -96,6 +96,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Resources\Debug.zip" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -104,6 +105,10 @@
     <ProjectReference Include="..\CommonLibary\CommonLibary.csproj">
       <Project>{0b09efa6-6fc8-414f-a705-4b71fc13a1e2}</Project>
       <Name>CommonLibary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MicroServiceInstaller3\MicroServiceInstaller3.csproj">
+      <Project>{db1a714c-010e-40e2-bc69-90904e3b4fa9}</Project>
+      <Name>MicroServiceInstaller3</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

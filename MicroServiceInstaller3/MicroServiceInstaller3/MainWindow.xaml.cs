@@ -11,8 +11,8 @@ using System.Configuration;
 using System.Collections;
 using CommonLibary.Poco;
 using CommonLibary.Handlers;
-
-
+using System.Windows.Resources;
+using Application = System.Windows.Application;
 
 namespace MicroServiceInstaller3
 {
@@ -206,12 +206,20 @@ namespace MicroServiceInstaller3
                 string finalZipFileName = System.IO.Path.Combine(finalZipPath, "final.zip");
                 ZipFile.CreateFromDirectory(zipLocation, finalZipFileName);
                 string finalLocation = System.IO.Path.Combine(zipLocation, finalZipFileName);
-
+                Resources.Add("ServiceZip", finalLocation);
                 LbStatus.Content = "Zip file is created successfully: " + finalLocation;
 
                 ListZipFiles.Items.Clear(); // eemaldab listis olevad valitud zip failide asukohakirjed
                 scope.Complete();
             }
+
+
+            Uri uri = new Uri("Resources/final.zip", UriKind.Relative);
+            StreamResourceInfo info = Application.GetContentStream(uri);
+            System.Windows.Markup.XamlReader reader = new System.Windows.Markup.XamlReader();
+            ResourceDictionary myResourceDictionary =
+                                           (ResourceDictionary)reader.LoadAsync(info.Stream);
+            Application.Current.Resources.MergedDictionaries.Add(myResourceDictionary);
         }
 
         private void BnCloseUpload_Click(object sender, RoutedEventArgs e)
