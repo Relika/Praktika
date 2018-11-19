@@ -63,6 +63,7 @@
     <Compile Include="Handlers\FShandler.cs" />
     <Compile Include="Poco\AppSettingsConfig.cs" />
     <Compile Include="Poco\ConnectionStrings.cs" />
+    <Compile Include="Poco\ResourceFiles.cs" />
     <Compile Include="Poco\SettingsBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\ConfFileHandlerTests.cs" />

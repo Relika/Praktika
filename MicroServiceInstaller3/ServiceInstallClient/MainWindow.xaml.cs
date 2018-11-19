@@ -15,6 +15,8 @@ using MicroServiceInstaller3;
 using System.Reflection;
 using System.Resources;
 using System.Linq;
+using ServiceInstallClient.Properties;
+using System.Globalization;
 
 namespace ServiceInstallClient
 {
@@ -246,33 +248,39 @@ namespace ServiceInstallClient
 
         private void BTestSelectZipFile_Click(object sender, RoutedEventArgs e)
         {
-            GetResourcesUnder("Resources");
-        }
-        public void GetResourcesUnder(string folder)
-        {
-            folder = folder.ToLower() + "/";
-
-            var assembly = Assembly.GetCallingAssembly();
-            var resourcesName = assembly.GetName().Name + ".g.resources";
-            var stream = assembly.GetManifestResourceStream(resourcesName);
-            var resourceReader = new ResourceReader(stream);
-            string resourceType;
-            byte[] resourceData;
-
-           // resourceReader.GetResourceData("Debug.zip", out resourceType, out resourceData);
-            resourceReader.GetResourceData("Test", out resourceType, out resourceData);
-            var resources =
-                from p in resourceReader.OfType<DictionaryEntry>()
-                let theme = (string)p.Key
-                where theme.StartsWith(folder)
-                select theme.Substring(folder.Length);
-
-            foreach (var item in resources.ToArray())
+            ResourceSet resourceSet = TestResources.ResourceManager.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
+            ObservableCollection<ResourceFiles> resourceFilesCollection = new ObservableCollection<ResourceFiles>();
+            foreach (DictionaryEntry entry in resourceSet)
             {
+                ResourceFiles resourceFile = new ResourceFiles();
+                resourceFile.Key = entry.Key.ToString();
+                resourceFile.Value = entry.Value.ToString();
+                if (resourceFile.Value == "System.Byte[]")
+                {
+                    byte[] resourceValue = (byte[])entry.Value;
+                    MemoryStream memoryStream = new MemoryStream(resourceValue);
+                    ZipArchive zipArchive = new ZipArchive(memoryStream);
+                    //CreateFileList(zipArchive);
+                    IEnumerable<string> unFilteredZipFileList = CreateFileList(zipArchive);
+                    FilterZipFileList(unFilteredZipFileList);
 
-                ListAppSettingsFiles.Items.Add(item);
+                }
+                resourceFilesCollection.Add(resourceFile);
             }
-            //return resources.ToArray();
+
+        }
+
+        public IEnumerable<string> CreateFileList(ZipArchive zipArchive)
+        {
+            IEnumerable<string> unFilteredZipFileList = null;
+            foreach (ZipArchiveEntry value in zipArchive.Entries)
+            {
+                ListUnPackedZipFiles.ItemsSource = value.FullName; // Paigutab failid faililisti
+                unFilteredZipFileList = IEnumerable<string>(ListUnPackedZipFiles.ItemsSource);
+                //from number in items select (object)item
+            }
+            return unFilteredZipFileList;
+            //muudab valitud faili asukohanimetuse tekstiks
         }
     }
 }
