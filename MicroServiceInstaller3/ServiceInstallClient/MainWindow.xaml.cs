@@ -17,7 +17,7 @@ using System.Resources;
 using System.Linq;
 using ServiceInstallClient.Properties;
 using System.Globalization;
-
+using System.Text;
 
 namespace ServiceInstallClient
 {
@@ -30,8 +30,6 @@ namespace ServiceInstallClient
         {
             InitializeComponent();
         }
-
-
 
         private void ListAppSettingsFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -54,37 +52,29 @@ namespace ServiceInstallClient
             }
         }
 
-        //private void BSelectZipFile_Click(object sender, RoutedEventArgs e)
-        //{
-        //    OpenFileDialog zipFileBrowserDialog1 = new OpenFileDialog();
-
-        //    zipFileBrowserDialog1.DefaultExt = ".zip";
-
-        //    DialogResult result = zipFileBrowserDialog1.ShowDialog();
-
-        //    if (result == System.Windows.Forms.DialogResult.OK)
-        //    {
-        //        string zipFileName = zipFileBrowserDialog1.FileName;
-        //        LbSelectedZipFile.Content = zipFileName;
-        //        string extractFolderPath = FShandler.MakeRandomDirectorytoTemp();
-        //        ZipFile.ExtractToDirectory(zipFileName, extractFolderPath);
-        //        IEnumerable<string> unFilteredZipFileList = CreateUnFilteredZipFileList(extractFolderPath);
-        //        foreach (var zipFile in unFilteredZipFileList)
-        //        {
-        //            bool endsIn = (zipFile.EndsWith(".zip"));
-        //            if (endsIn)
-        //            {
-        //                string extractFolderPath2 = FShandler.MakeRandomDirectorytoTemp();
-        //                ZipFile.ExtractToDirectory(zipFile, extractFolderPath2);
-        //                IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(extractFolderPath2);
-        //                FilterZipFileList(unFilteredFileList);
-        //            }
-        //        }
-        //        FilterZipFileList(unFilteredZipFileList);
-        //    }
-        //}
-
         private void BTestSelectZipFile_Click(object sender, RoutedEventArgs e)
+        {
+            ObservableCollection<ResourceFiles> resorceFilesCollection = CreateResourceFilesCollection();
+            if (resorceFilesCollection != null)
+            {
+                foreach (var entry in resorceFilesCollection)
+                {
+                    byte[] resourceValue = entry.ByteArray;
+                    MemoryStream memoryStream = new MemoryStream(resourceValue);
+                    ZipArchive zipArchive = new ZipArchive(memoryStream);
+                    string temporaryFolder = FShandler.CopyResourcesToTemporayFolder(zipArchive);
+                    LbTemporary.Content = ConfFileHandler.FindAppSettingsFile(temporaryFolder);
+                    IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryFolder);
+                    FilterZipFileList(unFilteredFileList);
+                }
+            }
+            else
+            {
+                LbProcessStatus.Content = "No zipfile found";
+            }
+        }
+
+        private static ObservableCollection<ResourceFiles> CreateResourceFilesCollection()
         {
             ResourceSet resourceSet = TestResources.ResourceManager.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
             ObservableCollection<ResourceFiles> resourceFilesCollection = new ObservableCollection<ResourceFiles>();
@@ -95,22 +85,11 @@ namespace ServiceInstallClient
                 resourceFile.Value = entry.Value.ToString();
                 if (resourceFile.Value == "System.Byte[]")
                 {
-
-                    byte[] resourceValue = (byte[])entry.Value;
-                    MemoryStream memoryStream = new MemoryStream(resourceValue);
-                    ZipArchive zipArchive = new ZipArchive(memoryStream);
-                    string temporaryFolder = FShandler.CopyResourcesToTemporayFolder(zipArchive);
-                    LbTemporary.Content = ConfFileHandler.FindAppSettingsFile(temporaryFolder);
-                    IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryFolder);
-                    FilterZipFileList(unFilteredFileList);
+                    resourceFile.ByteArray = (byte[])entry.Value;
+                    resourceFilesCollection.Add(resourceFile);
                 }
-                else
-                {
-
-                }
-                resourceFilesCollection.Add(resourceFile);
             }
-
+            return resourceFilesCollection;
         }
 
         private void FilterZipFileList(IEnumerable<string> unFilteredFileList)

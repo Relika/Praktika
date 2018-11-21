@@ -72,7 +72,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Row="0" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
-                <Label x:Name="LbSelectedZipFile" FontWeight="Bold" VerticalAlignment="Top"/>
+                <Label x:Name="LbProcessStatus" FontWeight="Bold" VerticalAlignment="Top"/>
                 <ListBox x:Name="ListAppSettingsFiles"   Grid.Row="0" Grid.Column="0"   SelectionMode="Single" SelectionChanged="ListAppSettingsFiles_SelectionChanged">
                 </ListBox>
             </StackPanel>
