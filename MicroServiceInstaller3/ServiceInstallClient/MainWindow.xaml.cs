@@ -13,11 +13,14 @@ using System.Collections.ObjectModel;
 using System.Collections;
 using MicroServiceInstaller3;
 using System.Reflection;
-using System.Resources;
+//using System.Resources;
 using System.Linq;
 using ServiceInstallClient.Properties;
 using System.Globalization;
 using System.Text;
+using Mono.Cecil;
+using System.Resources;
+using System.Diagnostics;
 
 namespace ServiceInstallClient
 {
@@ -29,6 +32,7 @@ namespace ServiceInstallClient
         public MainWindow()
         {
             InitializeComponent();
+            PrintResources();
         }
 
         private void ListAppSettingsFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -54,43 +58,94 @@ namespace ServiceInstallClient
 
         private void BTestSelectZipFile_Click(object sender, RoutedEventArgs e)
         {
-            ObservableCollection<ResourceFiles> resorceFilesCollection = CreateResourceFilesCollection();
-            if (resorceFilesCollection != null)
-            {
-                foreach (var entry in resorceFilesCollection)
-                {
-                    byte[] resourceValue = entry.ByteArray;
-                    MemoryStream memoryStream = new MemoryStream(resourceValue);
-                    ZipArchive zipArchive = new ZipArchive(memoryStream);
-                    string temporaryFolder = FShandler.CopyResourcesToTemporayFolder(zipArchive);
-                    LbTemporary.Content = ConfFileHandler.FindAppSettingsFile(temporaryFolder);
-                    IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryFolder);
-                    FilterZipFileList(unFilteredFileList);
-                }
-            }
-            else
-            {
-                LbProcessStatus.Content = "No zipfile found";
-            }
+            MemoryStream memoryStream = null; //GetResource("ServiceInstallClient.exe", "Debug.zip");
+            //ObservableCollection<ResourceFiles> resorceFilesCollection = CreateResourceFilesCollection();
+            //if (resorceFilesCollection != null)
+            //{
+            //    foreach (var entry in resorceFilesCollection)
+            //    {
+            //        byte[] resourceValue = entry.ByteArray;
+            //        MemoryStream memoryStream = new MemoryStream(resourceValue); //GetResources v'ljastab juba memoryStreami
+            ZipArchive zipArchive = new ZipArchive(memoryStream);
+            string temporaryFolder = FShandler.CopyResourcesToTemporayFolder(zipArchive);
+            LbTemporary.Content = ConfFileHandler.FindAppSettingsFile(temporaryFolder);
+            IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryFolder);
+            FilterZipFileList(unFilteredFileList);
+            //    }
+            //}
+            //else
+            //{
+            //    LbProcessStatus.Content = "No zipfile found";
+            //}
         }
 
-        private static ObservableCollection<ResourceFiles> CreateResourceFilesCollection()
+        public void GetResource(string path, string resourceName)
         {
-            ResourceSet resourceSet = TestResources.ResourceManager.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
-            ObservableCollection<ResourceFiles> resourceFilesCollection = new ObservableCollection<ResourceFiles>();
-            foreach (DictionaryEntry entry in resourceSet)
+            var definition =
+                AssemblyDefinition.ReadAssembly(path);
+
+            foreach (var resource in definition.MainModule.Resources)
             {
-                ResourceFiles resourceFile = new ResourceFiles();
-                resourceFile.Key = entry.Key.ToString();
-                resourceFile.Value = entry.Value.ToString();
-                if (resourceFile.Value == "System.Byte[]")
-                {
-                    resourceFile.ByteArray = (byte[])entry.Value;
-                    resourceFilesCollection.Add(resourceFile);
-                }
+                ListAppSettingsFiles.Items.Add(resource.Name);
+                //if (resource.Name == resourceName)
+                //{
+                //var embeddedResource = (EmbeddedResource)resource;
+                //var stream = embeddedResource.GetResourceStream();
+
+                //var bytes = new byte[stream.Length];
+                //stream.Read(bytes, 0, bytes.Length);
+
+                //var memStream = new MemoryStream();
+                //memStream.Write(bytes, 0, bytes.Length);
+                //memStream.Position = 0;
+               // return memStream;
+                //}
             }
-            return resourceFilesCollection;
+           // return null;
         }
+
+        public static void AddResource(string path, string resourceName, byte[] resource)
+        {
+            var definition =
+                AssemblyDefinition.ReadAssembly(path);
+
+            var er = new EmbeddedResource(resourceName, ManifestResourceAttributes.Public, resource);
+            definition.MainModule.Resources.Add(er);
+            definition.Write("abc.exe");
+        }
+
+        public void PrintResources()
+        {
+            GetResource(Process.GetCurrentProcess().MainModule.FileName, "Debug.zip");
+            //ResourceSet resourceSet = TestResources.ResourceManager.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
+            //foreach (DictionaryEntry entry in resourceSet)
+            //{
+            //    ResourceFiles resourceFile = new ResourceFiles();
+            //    resourceFile.Key = entry.Key.ToString();
+            //    resourceFile.Value = entry.Value.ToString();
+            //    ListAppSettingsFiles.Items.Add(resourceFile.Key + resourceFile.Value);
+            //}
+
+        }
+
+
+        //private static ObservableCollection<ResourceFiles> CreateResourceFilesCollection()
+        //{
+        //    ResourceSet resourceSet = TestResources.ResourceManager.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
+        //    ObservableCollection<ResourceFiles> resourceFilesCollection = new ObservableCollection<ResourceFiles>();
+        //    foreach (DictionaryEntry entry in resourceSet)
+        //    {
+        //        ResourceFiles resourceFile = new ResourceFiles();
+        //        resourceFile.Key = entry.Key.ToString();
+        //        resourceFile.Value = entry.Value.ToString();
+        //        if (resourceFile.Value == "System.Byte[]")
+        //        {
+        //            resourceFile.ByteArray = (byte[])entry.Value;
+        //            resourceFilesCollection.Add(resourceFile);
+        //        }
+        //    }
+        //    return resourceFilesCollection;
+        //}
 
         private void FilterZipFileList(IEnumerable<string> unFilteredFileList)
         {
