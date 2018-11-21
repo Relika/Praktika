@@ -73,23 +73,13 @@
 
             <StackPanel Grid.Row="0" Grid.Column="0" Background="GhostWhite" Grid.ColumnSpan="4" >
                 <Label x:Name="LbSelectedZipFile" FontWeight="Bold" VerticalAlignment="Top"/>
-                <ListView x:Name="LvResourceFiles"  Height="100" Grid.Row="1" Grid.Column="0" >
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock x:Name="Key" Text="{Binding Key}"/>
-                                <TextBox x:Name="Value" Text="{Binding Value}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
                 <ListBox x:Name="ListAppSettingsFiles"   Grid.Row="0" Grid.Column="0"   SelectionMode="Single" SelectionChanged="ListAppSettingsFiles_SelectionChanged">
                 </ListBox>
             </StackPanel>
 
             <StackPanel Grid.Row="0" Grid.Column="4"  Background="GhostWhite">
-                <Button x:Name="BSelectZipFile" Content="Select Zip file" Click="BSelectZipFile_Click" />
-                <Button x:Name="BTestSelectZipFile" Content="Select Test Zip file" Click="BTestSelectZipFile_Click" />
+                <!--<Button x:Name="BSelectZipFile" Content="Select Zip file" Click="BSelectZipFile_Click" />-->
+                <Button x:Name="BTestSelectZipFile" Content="Find config files" Click="BTestSelectZipFile_Click" />
                 <ListView x:Name="ListUnPackedZipFiles" Height="100" Width="100" Visibility="Hidden">
                     <ListView.View>
                         <GridView>

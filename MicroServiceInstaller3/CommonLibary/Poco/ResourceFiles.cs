@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,4 +12,5 @@ namespace CommonLibary.Poco
         public string Key { get; set; }
         public string Value { get; set; }
     }
+
 }

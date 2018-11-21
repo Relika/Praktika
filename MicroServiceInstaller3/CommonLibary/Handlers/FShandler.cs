@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Windows.Forms;
+using CommonLibary.Poco;
 
 namespace CommonLibary.Handlers
 {
@@ -103,6 +105,32 @@ namespace CommonLibary.Handlers
                     sw.WriteLine(selectedPath);
                 }
             }
+        }
+
+        public static string CopyResourcesToTemporayFolder(ZipArchive zipArchive)
+        {
+            string extractFolderPath = FShandler.MakeRandomDirectorytoTemp();
+            foreach (var item in zipArchive.Entries)
+            {
+                if (item.IsFolder())
+                {
+                    if (!Directory.Exists(Path.Combine(extractFolderPath, item.FullName)))
+                    {
+                        Directory.CreateDirectory(Path.Combine(extractFolderPath, item.FullName));
+                    }
+                }
+                else
+                {
+                    string destinationPath = Path.GetFullPath(Path.Combine(extractFolderPath, item.FullName));
+
+                    // Ordinal match is safest, case-sensitive volumes can be mounted within volumes that
+                    // are case-insensitive.
+                    if (destinationPath.StartsWith(extractFolderPath, StringComparison.Ordinal))
+                        item.ExtractToFile(destinationPath);
+                    //File.Copy(item.ToString(), extractFolderPath);
+                }
+            }
+            return extractFolderPath;
         }
 
     }
