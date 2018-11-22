@@ -22,6 +22,18 @@ namespace CommonLibary.Handlers
             return string.Empty;
         }
 
+        public static string FindZipFile(string folder)
+        {
+            foreach (var fileSystemEntry in Directory.EnumerateFileSystemEntries(folder, "*", SearchOption.AllDirectories)) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
+            {
+                if (!File.Exists(fileSystemEntry)) continue; // kui fail ei eksisteeri, j'tkab
+                if (fileSystemEntry.EndsWith(".zip")) return fileSystemEntry;
+            }
+            return string.Empty;
+        }
+
+
+
         public static ObservableCollection<AppSettingsConfig> FindAppSettings(string fileSystemEntry)
         {
             ObservableCollection<AppSettingsConfig> appSettingsCollection = new ObservableCollection<AppSettingsConfig>();

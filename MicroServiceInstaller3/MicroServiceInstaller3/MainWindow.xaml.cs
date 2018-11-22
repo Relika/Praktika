@@ -8,12 +8,8 @@ using System.IO.Compression;
 using System.Transactions;
 using System.Collections.ObjectModel;
 using System.Configuration;
-using System.Collections;
 using CommonLibary.Poco;
 using CommonLibary.Handlers;
-using System.Windows.Resources;
-using Application = System.Windows.Application;
-using Mono.Cecil;
 
 namespace MicroServiceInstaller3
 {
@@ -29,7 +25,8 @@ namespace MicroServiceInstaller3
             LbZipFilesFolder.Content = FShandler.MakeDirectorytoTemp(zipDirectory);
             string workDirectory = ConfigurationManager.AppSettings["workDirectory"];
             LbworkFilesFolder.Content = FShandler.MakeDirectorytoTemp(workDirectory);
-
+            string finalZipDirectory = ConfigurationManager.AppSettings["finalZipDirectory"];
+            LbFinalZipFolder.Content = FShandler.MakeDirectorytoTemp(finalZipDirectory);
         }
         string randomFileName = "";
 
@@ -44,10 +41,8 @@ namespace MicroServiceInstaller3
             {
                 string selectedPath =FShandler.ChooseFolder(folderBrowserDialog1, selectedFolderLabel: LbSelectedFolder, savebutton: BnZip);
                 string workFilesFolderPath = LbworkFilesFolder.Content.ToString();
-                //FShandler.CopyAll(selectedPath, workFilesFolderPath);
                 FShandler.DirectoryCopy(selectedPath, workFilesFolderPath, copySubDirs: true);
                 IEnumerable<string> unFilteredFileList = CreateUnFilteredFileList(workFilesFolderPath);
-                //string value = 
                 FilterFileList(unFilteredFileList);
                 FShandler.CreateMetaDataFile(selectedPath, workFilesFolderPath);
             }
@@ -67,16 +62,13 @@ namespace MicroServiceInstaller3
                     if (endsIn)
                     {
                         File.Delete(file);
-                        //return null;// kustutab faili
                     }
                     else
                     {
-                        ListFiles.Items.Add($"{file}");
-                        //return file;                   
+                        ListFiles.Items.Add($"{file}");                
                     }
                 }
             }
-            //return null;
         }
 
         private IEnumerable<string> CreateUnFilteredFileList(string temporaryFolder)
@@ -114,8 +106,6 @@ namespace MicroServiceInstaller3
                 LvUploadedConfigSettings.ItemsSource = appsettingsCollection;
                 ObservableCollection<ConnectionStrings> ConnectionStringsCollection = ConfFileHandler.FindConnectionsStrings(confFilePath);
                 LvUploadedConnectionSettings.ItemsSource = ConnectionStringsCollection;
-                //AddRadioButtons(appSettingsCollection);
-                //AddRadioButtons(connectionStringsCollection);
             }
             catch (Exception error)
             {
@@ -130,7 +120,6 @@ namespace MicroServiceInstaller3
             string selectedPath = LbTemporary.Content.ToString();         
             ObservableCollection<AppSettingsConfig> modifiedAppSettings = LvUploadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.ReadModifiedAppSettings( modifiedAppSettings);
-            //appConfigPath = appSettingsPath.Content.ToString();
             try
             {
                 ConfFileHandler.WriteSettingsToConfFile(selectedPath, appSettingsDic: appSettingsDictionary);
@@ -145,7 +134,6 @@ namespace MicroServiceInstaller3
             try
             {
                 ConfFileHandler.WriteConnectionStringstoConFile(selectedPath, connectionStringsDic: connectionStringsDictionary);
-
             }
              catch (Exception error)          
             {
@@ -164,7 +152,6 @@ namespace MicroServiceInstaller3
             BnSaveChanges.IsEnabled = false;
             using (var scope = new TransactionScope())
             {
-               // File.Delete(zipFile); // kustutab faili, mis asub sellel aadressil
                 ZipFile.CreateFromDirectory(InitialsFilesFolder, zipFile); // loob zip faili
                 bool existItem = false;
                 foreach (var value in ListZipFiles.Items) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
@@ -198,37 +185,25 @@ namespace MicroServiceInstaller3
 
         private void BnFinishandZip_Click(object sender, RoutedEventArgs e)
         {
-
             using (var scope = new TransactionScope())
             {
                 //Read zipFiles
                 string zipLocation = LbZipFilesFolder.Content.ToString();
                 // Create finalZip
-                string temporaryDirectory = FShandler.MakeRandomDirectorytoTemp();
+                string temporaryDirectory = LbFinalZipFolder.Content.ToString();
                 string finalZipFileName = "final.zip";
                 string finalZipFilePath = System.IO.Path.Combine(temporaryDirectory, finalZipFileName);
                 ZipFile.CreateFromDirectory(zipLocation, finalZipFilePath);
                 // Save finalZip to ServiceInstallClient.exe resourses
                 byte[] finalZipBytes = File.ReadAllBytes(finalZipFilePath);
                 string exeFilePath = @"ServiceInstallClient.exe";
-                AddResource(exeFilePath, finalZipFileName, finalZipBytes);
-                LbStatus.Content = "Zip file is created successfully: " + exeFilePath;
-
+                string finalExe = "start.exe";
+                ResourceHandler.AddResource(exeFilePath, finalZipFileName, finalZipBytes, finalExe);
+                LbStatus.Content = "Zip file is created successfully: " + finalExe;
+                BnFinishandZip.IsEnabled = false;
                 ListZipFiles.Items.Clear(); // eemaldab listis olevad valitud zip failide asukohakirjed
-                scope.Complete();
-                
+                scope.Complete();            
             }
-
-        }
-
-        public static void AddResource(string path, string resourceName, byte[] resource)
-        {
-            var definition =
-                AssemblyDefinition.ReadAssembly(path);
-
-            var er = new EmbeddedResource(resourceName, ManifestResourceAttributes.Public, resource);
-            definition.MainModule.Resources.Add(er);
-            definition.Write("start.exe");
         }
 
         private void BnCloseUpload_Click(object sender, RoutedEventArgs e)

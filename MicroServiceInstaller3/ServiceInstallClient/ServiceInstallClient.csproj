@@ -125,4 +125,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>COPY C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\ServiceInstallClient.exe C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug</PostBuildEvent>
+  </PropertyGroup>
 </Project>

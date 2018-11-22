@@ -6,55 +6,55 @@
         xmlns:local="clr-namespace:ServiceInstallClient"
         xmlns:converters="clr-namespace:CommonLibary.Converters;assembly=CommonLibary"
         mc:Ignorable="d"
-        Title="Service Installer Client" Height="1000" Width="1000">
+        Title="Service Installer Client" Height="700" Width="1000">
     <Window.Resources>
-            <BooleanToVisibilityConverter x:Key="B2VConverter"/>
-            <converters:StringNullOrEmptyToVisibilityConverter x:Key="S2VConverter"/>
-            <converters:BorderThicknessConverter x:Key="ThicknessConverter"/>
-            <Style TargetType="Label">
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Content" Value="" />
-                <Setter Property="Margin" Value="5" />
-                <Setter Property="Height" Value="30" />
-            </Style>
-            <Style TargetType="ListBox">
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Height" Value="200" />
-                <Setter Property="Margin" Value="3,3,3,3" />
-            </Style>
-            <Style TargetType="Button">
-                <Setter Property="FontSize" Value="20" />
-                <Setter Property="Width" Value="200" />
-                <Setter Property="Height" Value="50" />
-                <Setter Property="Margin" Value="5,20,5,5" />
-            </Style>
-            <Style TargetType="ListView">
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Height" Value="200" />
-                <Setter Property="Margin" Value="3,3,3,3" />
-            </Style>
-            <Style TargetType="TabItem">
-                <Setter Property="FontSize" Value="20" />
-                <Setter Property="Height" Value="50" />
-                <Setter Property="Width" Value="490" />
-            </Style>
-            <Style TargetType="RadioButton">
-                <Setter Property="Margin" Value="5" />
+        <BooleanToVisibilityConverter x:Key="B2VConverter"/>
+        <converters:StringNullOrEmptyToVisibilityConverter x:Key="S2VConverter"/>
+        <converters:BorderThicknessConverter x:Key="ThicknessConverter"/>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Content" Value="" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Height" Value="30" />
+        </Style>
+        <Style TargetType="ListBox">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Height" Value="200" />
+            <Setter Property="Margin" Value="3,3,3,3" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Width" Value="200" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="Margin" Value="5,20,5,5" />
+        </Style>
+        <Style TargetType="ListView">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Height" Value="200" />
+            <Setter Property="Margin" Value="3,3,3,3" />
+        </Style>
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="Width" Value="490" />
+        </Style>
+        <Style TargetType="RadioButton">
+            <Setter Property="Margin" Value="5" />
 
-            </Style>
-            <Style TargetType="TextBlock">
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Margin" Value="5" />
-                <Setter Property="Width" Value="180" />
-                <Setter Property="FontWeight" Value="Bold" />
-                <!--<Setter Property="Background" Value="Red" />-->
-                <!--FontWeight="Bold" Margin="5"-->
-            </Style>
-            <Style TargetType="TextBox">
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="Margin" Value="5" />
-            </Style>
-        </Window.Resources>
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="Width" Value="180" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <!--<Setter Property="Background" Value="Red" />-->
+            <!--FontWeight="Bold" Margin="5"-->
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Margin" Value="5" />
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid x:Name="downloadgrid">
             <Grid.RowDefinitions>
@@ -92,7 +92,7 @@
 
                 </Label>
             </StackPanel>
-            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
+            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="0,0,0,404">
                 <Label x:Name="LbDownloadedAppSettingsFilePath" FontWeight="Bold"  VerticalAlignment="Top" Visibility="Collapsed"/>
                 <Label x:Name="LbExistingAppSettingsFilePath"  FontWeight="Bold"  VerticalAlignment="Top"/>
                 <ListView x:Name="LvDownloadedConfigSettings"   Grid.Row="1" Grid.Column="0" >
@@ -129,7 +129,7 @@
                 <Button x:Name="BnSaveDownloadedAppSettingsChanges" IsEnabled="False" Content="Save changes" Click="BnSaveDownloadedAppSettingsChanges_Click"   />
                 <Label x:Name="LbDownloadedProcessStatus"   HorizontalAlignment="Center" />
             </StackPanel>
-            <StackPanel Grid.Row="2" Grid.Column="4">
+            <StackPanel Grid.Row="1" Grid.Column="4" Margin="5,150,0,307">
                 <Button x:Name="BnCloseDownload" IsEnabled="True" Content="Close" Margin="5,200,5,5" Click="BnCloseDownload_Click" />
             </StackPanel>
 

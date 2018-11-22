@@ -73,6 +73,7 @@
     <Compile Include="Converters\StringNullOrEmptyToVisibilityConverter.cs" />
     <Compile Include="Handlers\ConfFileHandler.cs" />
     <Compile Include="Handlers\FShandler.cs" />
+    <Compile Include="Handlers\ResourceHandler.cs" />
     <Compile Include="Poco\AppSettingsConfig.cs" />
     <Compile Include="Poco\ConnectionStrings.cs" />
     <Compile Include="Poco\ResourceFiles.cs" />
