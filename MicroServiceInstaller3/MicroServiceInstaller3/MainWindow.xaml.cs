@@ -13,6 +13,7 @@ using CommonLibary.Poco;
 using CommonLibary.Handlers;
 using System.Windows.Resources;
 using Application = System.Windows.Application;
+using Mono.Cecil;
 
 namespace MicroServiceInstaller3
 {
@@ -200,26 +201,34 @@ namespace MicroServiceInstaller3
 
             using (var scope = new TransactionScope())
             {
+                //Read zipFiles
                 string zipLocation = LbZipFilesFolder.Content.ToString();
-                string finalZipPath = ConfigurationManager.AppSettings["finalZipDirectory"];
-                FShandler.MakeDirectory(finalZipPath);
-                string finalZipFileName = System.IO.Path.Combine(finalZipPath, "final.zip");
-                ZipFile.CreateFromDirectory(zipLocation, finalZipFileName);
-                string finalLocation = System.IO.Path.Combine(zipLocation, finalZipFileName);
-                Resources.Add("ServiceZip", finalLocation);
-                LbStatus.Content = "Zip file is created successfully: " + finalLocation;
+                // Create finalZip
+                string temporaryDirectory = FShandler.MakeRandomDirectorytoTemp();
+                string finalZipFileName = "final.zip";
+                string finalZipFilePath = System.IO.Path.Combine(temporaryDirectory, finalZipFileName);
+                ZipFile.CreateFromDirectory(zipLocation, finalZipFilePath);
+                // Save finalZip to ServiceInstallClient.exe resourses
+                byte[] finalZipBytes = File.ReadAllBytes(finalZipFilePath);
+                string exeFilePath = @"ServiceInstallClient.exe";
+                AddResource(exeFilePath, finalZipFileName, finalZipBytes);
+                LbStatus.Content = "Zip file is created successfully: " + exeFilePath;
 
                 ListZipFiles.Items.Clear(); // eemaldab listis olevad valitud zip failide asukohakirjed
                 scope.Complete();
+                
             }
 
+        }
 
-            Uri uri = new Uri("Resources/final.zip", UriKind.Relative);
-            StreamResourceInfo info = Application.GetContentStream(uri);
-            System.Windows.Markup.XamlReader reader = new System.Windows.Markup.XamlReader();
-            ResourceDictionary myResourceDictionary =
-                                           (ResourceDictionary)reader.LoadAsync(info.Stream);
-            Application.Current.Resources.MergedDictionaries.Add(myResourceDictionary);
+        public static void AddResource(string path, string resourceName, byte[] resource)
+        {
+            var definition =
+                AssemblyDefinition.ReadAssembly(path);
+
+            var er = new EmbeddedResource(resourceName, ManifestResourceAttributes.Public, resource);
+            definition.MainModule.Resources.Add(er);
+            definition.Write("start.exe");
         }
 
         private void BnCloseUpload_Click(object sender, RoutedEventArgs e)

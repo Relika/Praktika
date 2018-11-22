@@ -58,7 +58,16 @@ namespace ServiceInstallClient
 
         private void BTestSelectZipFile_Click(object sender, RoutedEventArgs e)
         {
-            MemoryStream memoryStream = null; //GetResource("ServiceInstallClient.exe", "Debug.zip");
+            MemoryStream memoryStream = GetResource(Process.GetCurrentProcess().MainModule.FileName, "final.zip");
+            if (memoryStream != null)
+            {
+                ZipArchive zipArchive = new ZipArchive(memoryStream);
+                string temporaryFolder = FShandler.CopyResourcesToTemporayFolder(zipArchive);
+                LbTemporary.Content = ConfFileHandler.FindAppSettingsFile(temporaryFolder);
+                IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryFolder);
+                FilterZipFileList(unFilteredFileList);
+            }
+            //MemoryStream memoryStream = null; //GetResource("ServiceInstallClient.exe", "Debug.zip");
             //ObservableCollection<ResourceFiles> resorceFilesCollection = CreateResourceFilesCollection();
             //if (resorceFilesCollection != null)
             //{
@@ -66,42 +75,39 @@ namespace ServiceInstallClient
             //    {
             //        byte[] resourceValue = entry.ByteArray;
             //        MemoryStream memoryStream = new MemoryStream(resourceValue); //GetResources v'ljastab juba memoryStreami
-            ZipArchive zipArchive = new ZipArchive(memoryStream);
-            string temporaryFolder = FShandler.CopyResourcesToTemporayFolder(zipArchive);
-            LbTemporary.Content = ConfFileHandler.FindAppSettingsFile(temporaryFolder);
-            IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryFolder);
-            FilterZipFileList(unFilteredFileList);
+
             //    }
             //}
-            //else
-            //{
-            //    LbProcessStatus.Content = "No zipfile found";
-            //}
+            else
+            {
+                LbProcessStatus.Content = "No zipfile found";
+            }
         }
 
-        public void GetResource(string path, string resourceName)
+        public MemoryStream GetResource(string path, string resourceName)
         {
             var definition =
                 AssemblyDefinition.ReadAssembly(path);
 
             foreach (var resource in definition.MainModule.Resources)
             {
-                ListAppSettingsFiles.Items.Add(resource.Name);
-                //if (resource.Name == resourceName)
-                //{
-                //var embeddedResource = (EmbeddedResource)resource;
-                //var stream = embeddedResource.GetResourceStream();
+                //ListAppSettingsFiles.Items.Add(resource.Name);
+                if (resource.Name == resourceName)
+                {
+                    ListAppSettingsFiles.Items.Add(resource.Name);
+                    var embeddedResource = (EmbeddedResource)resource;
+                    var stream = embeddedResource.GetResourceStream();
 
-                //var bytes = new byte[stream.Length];
-                //stream.Read(bytes, 0, bytes.Length);
+                    var bytes = new byte[stream.Length];
+                    stream.Read(bytes, 0, bytes.Length);
 
-                //var memStream = new MemoryStream();
-                //memStream.Write(bytes, 0, bytes.Length);
-                //memStream.Position = 0;
-               // return memStream;
-                //}
+                    var memStream = new MemoryStream();
+                    memStream.Write(bytes, 0, bytes.Length);
+                    memStream.Position = 0;
+                    return memStream;
+                }
             }
-           // return null;
+           return null;
         }
 
         public static void AddResource(string path, string resourceName, byte[] resource)
@@ -116,7 +122,7 @@ namespace ServiceInstallClient
 
         public void PrintResources()
         {
-            GetResource(Process.GetCurrentProcess().MainModule.FileName, "Debug.zip");
+            GetResource(Process.GetCurrentProcess().MainModule.FileName, "final.zip");
             //ResourceSet resourceSet = TestResources.ResourceManager.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
             //foreach (DictionaryEntry entry in resourceSet)
             //{
