@@ -1,0 +1,5 @@
+;!@Install@!UTF-8!
+Title="Service v1.0.0.0"
+BeginPrompt="Do you want to open Service v1.0.0.0?"
+RunProgram="Debug/ServiceInstallClient.exe"
+;!@InstallEnd@!

@@ -49,24 +49,47 @@ namespace ServiceInstallClient
 
         private void BTestSelectZipFile_Click(object sender, RoutedEventArgs e)
         {
-            MemoryStream memoryStream = ResourceHandler.GetResource("start.exe", "final.zip"); //Process.GetCurrentProcess().MainModule.FileName
-            ZipArchive zipArchive = new ZipArchive(memoryStream);
-            string temporaryFolder =FShandler.CopyResourcesToTemporayFolder(zipArchive); //@"C:\Users\IEUser\AppData\Local\Temp\2f7fd81c-4fbf-46a1-9252-0d8bf7ef0c90"; 
-            //ListUnPackedZipFiles.ItemsSource = ConfFileHandler.FindZipFile(temporaryFolder);
-            // Leia kaustas zip file
+            //MemoryStream memoryStream = ResourceHandler.GetResource("start.exe", "final.zip"); //Process.GetCurrentProcess().MainModule.FileName
+            //ZipArchive zipArchive = new ZipArchive(memoryStream);
             try
             {
-                DirectoryInfo directory = new DirectoryInfo(temporaryFolder);
-                //IEnumerable<string>  unFilteredZipFileList = ListUnPackedZipFiles.ItemsSource as IEnumerable<string>;
-                foreach (var item in directory.GetFiles())
-                {
-                    string temporaryDirectory = FShandler.MakeRandomDirectorytoTemp();
-                    string zipFile = System.IO.Path.Combine(temporaryFolder, item.Name.ToString());
-                    ZipFile.ExtractToDirectory(zipFile, temporaryDirectory);
-                    //LbTemporary.Content = ConfFileHandler.FindAppSettingsFile(temporaryDirectory);
-                    IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory);
+                string temporaryFolder = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\Template";
+                    //FShandler.CopyResourcesToTemporayFolder(zipArchive); //@"C:\Users\IEUser\AppData\Local\Temp\2f7fd81c-4fbf-46a1-9252-0d8bf7ef0c90"; 
+                //ListUnPackedZipFiles.ItemsSource 
+                string zipFile= ConfFileHandler.FindZipFile(temporaryFolder);
+                // Leia kaustas zip file
+
+                    //DirectoryInfo directory = new DirectoryInfo(temporaryFolder);
+                    //IEnumerable<string>  unFilteredZipFileList = ListUnPackedZipFiles.ItemsSource as IEnumerable<string>;
+                    ///foreach (var item in directory.GetFiles())
+                    //{
+                string temporaryDirectory = FShandler.MakeRandomDirectorytoTemp();
+                        //string zipFile = System.IO.Path.Combine(temporaryFolder, item.Name.ToString());
+                ZipFile.ExtractToDirectory(zipFile, temporaryDirectory);
+
+                if (ConfFileHandler.FindZipFile(temporaryDirectory) == ""){// rohkem zip faile ei ole
+                        IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory);
                     FilterZipFileList(unFilteredFileList);
+                } else{
+                    IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(temporaryDirectory, "*", SearchOption.AllDirectories);
+                    ListUnPackedZipFiles.ItemsSource = Files;
+                    foreach (object item in ListUnPackedZipFiles.ItemsSource)
+                    {
+                        //ListUnPackedZipFiles.ItemsSource = item.ToString();
+                        string temporaryDirectory2 = FShandler.MakeRandomDirectorytoTemp();
+                        //string zipFile2 = ConfFileHandler.FindZipFile(temporaryDirectory);
+                        ZipFile.ExtractToDirectory(item.ToString(), temporaryDirectory2);
+                        IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory2);
+                        FilterZipFileList(unFilteredFileList);
+
+                    }
+
                 }
+
+                    //LbTemporary.Content = ConfFileHandler.FindAppSettingsFile(temporaryDirectory);
+                    ////IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory);
+                    //FilterZipFileList(unFilteredFileList);
+                //}
                 
                 //ZipFile.ExtractToDirectory(zipFilePath, temporaryFolder);
                 //LbProcessStatus.Content = "ZipFile saved successfully: " + temporaryFolder;
