@@ -59,5 +59,28 @@ namespace MicroServiceInstaller3.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] _7zS {
+            get {
+                object obj = ResourceManager.GetObject("_7zS", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ;!@Install@!UTF-8!
+        ///Title=&quot;Service v1.0.0.0&quot;
+        ///BeginPrompt=&quot;Do you want to open Service v1.0.0.0?&quot;
+        ///RunProgram=&quot;ServiceInstallClient.exe&quot;
+        ///;!@InstallEnd@!.
+        /// </summary>
+        internal static string config {
+            get {
+                return ResourceManager.GetString("config", resourceCulture);
+            }
+        }
     }
 }

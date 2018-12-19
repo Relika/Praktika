@@ -28,6 +28,48 @@ namespace ServiceInstallClient.Tests
             string temporaryFolder = FShandler.CopyResourcesToTemporayFolder(zipArchive);
         }
 
+        [TestMethod]
+        public void TestCreateServiceZip()
+        {
+            string temporaryDirectory = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\Template";
+            string installServiceDirectory = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService";
+            MicroServiceInstaller3.MainWindow.CreateServiceZip(temporaryDirectory, installServiceDirectory);
+            Assert.IsNotNull(ConfFileHandler.FindZipFile(installServiceDirectory));
+
+
+        }
+
+        [TestMethod]
+        public void TestCopyResources()
+        {
+            string installServiceDirectory = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService";
+            string confFilePath = Path.Combine(installServiceDirectory, "config.txt");
+            string sevenZipFilePath = Path.Combine(installServiceDirectory, "7zS.sfx");
+            MicroServiceInstaller3.MainWindow.CopyResources(confFilePath, sevenZipFilePath);
+        }
+
+        [TestMethod]
+        public void TestCreateInstallExe()
+        {
+            string serviceFilePath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService\Install.7z";
+            string confFilePath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService\config.txt";
+            string sevenZipFilPath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService\7zS.sfx";
+            MicroServiceInstaller3.MainWindow.CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilPath);
+        }
+
+        public void TestCopyExe()
+        {
+            string installServiceDirectory = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService";
+            MicroServiceInstaller3.MainWindow.CopyExeFile(installServiceDirectory);
+        }
+
+
+
+
+           
+
+
 
     }
+
 }

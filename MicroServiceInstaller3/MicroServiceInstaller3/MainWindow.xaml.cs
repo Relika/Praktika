@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using CommonLibary.Poco;
 using CommonLibary.Handlers;
+using System.Windows.Resources;
 
 namespace MicroServiceInstaller3
 {
@@ -27,6 +28,10 @@ namespace MicroServiceInstaller3
             LbworkFilesFolder.Content = FShandler.MakeDirectorytoTemp(workDirectory);
             string finalZipDirectory = ConfigurationManager.AppSettings["finalZipDirectory"];
             LbFinalZipFolder.Content = FShandler.MakeDirectorytoTemp(finalZipDirectory);
+            string serviceZipDirectory = ConfigurationManager.AppSettings["serviceZipDirectory"];
+            LbServiceZipFolder.Content = FShandler.MakeDirectorytoTemp(serviceZipDirectory);
+            string installpDirectory = ConfigurationManager.AppSettings["installDirectory"];
+            LbInstallFolder.Content = FShandler.MakeDirectorytoTemp(installpDirectory);
         }
         string randomFileName = "";
 
@@ -190,21 +195,75 @@ namespace MicroServiceInstaller3
                 //Read zipFiles
                 string zipLocation = LbZipFilesFolder.Content.ToString();
                 // Create finalZip
-                string temporaryDirectory = LbFinalZipFolder.Content.ToString();
+                string temporaryDirectory =  LbServiceZipFolder.Content.ToString(); 
                 string finalZipFileName = "final.zip";
                 string finalZipFilePath = System.IO.Path.Combine(temporaryDirectory, finalZipFileName);
+                if (File.Exists(finalZipFilePath))
+                {
+                    File.Delete(finalZipFilePath);
+                }
                 ZipFile.CreateFromDirectory(zipLocation, finalZipFilePath);
-                // Save finalZip to ServiceInstallClient.exe resourses
-                byte[] finalZipBytes = File.ReadAllBytes(finalZipFilePath);
-                string exeFilePath = @"ServiceInstallClient.exe";
-                string finalExe = "start.exe";
-                ResourceHandler.AddResource(exeFilePath, finalZipFileName, finalZipBytes, finalExe);
-                LbStatus.Content = "Zip file is created successfully: " + finalExe;
+                LbStatus.Content = "Zip file is created successfully: " + temporaryDirectory; //finalExe;
                 BnFinishandZip.IsEnabled = false;
                 ListZipFiles.Items.Clear(); // eemaldab listis olevad valitud zip failide asukohakirjed
-                scope.Complete();            
+                scope.Complete();
+
+                string installServiceDirectory = LbInstallFolder.Content.ToString();
+                string confFilePath = Path.Combine(installServiceDirectory, "config.txt");
+                string sevenZipFilePath = Path.Combine(installServiceDirectory, "7zS.sfx");
+                if (!Directory.Exists(installServiceDirectory)) Directory.CreateDirectory(installServiceDirectory);
+                string serviceFilePath = CreateServiceZip(temporaryDirectory, installServiceDirectory);
+                CopyResources(confFilePath, sevenZipFilePath);
+                CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath);
+                CopyExeFile(installServiceDirectory);
             }
         }
+        public static void CopyResources(string confFilePath, string sevenZipFilPath)
+        {
+            File.WriteAllBytes(sevenZipFilPath, Properties.Resources._7zS);
+            string configFileText = Properties.Resources.config;          
+            File.WriteAllText(confFilePath, configFileText);
+        }
+
+        public static string CreateServiceZip(string temporaryDirectory, string installServiceDirectory)
+        {
+            
+            string serviceFileName = "Install.7z";
+            string serviceFilePath = System.IO.Path.Combine(installServiceDirectory, serviceFileName);
+            if (File.Exists(serviceFilePath)) File.Delete(serviceFilePath);
+            SevenZip.SevenZipCompressor.SetLibraryPath(@"C:\Users\IEUser\Downloads\7z920_extra\7za.dll");
+            SevenZip.SevenZipCompressor compressor = new SevenZip.SevenZipCompressor();
+            compressor.CompressDirectory(temporaryDirectory, serviceFilePath);
+            return serviceFilePath;
+        }
+
+        public static void CreateInstallExe(string configFileName, string serviceFilePath, string sevenZipFileName)
+        {
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.FileName = "Installer.exe";
+            startInfo.Arguments = "/C copy /b "+ configFileName +"+"+ serviceFilePath + "+"+ sevenZipFileName;
+
+            //process.StartInfo = startInfo;
+            //process.Start();
+        }
+
+        public static void CopyExeFile(string installServiceDirectory)
+        {
+            IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(installServiceDirectory);
+            foreach (var item in Files)
+            {
+                if (File.Exists(item)) continue;
+                bool endsIn = (item.EndsWith(".exe")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
+                if (endsIn)
+                {
+                    File.Copy(item, Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+                }
+
+            }
+        }
+
 
         private void BnCloseUpload_Click(object sender, RoutedEventArgs e)
         {

@@ -11,7 +11,6 @@ using CommonLibary.Poco;
 using System.Collections.ObjectModel;
 using System.Collections;
 using MicroServiceInstaller3;
-//using System.Resources;
 
 namespace ServiceInstallClient
 {
