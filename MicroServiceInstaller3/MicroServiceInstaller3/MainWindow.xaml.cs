@@ -11,6 +11,11 @@ using System.Configuration;
 using CommonLibary.Poco;
 using CommonLibary.Handlers;
 using System.Windows.Resources;
+using System.Windows.Documents;
+using System.Resources;
+using System.Collections;
+using System.Linq;
+using System.Reflection;
 
 namespace MicroServiceInstaller3
 {
@@ -195,35 +200,109 @@ namespace MicroServiceInstaller3
                 //Read zipFiles
                 string zipLocation = LbZipFilesFolder.Content.ToString();
                 // Create finalZip
-                string temporaryDirectory =  LbServiceZipFolder.Content.ToString(); 
+                string serviceZipDirectory =  LbServiceZipFolder.Content.ToString(); 
                 string finalZipFileName = "final.zip";
-                string finalZipFilePath = System.IO.Path.Combine(temporaryDirectory, finalZipFileName);
+                string finalZipFilePath = System.IO.Path.Combine(serviceZipDirectory, finalZipFileName);
                 if (File.Exists(finalZipFilePath))
                 {
                     File.Delete(finalZipFilePath);
                 }
                 ZipFile.CreateFromDirectory(zipLocation, finalZipFilePath);
-                LbStatus.Content = "Zip file is created successfully: " + temporaryDirectory; //finalExe;
+                LbStatus.Content = "Zip file is created successfully: " + serviceZipDirectory; //finalExe;
                 BnFinishandZip.IsEnabled = false;
                 ListZipFiles.Items.Clear(); // eemaldab listis olevad valitud zip failide asukohakirjed
                 scope.Complete();
+
+
+                string serviceExePath = Path.Combine(serviceZipDirectory, "ServiceInstallClient.exe");
+                string newtonSoftDllPath = Path.Combine(serviceZipDirectory, "Newtonsoft_Json.dll");
+                Properties.Resources.ResourceManager.GetObject("ServiceInstallClient");
+              
+                
 
                 string installServiceDirectory = LbInstallFolder.Content.ToString();
                 string confFilePath = Path.Combine(installServiceDirectory, "config.txt");
                 string sevenZipFilePath = Path.Combine(installServiceDirectory, "7zS.sfx");
                 if (!Directory.Exists(installServiceDirectory)) Directory.CreateDirectory(installServiceDirectory);
-                string serviceFilePath = CreateServiceZip(temporaryDirectory, installServiceDirectory);
-                CopyResources(confFilePath, sevenZipFilePath);
+                // kopeerib Client programmi failid ressurssidest
+                string serviceFilePath = CreateServiceZip(serviceZipDirectory, installServiceDirectory);
+                //CopyResources(confFilePath, sevenZipFilePath);// kopeerib ressursid installServiceDirectorysse
                 CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath);
                 CopyExeFile(installServiceDirectory);
             }
         }
-        public static void CopyResources(string confFilePath, string sevenZipFilPath)
+
+        public static string[] GetAllTxt()
         {
-            File.WriteAllBytes(sevenZipFilPath, Properties.Resources._7zS);
-            string configFileText = Properties.Resources.config;          
-            File.WriteAllText(confFilePath, configFileText);
+            var executingAssembly = Assembly.GetExecutingAssembly();
+            string folderName = string.Format("MicroServiceInstaller3.Properties.Resources.", executingAssembly.GetName().Name);
+            return executingAssembly
+                .GetManifestResourceNames()
+                .Where(r => r.StartsWith(folderName) && r.EndsWith(".txt"))
+                //.Select(r => r.Substring(constantResName.Length + 1))
+                .ToArray();
         }
+        public static void CopyResources(string installServiceDirectory, string serviceZipDirectory)
+        {
+
+
+            const string subfolder = "MicroServiceInstaller3.Properties.Resources.";
+            var assembly = Assembly.GetExecutingAssembly();
+            foreach (var name in assembly.GetManifestResourceNames())
+            {
+                // Skip names outside of your desired subfolder
+                //if (!name.StartsWith(subfolder))
+                //{
+                //    continue;
+                //}
+                FileStream file = assembly.GetFile("config.txt");
+                FileStream[] files = assembly.GetFiles();
+                foreach (var item in files)
+                {
+
+                }
+                using (Stream input = assembly.GetManifestResourceStream(name))
+                using (Stream output = File.Create(installServiceDirectory + name.Substring(subfolder.Length)))
+                {
+                    input.CopyTo(output);
+                }
+            }
+
+            var ressourceList = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            foreach (var item in ressourceList)
+            {
+
+                if (item.EndsWith(".exe") || item.EndsWith("dll")){
+                    string filePath = Path.Combine(serviceZipDirectory, item.ToString());
+                    File.WriteAllBytes(filePath, Properties.Resources.ServiceInstallClient);
+                    File.WriteAllBytes(filePath, Properties.Resources.CommonLibary);
+
+                }
+                if(item.Equals("config.txt") )
+                {
+                    string confFilePath = Path.Combine(installServiceDirectory, "config.txt");
+                    string configFileText = Properties.Resources.config;
+                    File.WriteAllText(confFilePath, configFileText);
+                }
+                if (item.Equals("7zS.sfx"))
+                {
+                    string sevenZipFilePath = Path.Combine(installServiceDirectory, "7zS.sfx");
+                    File.WriteAllBytes(sevenZipFilePath, Properties.Resources._7zS);
+                }
+            }
+            var filename = ressourceList.Where(x => x.EndsWith(".exe")).FirstOrDefault();
+
+
+        }
+
+
+
+        //public static void CopyResources1(string confFilePath, string sevenZipFilPath)
+        //{
+            
+        //    string configFileText = Properties.Resources.config;          
+        //    File.WriteAllText(confFilePath, configFileText);
+        //}
 
         public static string CreateServiceZip(string temporaryDirectory, string installServiceDirectory)
         {

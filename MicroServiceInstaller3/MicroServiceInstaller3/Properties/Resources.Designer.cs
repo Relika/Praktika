@@ -71,6 +71,16 @@ namespace MicroServiceInstaller3.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] CommonLibary {
+            get {
+                object obj = ResourceManager.GetObject("CommonLibary", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ;!@Install@!UTF-8!
         ///Title=&quot;Service v1.0.0.0&quot;
         ///BeginPrompt=&quot;Do you want to open Service v1.0.0.0?&quot;
@@ -80,6 +90,26 @@ namespace MicroServiceInstaller3.Properties {
         internal static string config {
             get {
                 return ResourceManager.GetString("config", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Newtonsoft_Json {
+            get {
+                object obj = ResourceManager.GetObject("Newtonsoft_Json", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] ServiceInstallClient {
+            get {
+                object obj = ResourceManager.GetObject("ServiceInstallClient", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }

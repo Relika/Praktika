@@ -40,7 +40,20 @@ namespace ServiceInstallClient.Tests
         }
 
         [TestMethod]
-        public void TestCopyResources()
+        public void TestGettxtFiles()
+        {
+            string[] txtfiles = MicroServiceInstaller3.MainWindow.GetAllTxt();
+        }
+        [TestMethod]
+        public void TestCopyResourses()
+        {
+            string serviceZipDirectory = FShandler.MakeDirectorytoTemp("test1");
+            string installDirectory = FShandler.MakeDirectorytoTemp("test2");
+            MicroServiceInstaller3.MainWindow.CopyResources(serviceZipDirectory, installDirectory);
+        }
+
+        [TestMethod]
+        public void TestCopyResources1()
         {
             string installServiceDirectory = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService";
             string confFilePath = Path.Combine(installServiceDirectory, "config.txt");
