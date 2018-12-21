@@ -42,7 +42,8 @@ namespace ServiceInstallClient.Tests
         [TestMethod]
         public void TestGettxtFiles()
         {
-            string[] txtfiles = MicroServiceInstaller3.MainWindow.GetAllTxt();
+            //MicroServiceInstaller3.MainWindow.Listresources();
+            //string[] txtfiles = MicroServiceInstaller3.MainWindow.GetAllTxt();
         }
         [TestMethod]
         public void TestCopyResourses()

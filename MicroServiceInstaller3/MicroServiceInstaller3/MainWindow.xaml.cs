@@ -16,6 +16,8 @@ using System.Resources;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using System.Diagnostics;
+using Mono.Cecil;
 
 namespace MicroServiceInstaller3
 {
@@ -212,19 +214,14 @@ namespace MicroServiceInstaller3
                 BnFinishandZip.IsEnabled = false;
                 ListZipFiles.Items.Clear(); // eemaldab listis olevad valitud zip failide asukohakirjed
                 scope.Complete();
-
-
-                string serviceExePath = Path.Combine(serviceZipDirectory, "ServiceInstallClient.exe");
-                string newtonSoftDllPath = Path.Combine(serviceZipDirectory, "Newtonsoft_Json.dll");
-                Properties.Resources.ResourceManager.GetObject("ServiceInstallClient");
-              
-                
+                       
 
                 string installServiceDirectory = LbInstallFolder.Content.ToString();
                 string confFilePath = Path.Combine(installServiceDirectory, "config.txt");
                 string sevenZipFilePath = Path.Combine(installServiceDirectory, "7zS.sfx");
                 if (!Directory.Exists(installServiceDirectory)) Directory.CreateDirectory(installServiceDirectory);
-                // kopeerib Client programmi failid ressurssidest
+                // kopeerib failid ressurssidest
+                CopyResources(installServiceDirectory, serviceZipDirectory);
                 string serviceFilePath = CreateServiceZip(serviceZipDirectory, installServiceDirectory);
                 //CopyResources(confFilePath, sevenZipFilePath);// kopeerib ressursid installServiceDirectorysse
                 CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath);
@@ -232,77 +229,79 @@ namespace MicroServiceInstaller3
             }
         }
 
-        public static string[] GetAllTxt()
-        {
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            string folderName = string.Format("MicroServiceInstaller3.Properties.Resources.", executingAssembly.GetName().Name);
-            return executingAssembly
-                .GetManifestResourceNames()
-                .Where(r => r.StartsWith(folderName) && r.EndsWith(".txt"))
-                //.Select(r => r.Substring(constantResName.Length + 1))
-                .ToArray();
-        }
+        //public static string[] GetAllTxt()
+        //{
+
+        //    var executingAssembly = Assembly.GetExecutingAssembly();
+        //    string folderName = string.Format("MicroServiceInstaller3.Resources.", executingAssembly.GetName().Name);
+        //    return executingAssembly                .GetManifestResourceNames()
+        //        //.Where(r => r.StartsWith(folderName) && r.EndsWith(".txt"))
+        //        //.Select(r => r.Substring(constantResName.Length + 1))
+        //        .ToArray();
+        //}
+        //public void Listresources()
+        //{
+        //    var p = Process.GetCurrentProcess().MainModule.FileName;
+        //    var definition =
+        //        AssemblyDefinition.ReadAssembly(p);
+        //    foreach (var item in definition.MainModule.Resources)
+        //    {
+        //        var c = item.Name;
+        //        ListFiles.Items.Add(c);
+        //    }
+        //}
+
+
         public static void CopyResources(string installServiceDirectory, string serviceZipDirectory)
         {
 
-
-            const string subfolder = "MicroServiceInstaller3.Properties.Resources.";
-            var assembly = Assembly.GetExecutingAssembly();
-            foreach (var name in assembly.GetManifestResourceNames())
+            Assembly asmb = Assembly.GetExecutingAssembly();
+            string[] resourceNames = asmb.GetManifestResourceNames();
+            foreach (string s in resourceNames)
             {
-                // Skip names outside of your desired subfolder
-                //if (!name.StartsWith(subfolder))
-                //{
-                //    continue;
-                //}
-                FileStream file = assembly.GetFile("config.txt");
-                FileStream[] files = assembly.GetFiles();
-                foreach (var item in files)
+                string fileName = s.Substring(33);
+                if (s.EndsWith(".exe") || s.EndsWith(".dll"))
                 {
-
+                    Stream strm = asmb.GetManifestResourceStream(s);
+                    if (strm != null)
+                    {
+                        //using (var src = File.OpenRead(@"srcPath"))
+                        string serviceDirectoryFilePath = System.IO.Path.Combine(serviceZipDirectory, fileName);
+                        using (var dest = File.OpenWrite(serviceDirectoryFilePath))
+                        {
+                            strm.CopyTo(dest); //blocks until finished
+                        }
+                        //strm.CopyTo()
+                        //picsStrm.(strm);
+                        //File.WriteAllBytes(serviceFilePath, Properties.Resources.ServiceInstallClient);
+                    }
                 }
-                using (Stream input = assembly.GetManifestResourceStream(name))
-                using (Stream output = File.Create(installServiceDirectory + name.Substring(subfolder.Length)))
+                if (s.EndsWith(".txt")|| s.EndsWith(".sfx"))
                 {
-                    input.CopyTo(output);
+                    Stream strm = asmb.GetManifestResourceStream(s);
+                    if (strm != null)
+                    {
+                        string installServiceDirectoryFilePath = System.IO.Path.Combine(installServiceDirectory, fileName);
+                        using (var dest = File.OpenWrite(installServiceDirectoryFilePath))
+                        {
+                            strm.CopyTo(dest); //blocks until finished
+                        }
+                    }
+
                 }
             }
 
-            var ressourceList = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames();
-            foreach (var item in ressourceList)
-            {
+            //string serviceFilePath = Path.Combine(serviceZipDirectory, "ServiceInstallclient.exe");
+            //File.WriteAllBytes(serviceFilePath, Properties.Resources.ServiceInstallClient);
+            //string commonLibaryFilePath = Path.Combine(serviceZipDirectory, "CommonLibary.dll");
+            //File.WriteAllBytes(commonLibaryFilePath, Properties.Resources.CommonLibary);
+            //string NewtonsoftFilePath = Path.Combine(serviceZipDirectory, "Newtonsoft_Json.dll");
+            //File.WriteAllBytes(NewtonsoftFilePath, Properties.Resources.Newtonsoft_Json);
 
-                if (item.EndsWith(".exe") || item.EndsWith("dll")){
-                    string filePath = Path.Combine(serviceZipDirectory, item.ToString());
-                    File.WriteAllBytes(filePath, Properties.Resources.ServiceInstallClient);
-                    File.WriteAllBytes(filePath, Properties.Resources.CommonLibary);
-
-                }
-                if(item.Equals("config.txt") )
-                {
-                    string confFilePath = Path.Combine(installServiceDirectory, "config.txt");
-                    string configFileText = Properties.Resources.config;
-                    File.WriteAllText(confFilePath, configFileText);
-                }
-                if (item.Equals("7zS.sfx"))
-                {
-                    string sevenZipFilePath = Path.Combine(installServiceDirectory, "7zS.sfx");
-                    File.WriteAllBytes(sevenZipFilePath, Properties.Resources._7zS);
-                }
-            }
-            var filename = ressourceList.Where(x => x.EndsWith(".exe")).FirstOrDefault();
-
-
+            //string configFileText = Properties.Resources.config;
+            //File.WriteAllText(confFilePath, configFileText);
+            //File.WriteAllBytes(sevenZipFilePath, Properties.Resources._7zS);
         }
-
-
-
-        //public static void CopyResources1(string confFilePath, string sevenZipFilPath)
-        //{
-            
-        //    string configFileText = Properties.Resources.config;          
-        //    File.WriteAllText(confFilePath, configFileText);
-        //}
 
         public static string CreateServiceZip(string temporaryDirectory, string installServiceDirectory)
         {
@@ -323,9 +322,8 @@ namespace MicroServiceInstaller3
             startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
             startInfo.FileName = "Installer.exe";
             startInfo.Arguments = "/C copy /b "+ configFileName +"+"+ serviceFilePath + "+"+ sevenZipFileName;
-
-            //process.StartInfo = startInfo;
-            //process.Start();
+            process.StartInfo = startInfo;
+            process.Start();
         }
 
         public static void CopyExeFile(string installServiceDirectory)

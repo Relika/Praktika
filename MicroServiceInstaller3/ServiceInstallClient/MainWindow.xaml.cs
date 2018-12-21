@@ -11,6 +11,8 @@ using CommonLibary.Poco;
 using System.Collections.ObjectModel;
 using System.Collections;
 using MicroServiceInstaller3;
+using System.Management;
+using static System.Environment;
 
 namespace ServiceInstallClient
 {
@@ -52,7 +54,9 @@ namespace ServiceInstallClient
             //ZipArchive zipArchive = new ZipArchive(memoryStream);
             try
             {
-                string temporaryFolder = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\Template";
+                string temporaryFolder = Environment.GetFolderPath(SpecialFolder.CommonApplicationData);
+
+                //string temporaryFolder = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\Template";
                     //FShandler.CopyResourcesToTemporayFolder(zipArchive); //@"C:\Users\IEUser\AppData\Local\Temp\2f7fd81c-4fbf-46a1-9252-0d8bf7ef0c90"; 
                 //ListUnPackedZipFiles.ItemsSource 
                 string zipFile= ConfFileHandler.FindZipFile(temporaryFolder);
