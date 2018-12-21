@@ -68,9 +68,11 @@ namespace ServiceInstallClient.Tests
             string serviceFilePath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService\Install.7z";
             string confFilePath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService\config.txt";
             string sevenZipFilPath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService\7zS.sfx";
-            MicroServiceInstaller3.MainWindow.CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilPath);
+            string exeFileDirectory = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService";
+            MicroServiceInstaller3.MainWindow.CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilPath, exeFileDirectory);
         }
 
+        [TestMethod]
         public void TestCopyExe()
         {
             string installServiceDirectory = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService";

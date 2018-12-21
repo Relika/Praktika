@@ -223,38 +223,14 @@ namespace MicroServiceInstaller3
                 // kopeerib failid ressurssidest
                 CopyResources(installServiceDirectory, serviceZipDirectory);
                 string serviceFilePath = CreateServiceZip(serviceZipDirectory, installServiceDirectory);
-                //CopyResources(confFilePath, sevenZipFilePath);// kopeerib ressursid installServiceDirectorysse
-                CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath);
-                CopyExeFile(installServiceDirectory);
+                CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath, installServiceDirectory);
+                string desktopFilePath = CopyExeFile(installServiceDirectory);
+                if (desktopFilePath != "" ) LbStatus.Content = "Installer exe is created successfully: " + desktopFilePath;
             }
         }
 
-        //public static string[] GetAllTxt()
-        //{
-
-        //    var executingAssembly = Assembly.GetExecutingAssembly();
-        //    string folderName = string.Format("MicroServiceInstaller3.Resources.", executingAssembly.GetName().Name);
-        //    return executingAssembly                .GetManifestResourceNames()
-        //        //.Where(r => r.StartsWith(folderName) && r.EndsWith(".txt"))
-        //        //.Select(r => r.Substring(constantResName.Length + 1))
-        //        .ToArray();
-        //}
-        //public void Listresources()
-        //{
-        //    var p = Process.GetCurrentProcess().MainModule.FileName;
-        //    var definition =
-        //        AssemblyDefinition.ReadAssembly(p);
-        //    foreach (var item in definition.MainModule.Resources)
-        //    {
-        //        var c = item.Name;
-        //        ListFiles.Items.Add(c);
-        //    }
-        //}
-
-
         public static void CopyResources(string installServiceDirectory, string serviceZipDirectory)
         {
-
             Assembly asmb = Assembly.GetExecutingAssembly();
             string[] resourceNames = asmb.GetManifestResourceNames();
             foreach (string s in resourceNames)
@@ -271,9 +247,6 @@ namespace MicroServiceInstaller3
                         {
                             strm.CopyTo(dest); //blocks until finished
                         }
-                        //strm.CopyTo()
-                        //picsStrm.(strm);
-                        //File.WriteAllBytes(serviceFilePath, Properties.Resources.ServiceInstallClient);
                     }
                 }
                 if (s.EndsWith(".txt")|| s.EndsWith(".sfx"))
@@ -287,58 +260,51 @@ namespace MicroServiceInstaller3
                             strm.CopyTo(dest); //blocks until finished
                         }
                     }
-
                 }
             }
-
-            //string serviceFilePath = Path.Combine(serviceZipDirectory, "ServiceInstallclient.exe");
-            //File.WriteAllBytes(serviceFilePath, Properties.Resources.ServiceInstallClient);
-            //string commonLibaryFilePath = Path.Combine(serviceZipDirectory, "CommonLibary.dll");
-            //File.WriteAllBytes(commonLibaryFilePath, Properties.Resources.CommonLibary);
-            //string NewtonsoftFilePath = Path.Combine(serviceZipDirectory, "Newtonsoft_Json.dll");
-            //File.WriteAllBytes(NewtonsoftFilePath, Properties.Resources.Newtonsoft_Json);
-
-            //string configFileText = Properties.Resources.config;
-            //File.WriteAllText(confFilePath, configFileText);
-            //File.WriteAllBytes(sevenZipFilePath, Properties.Resources._7zS);
         }
 
         public static string CreateServiceZip(string temporaryDirectory, string installServiceDirectory)
-        {
-            
+        {          
             string serviceFileName = "Install.7z";
             string serviceFilePath = System.IO.Path.Combine(installServiceDirectory, serviceFileName);
             if (File.Exists(serviceFilePath)) File.Delete(serviceFilePath);
-            SevenZip.SevenZipCompressor.SetLibraryPath(@"C:\Users\IEUser\Downloads\7z920_extra\7za.dll");
+            SevenZip.SevenZipCompressor.SetLibraryPath (@"Resources\7za.dll");
             SevenZip.SevenZipCompressor compressor = new SevenZip.SevenZipCompressor();
             compressor.CompressDirectory(temporaryDirectory, serviceFilePath);
             return serviceFilePath;
         }
 
-        public static void CreateInstallExe(string configFileName, string serviceFilePath, string sevenZipFileName)
+        public static void CreateInstallExe(string configFileName, string serviceFilePath, string sevenZipFileName, string installServiceDirectory)
         {
             System.Diagnostics.Process process = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-            startInfo.FileName = "Installer.exe";
-            startInfo.Arguments = "/C copy /b "+ configFileName +"+"+ serviceFilePath + "+"+ sevenZipFileName;
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+            
+            startInfo.FileName = "C:\\Windows\\System32\\cmd.exe";
+            startInfo.Arguments = "/C copy /b "+ sevenZipFileName + " + "+ configFileName + " + "+ serviceFilePath + " "+ installServiceDirectory+ "\\Installer.exe";
             process.StartInfo = startInfo;
             process.Start();
         }
 
-        public static void CopyExeFile(string installServiceDirectory)
+        public static string CopyExeFile(string installServiceDirectory)
         {
             IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(installServiceDirectory);
             foreach (var item in Files)
             {
-                if (File.Exists(item)) continue;
+                string desktopPath= Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                //if (File.Exists(item)) continue;
                 bool endsIn = (item.EndsWith(".exe")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
                 if (endsIn)
                 {
-                    File.Copy(item, Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+                    string exeFileName = System.IO.Path.GetFileName(item);
+                    string desktopFilePath = System.IO.Path.Combine(desktopPath, exeFileName);
+                    if (File.Exists(desktopFilePath)) File.Delete(desktopFilePath);
+                    File.Copy(item, desktopFilePath);
+                    return desktopFilePath;
                 }
-
             }
+            return "";
         }
 
 

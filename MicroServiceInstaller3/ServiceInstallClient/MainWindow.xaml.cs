@@ -54,10 +54,13 @@ namespace ServiceInstallClient
             //ZipArchive zipArchive = new ZipArchive(memoryStream);
             try
             {
-                string temporaryFolder = Environment.GetFolderPath(SpecialFolder.CommonApplicationData);
+                //string temporaryFolder = Path.GetDirectoryName("Installer.exe");
+                //Environment.GetFolderPath(SpecialFolder.System);
+                string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string temporaryFolder = System.IO.Path.GetDirectoryName(path);
 
                 //string temporaryFolder = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\Template";
-                    //FShandler.CopyResourcesToTemporayFolder(zipArchive); //@"C:\Users\IEUser\AppData\Local\Temp\2f7fd81c-4fbf-46a1-9252-0d8bf7ef0c90"; 
+                //FShandler.CopyResourcesToTemporayFolder(zipArchive); //@"C:\Users\IEUser\AppData\Local\Temp\2f7fd81c-4fbf-46a1-9252-0d8bf7ef0c90"; 
                 //ListUnPackedZipFiles.ItemsSource 
                 string zipFile= ConfFileHandler.FindZipFile(temporaryFolder);
                 // Leia kaustas zip file

@@ -16,17 +16,31 @@ namespace ResourceInsectionTest
     {
         static void Main(string[] args)
         {
-            // string exeFilePath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\ResourceInsectionTest\ServiceInstallClient.exe";
-            string exeFilePath = @"ServiceInstallClient.exe";
-            string zipPath = @"C:\FinalZipDirectory\final.zip";
-            byte[] finalZipBytes = File.ReadAllBytes(zipPath);
-            //byte[] array = new byte[] { 1, 1, 0, 34 };
 
-            ResourceHandler.AddResource(exeFilePath, "Debug1.zip", finalZipBytes);
-            MemoryStream memoryStream = ResourceHandler.GetResource("start.exe", "Debug1.zip");
-            ZipArchive zipArchive = new ZipArchive(memoryStream);
-            string temporaryFolder = FShandler.CopyResourcesToTemporayFolder(zipArchive);
+            string serviceFilePath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService\Install.7z";
+            string confFilePath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService\config.txt";
+            string sevenZipFilPath = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService\7zS.sfx";
+            string exeFileDirectory = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\InstallService";
+            //System.Diagnostics.Process process = new System.Diagnostics.Process();
+            //System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            //startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+            string[] files = new string[] { serviceFilePath, sevenZipFilPath, confFilePath };
+            Stream streamFiles = File.Create(exeFileDirectory+"\\Install.exe");
+            foreach (var item in files)
+            {
+                Stream i = File.OpenRead(item);
+                i.CopyTo(streamFiles);
+                i.Close();
+            }
+            //startInfo.FileName = "cmd.exe";
+            //startInfo.Arguments = "/C copy /b " + confFilePath + " + " + serviceFilePath + " + " + sevenZipFilPath + " " + exeFileDirectory + "\\Installer.exe";
+            //startInfo.UseShellExecute = false;
+            //process.StartInfo = startInfo;
+            //process.Start();
 
+
+
+            //Console.ReadLine();
 
         }
 
