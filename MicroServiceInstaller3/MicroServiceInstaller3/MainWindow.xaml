@@ -144,6 +144,7 @@
             <Label x:Name="LbServiceZipFolder" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
             <Label x:Name="LbInstallFolder" Grid.Column="4" HorizontalAlignment="Left" Margin="48,60,0,0" Grid.Row="1" VerticalAlignment="Top" Visibility="Hidden"/>
             <Label x:Name="LbTemporary" Grid.Row="3" HorizontalAlignment="Left"    VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
+            <Label x:Name="LbLogFilePath" Grid.Row="3" HorizontalAlignment="Left"    VerticalAlignment="Top"  Height="36" Width="800" Grid.ColumnSpan="5" Visibility="Hidden"/>
         </Grid>
     </Grid>
 

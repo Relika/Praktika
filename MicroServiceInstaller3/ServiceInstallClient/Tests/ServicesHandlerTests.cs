@@ -18,8 +18,19 @@ namespace MicroServiceInstaller3.Tests
         {
             string serviceName = "TestService";
             string displayName = "TestService";
-            string fileName = "C:/Users/IEUser/source/repos/Relika/Praktika/Praktika/MicroServiceInstaller3/TestService/bin/Debug/TestService.exe";
+            string fileName = @"C:\Users\IEUser\Downloads\New folder\TestService.exe";
             ServiceInstaller.InstallAndStart(serviceName, displayName, fileName);
+            
+        }
+
+        [TestMethod]
+        public void TestInstallService2()
+        {
+            string serviceName = "Installer";
+            string displayName = "Installer";
+            string fileName = @"C:\Users\IEUser\Downloads\Installer.exe";
+            ServiceInstaller.InstallAndStart(serviceName, displayName, fileName);
+
         }
 
         [TestMethod]
@@ -36,7 +47,17 @@ namespace MicroServiceInstaller3.Tests
         [TestMethod]
         public void TestStartService()
         {
-            string serviceName = "TestService";
+            string serviceName = "WatchdogService";
+            ServiceInstaller.StartService(serviceName);
+            ServiceState serviceStatus = ServiceInstaller.GetServiceStatus(serviceName);
+            Assert.AreEqual(ServiceState.Running, serviceStatus);
+
+        }
+
+        [TestMethod]
+        public void TestStartService2()
+        {
+            string serviceName = "Installer";
             ServiceInstaller.StartService(serviceName);
             ServiceState serviceStatus = ServiceInstaller.GetServiceStatus(serviceName);
             Assert.AreEqual(ServiceState.Running, serviceStatus);

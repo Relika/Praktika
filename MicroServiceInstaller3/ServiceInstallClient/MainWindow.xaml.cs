@@ -11,8 +11,7 @@ using CommonLibary.Poco;
 using System.Collections.ObjectModel;
 using System.Collections;
 using MicroServiceInstaller3;
-using System.Management;
-using static System.Environment;
+using System.Transactions;
 
 namespace ServiceInstallClient
 {
@@ -33,6 +32,8 @@ namespace ServiceInstallClient
             LvDownLoadedConnectionSettings.ItemsSource = "";
             LvDownloadedConfigSettings.ItemsSource = "";
             LbExistingAppSettingsFilePath.Content = "";
+            LbDownloadedProcessStatus.Content = "";
+            
             if (ListAppSettingsFiles.SelectedIndex >= 0)
             {
                 BnConfigDownloadedAppSettings.IsEnabled = true;
@@ -50,27 +51,13 @@ namespace ServiceInstallClient
 
         private void BTestSelectZipFile_Click(object sender, RoutedEventArgs e)
         {
-            //MemoryStream memoryStream = ResourceHandler.GetResource("start.exe", "final.zip"); //Process.GetCurrentProcess().MainModule.FileName
-            //ZipArchive zipArchive = new ZipArchive(memoryStream);
             try
             {
-                //string temporaryFolder = Path.GetDirectoryName("Installer.exe");
-                //Environment.GetFolderPath(SpecialFolder.System);
                 string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 string temporaryFolder = System.IO.Path.GetDirectoryName(path);
-
-                //string temporaryFolder = @"C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\Template";
-                //FShandler.CopyResourcesToTemporayFolder(zipArchive); //@"C:\Users\IEUser\AppData\Local\Temp\2f7fd81c-4fbf-46a1-9252-0d8bf7ef0c90"; 
-                //ListUnPackedZipFiles.ItemsSource 
                 string zipFile= ConfFileHandler.FindZipFile(temporaryFolder);
                 // Leia kaustas zip file
-
-                    //DirectoryInfo directory = new DirectoryInfo(temporaryFolder);
-                    //IEnumerable<string>  unFilteredZipFileList = ListUnPackedZipFiles.ItemsSource as IEnumerable<string>;
-                    ///foreach (var item in directory.GetFiles())
-                    //{
                 string temporaryDirectory = FShandler.MakeRandomDirectorytoTemp();
-                        //string zipFile = System.IO.Path.Combine(temporaryFolder, item.Name.ToString());
                 ZipFile.ExtractToDirectory(zipFile, temporaryDirectory);
 
                 if (ConfFileHandler.FindZipFile(temporaryDirectory) == ""){// rohkem zip faile ei ole
@@ -81,25 +68,12 @@ namespace ServiceInstallClient
                     ListUnPackedZipFiles.ItemsSource = Files;
                     foreach (object item in ListUnPackedZipFiles.ItemsSource)
                     {
-                        //ListUnPackedZipFiles.ItemsSource = item.ToString();
                         string temporaryDirectory2 = FShandler.MakeRandomDirectorytoTemp();
-                        //string zipFile2 = ConfFileHandler.FindZipFile(temporaryDirectory);
                         ZipFile.ExtractToDirectory(item.ToString(), temporaryDirectory2);
                         IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory2);
                         FilterZipFileList(unFilteredFileList);
-
                     }
-
                 }
-
-                    //LbTemporary.Content = ConfFileHandler.FindAppSettingsFile(temporaryDirectory);
-                    ////IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory);
-                    //FilterZipFileList(unFilteredFileList);
-                //}
-                
-                //ZipFile.ExtractToDirectory(zipFilePath, temporaryFolder);
-                //LbProcessStatus.Content = "ZipFile saved successfully: " + temporaryFolder;
-
             }
             catch (Exception error)
             {
@@ -145,6 +119,8 @@ namespace ServiceInstallClient
             {
                 string selectedPath = FShandler.ChooseFolder(folderBrowserDialog1, selectedFolderLabel: LbExistingAppSettingsFilePath, savebutton: BnSaveDownloadedAppSettingsChanges);
                 LbTemporaryFolderZipFile.Content = selectedPath;
+                // logfaili loomine
+                LbLogFilePath.Content = FShandler.CreateLogFile(selectedPath);
                 LbExistingAppSettingsFilePath.Content = selectedPath; // n'itab valitud kausta Seda rida pole vaja, toimub chooseFolderi funktsioonis!!!!
                 string temporaryFolder = LbTemporary.Content.ToString();
                 string[] folderIsEmpty = Directory.GetFiles(selectedPath);
@@ -233,41 +209,56 @@ namespace ServiceInstallClient
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
             Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectinStringsCollection);
             string serviceName = ConfFileHandler.GetServiceName(downloadedConfigFilePath);
-            try
-            {
-                ServiceState serviceStatusbefore = ServiceInstaller.GetServiceStatus(serviceName);
-                if (serviceStatusbefore == ServiceState.Running)
+            //string serviceFileName = System.IO.Path.Combine(serviceName, ".exe");
+            ErrorHandler.WriteErrorMessage(LbLogFilePath.Content.ToString(), "serviceName: " + serviceName);
+            using (TransactionScope scope = new TransactionScope())
+            { 
+                try
                 {
-                    ServiceInstaller.StopService(serviceName);
-                    ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
-                    ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                    ServiceInstaller.StartService(serviceName);
-                }
-                if (serviceStatusbefore == ServiceState.NotFound)
-                {
-                    ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
-                    ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                    ServiceInstaller.InstallAndStart(serviceName, serviceName, downloadedConfigFilePath);
-                }
-                else
-                {
-                    ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
-                    ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                    ServiceInstaller.StartService(serviceName);
-                }
+                    ServiceState serviceStatusbefore = ServiceInstaller.GetServiceStatus(serviceName);
+                    if (serviceStatusbefore == ServiceState.Running)
+                    {
+                        ServiceInstaller.StopService(serviceName);
+                        ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                        ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
+                        ErrorHandler.WriteErrorMessage(LbLogFilePath.Content.ToString(), "Servicestate.Running serviceName: " + serviceName);
+                        ServiceInstaller.StartService(serviceName);
 
-                ServiceState serviceStatusafter = ServiceInstaller.GetServiceStatus(serviceName);
-                LbDownloadedProcessStatus.Content = "Changes saved, service status: " + serviceStatusafter;
-                LvDownLoadedConnectionSettings.ItemsSource = "";
-                LvDownloadedConfigSettings.ItemsSource = "";
-                LbExistingAppSettingsFilePath.Content = "";
-                BnSaveDownloadedAppSettingsChanges.IsEnabled = false;
-            }
-            catch (Exception error)
-            {
-                LbDownloadedProcessStatus.Content = error.Message;
+                    }
+                    if (serviceStatusbefore == ServiceState.NotFound)
+                    {
+                        ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                        ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
+                        ErrorHandler.WriteErrorMessage(LbLogFilePath.Content.ToString(), " Servicestate.NotFound downloadedConfigFilePath: " + downloadedConfigFilePath);
+                        ErrorHandler.WriteErrorMessage(LbLogFilePath.Content.ToString(), "Servicestate.NotFound serviceName: " + serviceName);
+                        ServiceInstaller.InstallAndStart(serviceName, serviceName, downloadedConfigFilePath);
+                    }
+                    else
+                    {
+                        ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                        ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
+                        ErrorHandler.WriteErrorMessage(LbLogFilePath.Content.ToString(), "Servicestate.else serviceName: " + serviceName);
+                        ServiceInstaller.StartService(serviceName);
+                    }
+
+                    ServiceState serviceStatusafter = ServiceInstaller.GetServiceStatus(serviceName);
+                    LbDownloadedProcessStatus.Content = "Changes saved, service status: " + serviceStatusafter;
+                    LvDownLoadedConnectionSettings.ItemsSource = "";
+                    LvDownloadedConfigSettings.ItemsSource = "";
+                    LbExistingAppSettingsFilePath.Content = "";
+                    BnSaveDownloadedAppSettingsChanges.IsEnabled = false;
+                    scope.Complete();
+                }
+                catch (Exception error)
+                {
+                    LbDownloadedProcessStatus.Content = error.Message;
+                    string errorMessage = ErrorHandler.CreateErrorMessage(error);
+                    ErrorHandler.WriteErrorMessage(LbLogFilePath.Content.ToString(), errorMessage);
+
+                }
             }
         }
+
 
         private void BnCloseDownload_Click(object sender, RoutedEventArgs e)
         {

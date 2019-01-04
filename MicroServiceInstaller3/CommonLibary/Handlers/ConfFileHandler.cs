@@ -374,8 +374,14 @@ namespace CommonLibary.Handlers
             string fileName = Path.GetFileName(downloadedConfigFilePath);
             //string serviceName =
             string[] substrings = fileName.Split('.');
-            string serviceName = substrings[1];
-            return serviceName;
+            foreach (var substring in substrings)
+            {
+                if (substring != "exe" || substring != "config")
+                {
+                    return substring;
+                }
+            }  
+            return "";
         }
     }
 }

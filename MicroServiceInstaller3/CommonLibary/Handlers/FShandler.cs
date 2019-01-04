@@ -107,6 +107,14 @@ namespace CommonLibary.Handlers
             }
         }
 
+        public static string CreateLogFile (string selectedPath)
+        {
+            string logFileName = "log.txt";
+            string logFilePath = System.IO.Path.Combine(selectedPath, logFileName);
+            File.Create(logFilePath);
+            return logFilePath;
+        }
+
         public static string CopyResourcesToTemporayFolder(ZipArchive zipArchive)
         {
             string extractFolderPath = FShandler.MakeRandomDirectorytoTemp();
@@ -132,6 +140,14 @@ namespace CommonLibary.Handlers
             }
             return extractFolderPath;
         }
+
+        public static string GetProgramLocation()
+        {
+            string location = System.Reflection.Assembly.GetEntryAssembly().Location;
+            string directoryPath = Path.GetDirectoryName(location);
+            return directoryPath;
+        }
+
 
     }
 }

@@ -10,14 +10,7 @@ using System.Collections.ObjectModel;
 using System.Configuration;
 using CommonLibary.Poco;
 using CommonLibary.Handlers;
-using System.Windows.Resources;
-using System.Windows.Documents;
-using System.Resources;
-using System.Collections;
-using System.Linq;
-using System.Reflection;
-using System.Diagnostics;
-using Mono.Cecil;
+using MicroServiceInstaller3.Handlers;
 
 namespace MicroServiceInstaller3
 {
@@ -39,23 +32,31 @@ namespace MicroServiceInstaller3
             LbServiceZipFolder.Content = FShandler.MakeDirectorytoTemp(serviceZipDirectory);
             string installpDirectory = ConfigurationManager.AppSettings["installDirectory"];
             LbInstallFolder.Content = FShandler.MakeDirectorytoTemp(installpDirectory);
+            string programLocation = FShandler.GetProgramLocation();
+            LbLogFilePath.Content = FShandler.CreateLogFile(programLocation);
         }
         string randomFileName = "";
 
 
         private void BSelectFolder_Click(object sender, RoutedEventArgs e)
         {
-            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog(); // avab failide valimise akna
+            // m''rab parameetrid
             folderBrowserDialog1.Description = "Select directory";
             folderBrowserDialog1.ShowNewFolderButton = false;
             DialogResult result = folderBrowserDialog1.ShowDialog();
+            // kui kasutaja valib kausta ja vajutab OK
             if (result == System.Windows.Forms.DialogResult.OK)
             {
                 string selectedPath =FShandler.ChooseFolder(folderBrowserDialog1, selectedFolderLabel: LbSelectedFolder, savebutton: BnZip);
                 string workFilesFolderPath = LbworkFilesFolder.Content.ToString();
+                // kopeerib valitud kasutas olevad failid nn t;;folderisse
                 FShandler.DirectoryCopy(selectedPath, workFilesFolderPath, copySubDirs: true);
+                // loob faililisti
                 IEnumerable<string> unFilteredFileList = CreateUnFilteredFileList(workFilesFolderPath);
+                // filtreerib faililisti
                 FilterFileList(unFilteredFileList);
+                // loob metaandmetega faili
                 FShandler.CreateMetaDataFile(selectedPath, workFilesFolderPath);
             }
         }
@@ -70,14 +71,14 @@ namespace MicroServiceInstaller3
                 }
                 else
                 {
-                    bool endsIn = (file.EndsWith(".pdb") || file.Contains("/deps/") || file.Contains(".vshost.")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
+                    bool endsIn = (file.EndsWith(".pdb") || file.Contains("/deps/") || file.Contains(".vshost.")); // kui faili asukohanimetus sisaldab j'rgmisi v''rtusi
                     if (endsIn)
                     {
-                        File.Delete(file);
+                        File.Delete(file); // kustutab faili
                     }
                     else
                     {
-                        ListFiles.Items.Add($"{file}");                
+                        ListFiles.Items.Add($"{file}");  // lisab faili listi              
                     }
                 }
             }
@@ -143,14 +144,8 @@ namespace MicroServiceInstaller3
             }
             ObservableCollection<ConnectionStrings> connectionStringsCollection = LvUploadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
             Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateConnectionStringsDicitionary(connectionStringsCollection);
-            try
-            {
-                ConfFileHandler.WriteConnectionStringstoConFile(selectedPath, connectionStringsDic: connectionStringsDictionary);
-            }
-             catch (Exception error)          
-            {
-                LbProcessStatus.Content = error.Message;
-            }
+            try{ConfFileHandler.WriteConnectionStringstoConFile(selectedPath, connectionStringsDic: connectionStringsDictionary);}
+            catch (Exception error) { LbProcessStatus.Content = error.Message;}
         }
 
         private void BnZip_Click(object sender, RoutedEventArgs e)
@@ -170,26 +165,17 @@ namespace MicroServiceInstaller3
                 {
                     string ZipFilePath = value.ToString();
                     existItem = (ZipFilePath.Equals(zipFile)); // kui on olemas sama asukohanimetusega fail
-                    if (existItem)
-                    {
-                        break;
-                    }
+                    if (existItem)break; // l6peta tegevus
                 }
-                if (!existItem)
-                {
-                    ListZipFiles.Items.Add($"{zipFile}");
-                }
-                ListFiles.Items.Clear(); // eemaldab listis olevad asukohakirjed
-                LbSelectedFolder.Content = ""; // eemaldab valitud algse kataloogi asukoha kirje.
+                if (!existItem)ListZipFiles.Items.Add($"{zipFile}"); // kui faili ei ole, lisa see
+                // eemaldab ebavajaliku info
+                ListFiles.Items.Clear(); 
+                LbSelectedFolder.Content = ""; 
                 LbappSettingsPath.Content = "";
                 LvUploadedConfigSettings.ItemsSource = "";
                 LvUploadedConnectionSettings.ItemsSource = "";
                 LbProcessStatus.Content = "";
-
-                if (ListZipFiles.HasItems)
-                {
-                    BnFinishandZip.IsEnabled = true;
-                }
+                if (ListZipFiles.HasItems) BnFinishandZip.IsEnabled = true; // kui zipfailide listis on faile muudab finalzip nupu aktiivseks
                 scope.Complete();
             }
             BnZip.IsEnabled = false;
@@ -197,116 +183,46 @@ namespace MicroServiceInstaller3
 
         private void BnFinishandZip_Click(object sender, RoutedEventArgs e)
         {
-            using (var scope = new TransactionScope())
+            using (TransactionScope scope = new TransactionScope())
             {
-                //Read zipFiles
-                string zipLocation = LbZipFilesFolder.Content.ToString();
+                string zipLocation = LbZipFilesFolder.Content.ToString(); // defineerib kausta, kus on k6ik zipitud failid
                 // Create finalZip
-                string serviceZipDirectory =  LbServiceZipFolder.Content.ToString(); 
-                string finalZipFileName = "final.zip";
-                string finalZipFilePath = System.IO.Path.Combine(serviceZipDirectory, finalZipFileName);
-                if (File.Exists(finalZipFilePath))
-                {
-                    File.Delete(finalZipFilePath);
-                }
+                string serviceZipDirectory =  LbServiceZipFolder.Content.ToString(); // defineerib kausta, kus on k6ik teenuse failid, mis zipitakse
+                string finalZipFileName = "final.zip"; // defineerib l6ppzipfaili nime
+                string finalZipFilePath = System.IO.Path.Combine(serviceZipDirectory, finalZipFileName); // defineerib l6ppzipfaili aadressi
+                // kui l6ppzipfail eksisteerib, siis kutsutab selle
+                if (File.Exists(finalZipFilePath))File.Delete(finalZipFilePath);
+                // zipi k6ik zipfailid l6ppzipfailiks
                 ZipFile.CreateFromDirectory(zipLocation, finalZipFilePath);
-                LbStatus.Content = "Zip file is created successfully: " + serviceZipDirectory; //finalExe;
-                BnFinishandZip.IsEnabled = false;
+                LbStatus.Content = "Zip file is created successfully: " + serviceZipDirectory; // teade kasutajale l6ppzipfaili loomisest;
+                
+                // defineerib kausta, kuhu kopeeritakse k6ik teenuse k'ivitamiseks vajalikud failid
+                string installServiceDirectory = LbInstallFolder.Content.ToString(); 
+                string confFilePath = Path.Combine(installServiceDirectory, "config.txt"); // defineerib conffaili aadressi
+                string sevenZipFilePath = Path.Combine(installServiceDirectory, "7zS.sfx");// defineerib 7zs faili aadressi
+                // kui kausta ei ekstisteeri, loob uue kausta
+                if (!Directory.Exists(installServiceDirectory)) Directory.CreateDirectory(installServiceDirectory);
+                // kopeerib teenuse failid ressurssidest teenuse failide kausta ja teenuse k'ivitamiseks vajalikud failid eraldi kausta 
+                ServiceFileHandler.CopyResources(installServiceDirectory, serviceZipDirectory);
+                // zipib teenusefailid teenuse k'ivitamiseks vajalike failide kausta
+                string serviceFilePath = ServiceFileHandler.CreateServiceZip(serviceZipDirectory, installServiceDirectory);
+                // salvestab teenuse failid ja teenuse automaatseks k'ivitamiseks vajalikud failid yhte installifaili
+                ServiceFileHandler.CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath, installServiceDirectory);
+                ErrorHandler.WriteErrorMessage(LbLogFilePath.Content.ToString(), "installServiceDirectory" + installServiceDirectory);
+                string desktopFilePath = ServiceFileHandler.CopyExeFile(installServiceDirectory); // kopeerib exe faili
+                if (desktopFilePath != "") {
+                    LbStatus.Content = "Installer.exe is created successfully: " + desktopFilePath;
+                }
+                else
+                {
+                    LbStatus.Content = "Installer.exe is created successfully: " + installServiceDirectory; // teavitab kasutajat exe faili loomisest
+                }
+                
+                BnFinishandZip.IsEnabled = false;// deaktiveerib nupu
                 ListZipFiles.Items.Clear(); // eemaldab listis olevad valitud zip failide asukohakirjed
                 scope.Complete();
-                       
-
-                string installServiceDirectory = LbInstallFolder.Content.ToString();
-                string confFilePath = Path.Combine(installServiceDirectory, "config.txt");
-                string sevenZipFilePath = Path.Combine(installServiceDirectory, "7zS.sfx");
-                if (!Directory.Exists(installServiceDirectory)) Directory.CreateDirectory(installServiceDirectory);
-                // kopeerib failid ressurssidest
-                CopyResources(installServiceDirectory, serviceZipDirectory);
-                string serviceFilePath = CreateServiceZip(serviceZipDirectory, installServiceDirectory);
-                CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath, installServiceDirectory);
-                string desktopFilePath = CopyExeFile(installServiceDirectory);
-                if (desktopFilePath != "" ) LbStatus.Content = "Installer exe is created successfully: " + desktopFilePath;
             }
         }
-
-        public static void CopyResources(string installServiceDirectory, string serviceZipDirectory)
-        {
-            Assembly asmb = Assembly.GetExecutingAssembly();
-            string[] resourceNames = asmb.GetManifestResourceNames();
-            foreach (string s in resourceNames)
-            {
-                string fileName = s.Substring(33);
-                if (s.EndsWith(".exe") || s.EndsWith(".dll"))
-                {
-                    Stream strm = asmb.GetManifestResourceStream(s);
-                    if (strm != null)
-                    {
-                        //using (var src = File.OpenRead(@"srcPath"))
-                        string serviceDirectoryFilePath = System.IO.Path.Combine(serviceZipDirectory, fileName);
-                        using (var dest = File.OpenWrite(serviceDirectoryFilePath))
-                        {
-                            strm.CopyTo(dest); //blocks until finished
-                        }
-                    }
-                }
-                if (s.EndsWith(".txt")|| s.EndsWith(".sfx"))
-                {
-                    Stream strm = asmb.GetManifestResourceStream(s);
-                    if (strm != null)
-                    {
-                        string installServiceDirectoryFilePath = System.IO.Path.Combine(installServiceDirectory, fileName);
-                        using (var dest = File.OpenWrite(installServiceDirectoryFilePath))
-                        {
-                            strm.CopyTo(dest); //blocks until finished
-                        }
-                    }
-                }
-            }
-        }
-
-        public static string CreateServiceZip(string temporaryDirectory, string installServiceDirectory)
-        {          
-            string serviceFileName = "Install.7z";
-            string serviceFilePath = System.IO.Path.Combine(installServiceDirectory, serviceFileName);
-            if (File.Exists(serviceFilePath)) File.Delete(serviceFilePath);
-            SevenZip.SevenZipCompressor.SetLibraryPath (@"Resources\7za.dll");
-            SevenZip.SevenZipCompressor compressor = new SevenZip.SevenZipCompressor();
-            compressor.CompressDirectory(temporaryDirectory, serviceFilePath);
-            return serviceFilePath;
-        }
-
-        public static void CreateInstallExe(string configFileName, string serviceFilePath, string sevenZipFileName, string installServiceDirectory)
-        {
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
-            
-            startInfo.FileName = "C:\\Windows\\System32\\cmd.exe";
-            startInfo.Arguments = "/C copy /b "+ sevenZipFileName + " + "+ configFileName + " + "+ serviceFilePath + " "+ installServiceDirectory+ "\\Installer.exe";
-            process.StartInfo = startInfo;
-            process.Start();
-        }
-
-        public static string CopyExeFile(string installServiceDirectory)
-        {
-            IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(installServiceDirectory);
-            foreach (var item in Files)
-            {
-                string desktopPath= Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                //if (File.Exists(item)) continue;
-                bool endsIn = (item.EndsWith(".exe")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
-                if (endsIn)
-                {
-                    string exeFileName = System.IO.Path.GetFileName(item);
-                    string desktopFilePath = System.IO.Path.Combine(desktopPath, exeFileName);
-                    if (File.Exists(desktopFilePath)) File.Delete(desktopFilePath);
-                    File.Copy(item, desktopFilePath);
-                    return desktopFilePath;
-                }
-            }
-            return "";
-        }
-
 
         private void BnCloseUpload_Click(object sender, RoutedEventArgs e)
         {
