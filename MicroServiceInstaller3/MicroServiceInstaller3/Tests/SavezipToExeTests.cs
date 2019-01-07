@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CommonLibary.Handlers;
 using MicroServiceInstaller3.Handlers;
@@ -77,8 +78,15 @@ namespace ServiceInstallClient.Tests
         public void TestCopyExe()
         {
             string installServiceDirectory = @"C:\Users\IEUser\AppData\Local\Temp\installFilesDirectory";
-            string result = ServiceFileHandler.CopyExeFile(installServiceDirectory);
-            Assert.IsNotNull(result);
+            string logFilePath = @"C:\Users\IEUser\AppData\Local\Temp\installFilesDirectory\log.txt";
+            for (int i = 0; i < 20; i++)
+            {
+                string result = ServiceFileHandler.CopyExeFile(installServiceDirectory, logFilePath);
+                Assert.IsNotNull(result);
+                Thread.Sleep(10);
+            }
+
+
         }
 
 

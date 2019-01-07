@@ -77,6 +77,8 @@ namespace MicroServiceInstaller3.Tests
             //                               (ResourceDictionary)reader.LoadAsync(info.Stream);
             //Application.Current.Resources.MergedDictionaries.Add(myResourceDictionary);
         }
+
+
             
     }
 }

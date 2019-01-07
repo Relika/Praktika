@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonLibary.Handlers;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -57,22 +58,28 @@ namespace MicroServiceInstaller3.Handlers
             return serviceFilePath; // tagastab zipfaili aadressi
         }
 
-        public static void CreateInstallExe(string configFileName, string serviceFilePath, string sevenZipFileName, string installServiceDirectory)
+        public static string CreateInstallExe(string configFileName, string serviceFilePath, string sevenZipFileName, string installServiceDirectory)
         {
             Process process = new Process();// defineerib uue protsessi
             ProcessStartInfo startInfo = new ProcessStartInfo(); // defineerib protsessi k'ivitamise  andmed
             startInfo.WindowStyle = ProcessWindowStyle.Normal;
             startInfo.FileName = "C:\\Windows\\System32\\cmd.exe";
+            
             startInfo.Arguments = "/C copy /b " + sevenZipFileName + " + " + configFileName + " + " + serviceFilePath + " " + installServiceDirectory + "\\Installer.exe";
             process.StartInfo = startInfo;
             process.Start(); // k'ivitab protsessi
+            string installerFilePath = System.IO.Path.Combine(installServiceDirectory, "Installer.exe");
+            return installerFilePath;
         }
 
-        public static string CopyExeFile(string installServiceDirectory)
+        public static string CopyExeFile(string installServiceDirectory, string logFilePath)
         {
             IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(installServiceDirectory);
+            try
+            {
             foreach (var item in Files)
             {
+                ErrorHandler.WriteLogMessage(logFilePath, "Files: " + item);
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 if (File.Exists(item))
                 {
@@ -80,6 +87,7 @@ namespace MicroServiceInstaller3.Handlers
                     if (endsIn)
                     {
                         string exeFileName = System.IO.Path.GetFileName(item);
+                        ErrorHandler.WriteLogMessage(logFilePath, "Found exe file: " + exeFileName);
                         string desktopFilePath = System.IO.Path.Combine(desktopPath, exeFileName);
                         if (File.Exists(desktopFilePath)) File.Delete(desktopFilePath);
                         File.Copy(item, desktopFilePath);
@@ -89,6 +97,12 @@ namespace MicroServiceInstaller3.Handlers
 
             }
             return "";
+            }
+            catch (Exception error)
+            {
+                ErrorHandler.WriteLogMessage(logFilePath, "Files: " + error);
+                throw;
+            }
         }
     }
 }

@@ -11,6 +11,8 @@ using System.Configuration;
 using CommonLibary.Poco;
 using CommonLibary.Handlers;
 using MicroServiceInstaller3.Handlers;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MicroServiceInstaller3
 {
@@ -40,6 +42,7 @@ namespace MicroServiceInstaller3
 
         private void BSelectFolder_Click(object sender, RoutedEventArgs e)
         {
+            LbStatus.Content = "";
             FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog(); // avab failide valimise akna
             // m''rab parameetrid
             folderBrowserDialog1.Description = "Select directory";
@@ -181,10 +184,9 @@ namespace MicroServiceInstaller3
             BnZip.IsEnabled = false;
         }
 
-        private void BnFinishandZip_Click(object sender, RoutedEventArgs e)
+        private async void BnFinishandZip_Click(object sender, RoutedEventArgs e)
         {
-            using (TransactionScope scope = new TransactionScope())
-            {
+            try { 
                 string zipLocation = LbZipFilesFolder.Content.ToString(); // defineerib kausta, kus on k6ik zipitud failid
                 // Create finalZip
                 string serviceZipDirectory =  LbServiceZipFolder.Content.ToString(); // defineerib kausta, kus on k6ik teenuse failid, mis zipitakse
@@ -207,9 +209,50 @@ namespace MicroServiceInstaller3
                 // zipib teenusefailid teenuse k'ivitamiseks vajalike failide kausta
                 string serviceFilePath = ServiceFileHandler.CreateServiceZip(serviceZipDirectory, installServiceDirectory);
                 // salvestab teenuse failid ja teenuse automaatseks k'ivitamiseks vajalikud failid yhte installifaili
-                ServiceFileHandler.CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath, installServiceDirectory);
-                ErrorHandler.WriteErrorMessage(LbLogFilePath.Content.ToString(), "installServiceDirectory" + installServiceDirectory);
-                string desktopFilePath = ServiceFileHandler.CopyExeFile(installServiceDirectory); // kopeerib exe faili
+                var progressHandler = new Progress<string>(value =>
+                {
+                    LbStatus.Content = value;
+                });
+                var progress = progressHandler as IProgress<string>;
+                try
+                {
+                    string installerexePath = await Task.Run(() => ServiceFileHandler.CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath, installServiceDirectory));
+                    {
+                        for (int i = 0; i != 100; ++i)
+                        {
+                            if (progress != null)
+                                progress.Report(i + "%");
+                            //token.ThrowIfCancellationRequested();
+                            Thread.Sleep(100);
+                            if (File.Exists(installerexePath)) break;
+                        }
+                        if(!File.Exists(installerexePath))
+                            throw new InvalidOperationException("Installer.exe not found.");
+                        //return 13;
+                    };
+                    LbStatus.Content = "Completed: " + installerexePath;
+                }
+                //catch (OperationCanceledException)
+                //{
+                //    LbStatus.Content = "Cancelled.";
+                //}
+                catch (Exception ex)
+                {
+                    LbStatus.Content = ex.GetType().Name + ": " + ex.Message;
+                }
+                //var result = await Task.Run(() => ServiceFileHandler.CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath, installServiceDirectory);
+                //string installerexePath = ServiceFileHandler.CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath, installServiceDirectory);
+                //for (int i = 0; i < 10; i++)
+                //{
+                //    Thread.Sleep(20000);
+                //    if (File.Exists(installerexePath)) break;
+                //}
+                //if (!File.Exists(installerexePath))
+                //{
+                //    LbStatus.Content = "Installer.exe not found: " + installerexePath;
+                //}
+                ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "installServiceDirectory: " + installServiceDirectory);
+                string desktopFilePath = ServiceFileHandler.CopyExeFile(installServiceDirectory, LbLogFilePath.Content.ToString()); // kopeerib exe faili
                 if (desktopFilePath != "") {
                     LbStatus.Content = "Installer.exe is created successfully: " + desktopFilePath;
                 }
@@ -220,7 +263,10 @@ namespace MicroServiceInstaller3
                 
                 BnFinishandZip.IsEnabled = false;// deaktiveerib nupu
                 ListZipFiles.Items.Clear(); // eemaldab listis olevad valitud zip failide asukohakirjed
-                scope.Complete();
+            }
+            catch (Exception error)
+            {
+                ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "error: " + error);
             }
         }
 

@@ -9,7 +9,7 @@ namespace CommonLibary.Handlers
 {
     public class ErrorHandler
     {
-        public static void WriteErrorMessage(string path, string error)
+        public static void WriteLogMessage(string path, string error)
         {
             if (File.Exists(path))
             {
@@ -41,12 +41,18 @@ namespace CommonLibary.Handlers
 
             if (addStackTrace)
             {
-                if (error != null && !string.IsNullOrWhiteSpace(error.StackTrace)) ;
-                    //builder.Append("ST:").Append(CutString(error.StackTrace, stackTraceLen));
+                if (error != null && !string.IsNullOrWhiteSpace(error.StackTrace))builder.Append("ST:").Append(CutString(error.StackTrace, stackTraceLen));
 
             }
 
             return builder.ToString();
+        }
+
+        public static string CutString(string initialString, int length)
+        {
+            if (string.IsNullOrWhiteSpace(initialString) || length < 1) return string.Empty;
+            if (initialString.Length <= length) return initialString;
+            return initialString.Substring(0, length);
         }
     }
 }
