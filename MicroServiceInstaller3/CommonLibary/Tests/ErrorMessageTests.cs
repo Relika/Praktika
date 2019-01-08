@@ -18,9 +18,9 @@ namespace CommonLibary.Tests
         {
             string error = "Viga";
             string path = @"C:\Users\IEUser\Downloads\Watchdog\log.txt";
-            ErrorHandler.WriteLogMessage(path, error);
+            LogHandler.WriteLogMessage(path, error);
             string error2 = "viga2";
-            ErrorHandler.WriteLogMessage(path, error2);
+            LogHandler.WriteLogMessage(path, error2);
         }
 
         

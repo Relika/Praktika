@@ -79,7 +79,7 @@ namespace MicroServiceInstaller3.Handlers
             {
             foreach (var item in Files)
             {
-                ErrorHandler.WriteLogMessage(logFilePath, "Files: " + item);
+                LogHandler.WriteLogMessage(logFilePath, "Files: " + item);
                 string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 if (File.Exists(item))
                 {
@@ -87,7 +87,7 @@ namespace MicroServiceInstaller3.Handlers
                     if (endsIn)
                     {
                         string exeFileName = System.IO.Path.GetFileName(item);
-                        ErrorHandler.WriteLogMessage(logFilePath, "Found exe file: " + exeFileName);
+                        LogHandler.WriteLogMessage(logFilePath, "Found exe file: " + exeFileName);
                         string desktopFilePath = System.IO.Path.Combine(desktopPath, exeFileName);
                         if (File.Exists(desktopFilePath)) File.Delete(desktopFilePath);
                         File.Copy(item, desktopFilePath);
@@ -100,7 +100,7 @@ namespace MicroServiceInstaller3.Handlers
             }
             catch (Exception error)
             {
-                ErrorHandler.WriteLogMessage(logFilePath, "Files: " + error);
+                LogHandler.WriteLogMessage(logFilePath, "Files: " + error);
                 throw;
             }
         }

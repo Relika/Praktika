@@ -271,7 +271,7 @@ namespace MicroServiceInstaller3
             }
             catch (Exception error)
             {
-                ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "error: " + error);
+                LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "error: " + error);
             }
         }
 

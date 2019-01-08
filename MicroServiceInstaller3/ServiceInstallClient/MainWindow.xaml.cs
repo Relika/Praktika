@@ -210,7 +210,7 @@ namespace ServiceInstallClient
             Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectinStringsCollection);
             string serviceName = ConfFileHandler.GetServiceName(downloadedConfigFilePath);
             //string serviceFileName = System.IO.Path.Combine(serviceName, ".exe");
-            ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "serviceName: " + serviceName);
+            LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "serviceName: " + serviceName);
             using (TransactionScope scope = new TransactionScope())
             { 
                 try
@@ -221,7 +221,7 @@ namespace ServiceInstallClient
                         ServiceInstaller.StopService(serviceName);
                         ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                         ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                        ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "Servicestate.Running serviceName: " + serviceName);
+                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "Servicestate.Running serviceName: " + serviceName);
                         ServiceInstaller.StartService(serviceName);
 
                     }
@@ -229,15 +229,15 @@ namespace ServiceInstallClient
                     {
                         ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                         ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                        ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), " Servicestate.NotFound downloadedConfigFilePath: " + downloadedConfigFilePath);
-                        ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "Servicestate.NotFound serviceName: " + serviceName);
+                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), " Servicestate.NotFound downloadedConfigFilePath: " + downloadedConfigFilePath);
+                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "Servicestate.NotFound serviceName: " + serviceName);
                         ServiceInstaller.InstallAndStart(serviceName, serviceName, downloadedConfigFilePath);
                     }
                     else
                     {
                         ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                         ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                        ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "Servicestate.else serviceName: " + serviceName);
+                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "Servicestate.else serviceName: " + serviceName);
                         ServiceInstaller.StartService(serviceName);
                     }
 
@@ -252,8 +252,8 @@ namespace ServiceInstallClient
                 catch (Exception error)
                 {
                     LbDownloadedProcessStatus.Content = error.Message;
-                    string errorMessage = ErrorHandler.CreateErrorMessage(error);
-                    ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), errorMessage);
+                    string errorMessage = LogHandler.CreateErrorMessage(error);
+                    LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), errorMessage);
 
                 }
             }
