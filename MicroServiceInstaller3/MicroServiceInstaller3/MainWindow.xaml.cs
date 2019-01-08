@@ -153,16 +153,16 @@ namespace MicroServiceInstaller3
 
         private void BnZip_Click(object sender, RoutedEventArgs e)
         {
-            string InitialsFilesFolder = LbworkFilesFolder.Content.ToString();
+            string initialsFilesFolder = LbworkFilesFolder.Content.ToString();
             string zipFileFolder = LbZipFilesFolder.Content.ToString();
             randomFileName = Guid.NewGuid().ToString();
-            string zipFile = System.IO.Path.Combine(zipFileFolder, randomFileName + ".zip"); // M''rab zip faili asukoha ja nime
+            string zipFile = System.IO.Path.Combine(zipFileFolder, randomFileName + ".zip"); // M''rab zip faili asukoha aadressi
 
             BnConfig.IsEnabled = false;
             BnSaveChanges.IsEnabled = false;
             using (var scope = new TransactionScope())
             {
-                ZipFile.CreateFromDirectory(InitialsFilesFolder, zipFile); // loob zip faili
+                ZipFile.CreateFromDirectory(initialsFilesFolder, zipFile); // loob zip faili
                 bool existItem = false;
                 foreach (var value in ListZipFiles.Items) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
                 {

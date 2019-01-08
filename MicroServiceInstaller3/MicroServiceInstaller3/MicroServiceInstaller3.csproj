@@ -176,4 +176,9 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\SevenZipSharp.Interop.18.5.0\build\SevenZipSharp.Interop.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SevenZipSharp.Interop.18.5.0\build\SevenZipSharp.Interop.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PreBuildEvent>COPY C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\ServiceInstallClient.exe C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\Resources
+COPY C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\CommonLibary.dll C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\Resources
+COPY C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\NewtonSoft.Json.dll C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\Resources</PreBuildEvent>
+  </PropertyGroup>
 </Project>
