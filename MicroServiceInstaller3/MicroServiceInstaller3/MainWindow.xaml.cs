@@ -184,7 +184,7 @@ namespace MicroServiceInstaller3
             BnZip.IsEnabled = false;
         }
 
-        private async void BnFinishandZip_Click(object sender, RoutedEventArgs e)
+        private  void BnFinishandZip_Click(object sender, RoutedEventArgs e)
         {
             try { 
                 string zipLocation = LbZipFilesFolder.Content.ToString(); // defineerib kausta, kus on k6ik zipitud failid
@@ -211,7 +211,6 @@ namespace MicroServiceInstaller3
                 // salvestab teenuse failid ja teenuse automaatseks k'ivitamiseks vajalikud failid yhte installifaili
                 string logFilePath = LbLogFilePath.Content.ToString();
 
-                //TaskCreationOptions atp = TaskCreationOptions.AttachedToParent;
                 var progressHandler = new Progress<string>(value =>
                 {
                     LbStatus.Content = value;
@@ -219,62 +218,52 @@ namespace MicroServiceInstaller3
                 var progress = progressHandler as IProgress<string>;
                 try
                 {
-                    Task task = Task.Run(() =>
+                    Task task = Task.Factory.StartNew(() =>
                     {
+                        
                         string installerexePath = ServiceFileHandler.CreateInstallExe(confFilePath, serviceFilePath, sevenZipFilePath, installServiceDirectory);
 
                         for (int i = 0; i != 100; ++i)
                         {
-                            if (progress != null)
-                                progress.Report(i + "%");
-                            //token.ThrowIfCancellationRequested();
-                            Task.Delay(100);
-                            //Thread.Sleep(100);
+                            if (progress != null) progress.Report(i + "%");
+                           //Task.Delay(100);
+                            Thread.Sleep(100);
                             if (File.Exists(installerexePath))
                             {
-                                Dispatcher.Invoke(() =>
-                                {
-                                    LbStatus.Content = "Completed: " + installerexePath;
-                                });
+                                Dispatcher.Invoke(() => {LbStatus.Content = "Completed: " + installerexePath;});
                                 break;
                             }
                         }
                         if (!File.Exists(installerexePath))
                         {
-                            Dispatcher.Invoke(() =>
-                            {
+                            throw new Exception("Installer.exe not found.");
+                        }                       
+                    }, TaskCreationOptions.LongRunning);
 
-                                throw new InvalidOperationException("Installer.exe not found.");
-                            });
-
-                        }
-
-
-
-                    });//, atp);
-
-                    Task task2 = Task.Run(() =>
+                    Task task2 = task.ContinueWith((p) =>
                    {
-                       //ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "installServiceDirectory: " + installServiceDirectory);
+                       if (p.Exception != null) {
+                           Dispatcher.Invoke(() => { LbStatus.Content = p.Exception;});
+                       }
+                           //ErrorHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "installServiceDirectory: " + installServiceDirectory);
                        string desktopFilePath = ServiceFileHandler.CopyExeFile(installServiceDirectory, logFilePath); // kopeerib exe faili
-                       Dispatcher.Invoke(() =>
-                      {
-                          LbStatus.Content = desktopFilePath != ""
-                              ? (object)("Installer.exe is created successfully: " + desktopFilePath)
-                              : (object)("Installer.exe is created successfully: " + installServiceDirectory);
-                      });
-
+                       if (desktopFilePath == "") {
+                           throw new Exception("Installer.exe wasn't copied, find file from: " + installServiceDirectory);
+                       }
+                       else {
+                           Dispatcher.Invoke(() => {LbStatus.Content = ("Installer.exe is copied successfully: " + desktopFilePath);});
+                       }
                    });
 
-                    Task task3 = Task.Run(() =>
+                    Task task3 = task2.ContinueWith((p) =>
                     {
-                        Dispatcher.Invoke(() =>
-                           { BnFinishandZip.IsEnabled = false; ListZipFiles.Items.Clear(); });
+                        if (p.Exception != null){
+                            Dispatcher.Invoke(() => { LbStatus.Content = p.Exception; });
+                        } else {
+                            Dispatcher.Invoke(() => { BnFinishandZip.IsEnabled = false; ListZipFiles.Items.Clear(); });
+                        }
                     });
-
-
-                    await task.ContinueWith((p) => task2).ContinueWith((p) => task3);
-                   }
+                }
                 catch (Exception ex)
                 {
                     LbStatus.Content = ex.GetType().Name + ": " + ex.Message;
