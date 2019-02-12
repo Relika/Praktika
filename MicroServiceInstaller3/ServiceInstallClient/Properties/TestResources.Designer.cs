@@ -61,16 +61,6 @@ namespace ServiceInstallClient.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] Debug {
-            get {
-                object obj = ResourceManager.GetObject("Debug", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to test.
         /// </summary>
         internal static string Test {

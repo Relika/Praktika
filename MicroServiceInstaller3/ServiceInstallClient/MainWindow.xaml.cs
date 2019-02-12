@@ -120,7 +120,7 @@ namespace ServiceInstallClient
                 string selectedPath = FShandler.ChooseFolder(folderBrowserDialog1, selectedFolderLabel: LbExistingAppSettingsFilePath, savebutton: BnSaveDownloadedAppSettingsChanges);
                 LbTemporaryFolderZipFile.Content = selectedPath;
                 // logfaili loomine
-                LbLogFilePath.Content = FShandler.CreateLogFile(selectedPath);
+                //LbLogFilePath.Content = FShandler.CreateLogFile(selectedPath);
                 LbExistingAppSettingsFilePath.Content = selectedPath; // n'itab valitud kausta Seda rida pole vaja, toimub chooseFolderi funktsioonis!!!!
                 string temporaryFolder = LbTemporary.Content.ToString();
                 string[] folderIsEmpty = Directory.GetFiles(selectedPath);
@@ -178,6 +178,7 @@ namespace ServiceInstallClient
                         LbDownloadedAppSettingsFilePath.Content = "Existing conf file name does not match with downloaded conf file name. Please select another folder";
                     }
                 }
+                LbLogFilePath.Content = FShandler.CreateLogFile(selectedPath);
             }
         }
 

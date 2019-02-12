@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
@@ -114,8 +117,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>COPY C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\ServiceInstallClient.exe C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\Template
-COPY C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\*.dll C:\Users\IEUser\source\repos\Relika\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\bin\Debug\Template
-</PostBuildEvent>
+    <PostBuildEvent>COPY C:\Users\IEUser\source\repos\Relika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\ServiceInstallClient.exe C:\Users\IEUser\source\repos\Relika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\Resources
+COPY C:\Users\IEUser\source\repos\Relika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\*.dll C:\Users\IEUser\source\repos\Relika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\Resources</PostBuildEvent>
   </PropertyGroup>
 </Project>
