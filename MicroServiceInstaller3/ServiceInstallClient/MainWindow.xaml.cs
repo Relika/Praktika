@@ -12,6 +12,9 @@ using System.Collections.ObjectModel;
 using System.Collections;
 using MicroServiceInstaller3;
 using System.Transactions;
+using System.ServiceProcess;
+using System.Linq;
+using System.Configuration.Install;
 
 namespace ServiceInstallClient
 {
@@ -118,7 +121,7 @@ namespace ServiceInstallClient
             if (result == System.Windows.Forms.DialogResult.OK)
             {
                 string selectedPath = FShandler.ChooseFolder(folderBrowserDialog1, selectedFolderLabel: LbExistingAppSettingsFilePath, savebutton: BnSaveDownloadedAppSettingsChanges);
-                LbTemporaryFolderZipFile.Content = selectedPath;
+                //LbTemporaryFolderZipFile.Content = selectedPath;
                 // logfaili loomine
                 //LbLogFilePath.Content = FShandler.CreateLogFile(selectedPath);
                 LbExistingAppSettingsFilePath.Content = selectedPath; // n'itab valitud kausta Seda rida pole vaja, toimub chooseFolderi funktsioonis!!!!
@@ -216,34 +219,45 @@ namespace ServiceInstallClient
             { 
                 try
                 {
-                    ServiceState serviceStatusbefore = ServiceInstaller.GetServiceStatus(serviceName);
-                    if (serviceStatusbefore == ServiceState.Running)
+                    ServiceController service = new ServiceController(serviceName);
+                    bool isExists = DoesServiceExist(serviceName);
+                    if (isExists)
                     {
-                        ServiceInstaller.StopService(serviceName);
-                        ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
-                        ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "Servicestate.Running serviceName: " + serviceName);
-                        ServiceInstaller.StartService(serviceName);
-
-                    }
-                    if (serviceStatusbefore == ServiceState.NotFound)
-                    {
-                        ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
-                        ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), " Servicestate.NotFound downloadedConfigFilePath: " + downloadedConfigFilePath);
-                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "Servicestate.NotFound serviceName: " + serviceName);
-                        ServiceInstaller.InstallAndStart(serviceName, serviceName, downloadedConfigFilePath);
+                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "ServiceStatusBefore: " + service.Status);
+                        if (service.Status == ServiceControllerStatus.Stopped)
+                        {
+                            ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                            ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
+                            service.Start();
+                            var timeout = new TimeSpan(0, 0, 5);
+                            service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                            LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "ServiceStatus: " + service.Status);
+                        }
+                        else
+                        {
+                            service.Stop();
+                            var timeout = new TimeSpan(0, 0, 5); // 5seconds
+                            service.WaitForStatus(ServiceControllerStatus.Stopped, timeout);
+                            ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
+                            ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
+                            service.Start();
+                            service.WaitForStatus(ServiceControllerStatus.Running, timeout);
+                            LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "ServiceStatus: " + service.Status);
+                        }
                     }
                     else
                     {
                         ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                         ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
-                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "Servicestate.else serviceName: " + serviceName);
-                        ServiceInstaller.StartService(serviceName);
+                        string exeFilePath = ConfFileHandler.GetExeFileName(existingConfFilePath);
+                        InstallService(exeFilePath);
+                        service.Start();
+                        //if (service.Status == ServiceControllerStatus.)
+                        LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "ServiceStatus: " + service.Status);
                     }
 
-                    ServiceState serviceStatusafter = ServiceInstaller.GetServiceStatus(serviceName);
-                    LbDownloadedProcessStatus.Content = "Changes saved, service status: " + serviceStatusafter;
+
+                    LbDownloadedProcessStatus.Content = "Changes saved, service status: " + service.Status;
                     LvDownLoadedConnectionSettings.ItemsSource = "";
                     LvDownloadedConfigSettings.ItemsSource = "";
                     LbExistingAppSettingsFilePath.Content = "";
@@ -266,7 +280,43 @@ namespace ServiceInstallClient
             System.Windows.Application.Current.Shutdown();
         }
 
+        public static bool DoesServiceExist(string serviceName)
+        {
+            ServiceController[] services = ServiceController.GetServices();
+            foreach(ServiceController service in services)
+            {
+                if (service.ServiceName == serviceName)
+                {
+                    return true;
+                }
+            }
+            return false; //return ServiceController.GetServices().Any(serviceController => serviceController.ServiceName.Equals(serviceName));
+        }
 
+        public static void InstallService(string exeFilename)
+        {
+            //string[] commandLineOptions = new string[1] { "/LogFile=install.log" };
+
+            //AssemblyInstaller installer = new AssemblyInstaller(exeFilename, commandLineOptions);
+
+            //installer.UseNewContext = true;
+            //installer.Install(null);
+            //installer.Commit(null);
+            //public void InstallWinService(string winServicePath)
+            //{
+            //ServiceInstaller.
+                try
+                {
+                    ManagedInstallerClass.InstallHelper(new string[] { exeFilename });
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+            //}
+
+        }
 
     }
 }

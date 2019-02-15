@@ -387,5 +387,16 @@ namespace CommonLibary.Handlers
             
             return serviceName;
         }
+
+        public static string GetExeFileName(string filePath)
+        {
+            string exeFilePath ="";
+            if (filePath.EndsWith(".config"))
+            {
+                exeFilePath = filePath.Substring(0, filePath.LastIndexOf(".config"));
+                return exeFilePath;
+            }
+            return exeFilePath;
+        }
     }
 }

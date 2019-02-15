@@ -112,7 +112,14 @@ namespace CommonLibary.Handlers
         {
             string logFileName = "log.txt";
             string logFilePath = System.IO.Path.Combine(selectedPath, logFileName);
-            File.Create(logFilePath);
+            //File.Create(logFilePath);
+
+
+            FileInfo fi = new FileInfo(logFilePath);
+            // Actually create the file.
+            FileStream fs = fi.Create();
+            // Modify the file as required, and then close the file.
+            fs.Close();
             return logFilePath;
         }
 
