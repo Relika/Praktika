@@ -15,6 +15,8 @@ using System.Transactions;
 using System.ServiceProcess;
 using System.Linq;
 using System.Configuration.Install;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace ServiceInstallClient
 {
@@ -213,7 +215,8 @@ namespace ServiceInstallClient
             Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
             Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectinStringsCollection);
             string serviceName = ConfFileHandler.GetServiceName(downloadedConfigFilePath);
-            //string serviceFileName = System.IO.Path.Combine(serviceName, ".exe");
+            LbServiceName.Content = serviceName;
+            string serviceFilePath = Path.Combine(existingConfigFileDirectory, serviceName + ".exe");
             LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "serviceName: " + serviceName);
             using (TransactionScope scope = new TransactionScope())
             { 
@@ -250,9 +253,17 @@ namespace ServiceInstallClient
                         ConfFileHandler.WriteSettingsToConfFile(existingConfFilePath, appSettingsDic: appSettingsDictionary);
                         ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
                         string exeFilePath = ConfFileHandler.GetExeFileName(existingConfFilePath);
-                        InstallService(exeFilePath);
+                        CreateService(serviceName, serviceFilePath);
+                        //InstallService.InstallMyService(serviceName, serviceFilePath);
+                        //MyServiceInstaller.MyInstaller(serviceName);
+                        bool exists = FindDoesServiceExists(serviceName);
+                        //var timeout = new TimeSpan(0, 0, 5); // 5seconds
+                        service.WaitForStatus(ServiceControllerStatus.Stopped);
                         service.Start();
-                        //if (service.Status == ServiceControllerStatus.)
+                        service.WaitForStatus(ServiceControllerStatus.Running);
+                        //InstallService(exeFilePath);
+                        //service.Start();
+                        //if (service.Status == ServiceControllerStatus.Running) { }
                         LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "ServiceStatus: " + service.Status);
                     }
 
@@ -293,30 +304,71 @@ namespace ServiceInstallClient
             return false; //return ServiceController.GetServices().Any(serviceController => serviceController.ServiceName.Equals(serviceName));
         }
 
-        public static void InstallService(string exeFilename)
+        public static bool FindDoesServiceExists(string serviceName)
         {
-            //string[] commandLineOptions = new string[1] { "/LogFile=install.log" };
+            if (serviceName == null)
+            {
+                throw new ArgumentNullException(nameof(serviceName));
+            }
 
-            //AssemblyInstaller installer = new AssemblyInstaller(exeFilename, commandLineOptions);
-
-            //installer.UseNewContext = true;
-            //installer.Install(null);
-            //installer.Commit(null);
-            //public void InstallWinService(string winServicePath)
-            //{
-            //ServiceInstaller.
-                try
+            ServiceController[] services = ServiceController.GetServices();
+            foreach (ServiceController service in services)
+            {
+                if (service.ServiceName == serviceName)
                 {
-                    ManagedInstallerClass.InstallHelper(new string[] { exeFilename });
+                    return true;
                 }
-                catch (Exception)
-                {
-
-                    throw;
-                }
-            //}
-
+            }
+            var timeout = new TimeSpan(0, 0, 5);
+            FindDoesServiceExists(serviceName);
+            return false;//return ServiceController.GetServices().Any(serviceController => serviceController.ServiceName.Equals(serviceName));
         }
+
+        public static void CreateService(string serviceName, string exePath)
+        {
+
+            Process process = new Process();// defineerib uue protsessi
+            ProcessStartInfo startInfo = new ProcessStartInfo(); // defineerib protsessi k'ivitamise  andmed
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
+            startInfo.FileName = "C:\\Windows\\System32\\sc.exe";
+            //sc create TestService binPath = C:\test\TestService.exe
+
+            startInfo.Arguments = "create "+serviceName+ " binPath= "+exePath;
+            process.StartInfo = startInfo;
+             //process.UseShellExecute = false;
+            process.Start(); // k'ivitab protsessi
+            //string installerFilePath = System.IO.Path.Combine(installServiceDirectory, "Installer.exe");
+            //return installerFilePath;
+        }
+
+
+
+        //public static void InstallService(string exeFilename)
+        //{
+        //    //string[] commandLineOptions = new string[1] { "/LogFile=install.log" };
+
+        //    //AssemblyInstaller installer = new AssemblyInstaller(exeFilename, commandLineOptions);
+
+        //    //installer.UseNewContext = true;
+        //    //installer.Install(null);
+        //    //installer.Commit(null);
+        //    //public void InstallWinService(string winServicePath)
+        //    //{
+        //    //ServiceInstaller.
+        //        try
+        //        {
+        //            ManagedInstallerClass.InstallHelper(new string[] { exeFilename });
+        //        }
+        //        catch (Exception)
+        //        {
+
+        //            throw;
+        //        }
+        //    //}
+
+        //}
+
+
 
     }
 }

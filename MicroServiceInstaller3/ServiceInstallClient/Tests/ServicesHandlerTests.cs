@@ -45,6 +45,16 @@ namespace MicroServiceInstaller3.Tests
 
             Assert.IsTrue(ServiceInstallClient.MainWindow.DoesServiceExist(serviceName));
         }
+
+        [TestMethod]
+        public void CreateServiceTest()
+        {
+            string serviceName = "TestService";
+            string exePath = @"C:\testservice\TestService.exe";
+            ServiceInstallClient.MainWindow.CreateService(serviceName, exePath);
+            Assert.IsTrue(ServiceInstallClient.MainWindow.DoesServiceExist(serviceName));
+
+        }
             
     }
 }
