@@ -65,7 +65,7 @@ namespace CommonLibary
             string existingfFilePath = "C:/Users/IEUser/Downloads/sss/Enics.WiseToSapIntegration.Shipper.exe.config";
             string downloadedFilePath = "C:/Users/IEUser/Downloads/ddd/Enics.WiseToSapIntegration.Shipper.exe.config";
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = ConfFileHandler.CompareAppSettings(existingfFilePath, downloadedFilePath);
-            Dictionary<string, AppSettingsConfig> comparedAppSettingsDicitionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
+            Dictionary<string, AppSettingsConfig> comparedAppSettingsDicitionary = ConfFileHandler.CreateAppSettingsDicitionary(comparedAppSettingsCollection);
             ConfFileHandler.WriteSettingsToConfFile(existingfFilePath, comparedAppSettingsDicitionary);
             // kontrollin, kas andmed on molemas failis samad
 

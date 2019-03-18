@@ -134,8 +134,8 @@ namespace MicroServiceInstaller3
         {        
             string appConfigPath = LbworkFilesFolder.Content.ToString();
             string selectedPath = LbTemporary.Content.ToString();         
-            ObservableCollection<AppSettingsConfig> modifiedAppSettings = LvUploadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
-            Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.ReadModifiedAppSettings( modifiedAppSettings);
+            ObservableCollection<AppSettingsConfig> modifiedAppSettingsCollection = LvUploadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateAppSettingsDicitionary( modifiedAppSettingsCollection);
             try
             {
                 ConfFileHandler.WriteSettingsToConfFile(selectedPath, appSettingsDic: appSettingsDictionary);

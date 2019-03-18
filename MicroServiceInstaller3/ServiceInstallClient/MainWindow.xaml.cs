@@ -28,7 +28,6 @@ namespace ServiceInstallClient
         public MainWindow()
         {
             InitializeComponent();
-            //PrintResources();
         }
 
         private void ListAppSettingsFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -105,7 +104,11 @@ namespace ServiceInstallClient
                 }
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="extractPath"></param>
+        /// <returns></returns>
         private IEnumerable<string> CreateUnFilteredZipFileList(string extractPath)
         {
             IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(extractPath, "*", SearchOption.AllDirectories); // Otsib ajutisest kaustast ja alamkaustadest faile
@@ -212,7 +215,7 @@ namespace ServiceInstallClient
             string existingConfFilePath = Path.Combine(existingConfigFileDirectory, Path.GetFileName(downloadedConfigFilePath));
             ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = LvDownloadedConfigSettings.ItemsSource as ObservableCollection<AppSettingsConfig>;
             ObservableCollection<ConnectionStrings> comparedConnectinStringsCollection = LvDownLoadedConnectionSettings.ItemsSource as ObservableCollection<ConnectionStrings>;
-            Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateComparedAppSettingsDicitionary(comparedAppSettingsCollection);
+            Dictionary<string, AppSettingsConfig> appSettingsDictionary = ConfFileHandler.CreateAppSettingsDicitionary(comparedAppSettingsCollection);
             Dictionary<string, ConnectionStrings> connectionStringsDictionary = ConfFileHandler.CreateComparedConnectionStringsDicitionary(comparedConnectinStringsCollection);
             string serviceName = ConfFileHandler.GetServiceName(downloadedConfigFilePath);
             LbServiceName.Content = serviceName;
