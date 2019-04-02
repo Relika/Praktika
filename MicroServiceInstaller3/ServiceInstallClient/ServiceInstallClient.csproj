@@ -118,7 +118,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>COPY C:\Users\IEUser\source\repos\Relika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\ServiceInstallClient.exe C:\Users\IEUser\source\repos\Relika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\Resources
-COPY C:\Users\IEUser\source\repos\Relika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\*.dll C:\Users\IEUser\source\repos\Relika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\Resources</PostBuildEvent>
+    <PostBuildEvent>COPY C:\Users\Relika\Documents\Ametikool\Praktika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\ServiceInstallClient.exe C:\Users\Relika\Documents\Ametikool\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\Resources
+COPY C:\Users\Relika\Documents\Ametikool\Praktika\Praktika\MicroServiceInstaller3\ServiceInstallClient\bin\Debug\*.dll C:\Users\Relika\Documents\Ametikool\Praktika\Praktika\MicroServiceInstaller3\MicroServiceInstaller3\Resources</PostBuildEvent>
   </PropertyGroup>
 </Project>

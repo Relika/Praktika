@@ -43,7 +43,7 @@ namespace MicroServiceInstaller3
         private void BSelectFolder_Click(object sender, RoutedEventArgs e)
         {
             LbStatus.Content = "";
-            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog(); // avab failide valimise akna
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
             // m''rab parameetrid
             folderBrowserDialog1.Description = "Select directory";
             folderBrowserDialog1.ShowNewFolderButton = false;

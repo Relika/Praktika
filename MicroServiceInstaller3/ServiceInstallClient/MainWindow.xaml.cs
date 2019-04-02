@@ -81,7 +81,7 @@ namespace ServiceInstallClient
             }
             catch (Exception error)
             {
-                LbProcessStatus.Content = "No zipfile found"+error.Message;
+                LbProcessStatus.Content = "No zipfile found "+error.Message;
             }
             finally
             {
