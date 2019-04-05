@@ -7,6 +7,14 @@ namespace CommonLibary.Converters
 {
     public class BorderThicknessConverter : System.Windows.Markup.MarkupExtension, IValueConverter
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value">Is checked value</param>
+        /// <param name="targetType"></param>
+        /// <param name="parameter"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
         public object Convert(Object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
 			bool isChecked = (bool)value;

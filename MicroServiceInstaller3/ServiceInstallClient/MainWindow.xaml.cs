@@ -60,12 +60,11 @@ namespace ServiceInstallClient
                 string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 string temporaryFolder = System.IO.Path.GetDirectoryName(path);
                 string zipFile= ConfFileHandler.FindZipFile(temporaryFolder);
-                // Leia kaustas zip file
                 string temporaryDirectory = FShandler.MakeRandomDirectorytoTemp();
                 ZipFile.ExtractToDirectory(zipFile, temporaryDirectory);
 
                 if (ConfFileHandler.FindZipFile(temporaryDirectory) == ""){// rohkem zip faile ei ole
-                        IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory);
+                    IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory);
                     FilterZipFileList(unFilteredFileList);
                 } else{
                     IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(temporaryDirectory, "*", SearchOption.AllDirectories);
@@ -197,7 +196,7 @@ namespace ServiceInstallClient
                 //if(typeof(ConnectionStrings)== it.GetType()) niimoodi 'ra tee
                 CommonLibary.Poco.SettingsBase item = it as CommonLibary.Poco.SettingsBase;
 
-                if (item.IsValueExist) //
+                if (item.IsValueExist)
                 {
                     item.RbExistingValue = true;
                 }
@@ -269,8 +268,6 @@ namespace ServiceInstallClient
                         //if (service.Status == ServiceControllerStatus.Running) { }
                         LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "ServiceStatus: " + service.Status);
                     }
-
-
                     LbDownloadedProcessStatus.Content = "Changes saved, service status: " + service.Status;
                     LvDownLoadedConnectionSettings.ItemsSource = "";
                     LvDownloadedConfigSettings.ItemsSource = "";
@@ -283,7 +280,6 @@ namespace ServiceInstallClient
                     LbDownloadedProcessStatus.Content = error.Message;
                     string errorMessage = LogHandler.CreateErrorMessage(error);
                     LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), errorMessage);
-
                 }
             }
         }
@@ -329,7 +325,6 @@ namespace ServiceInstallClient
 
         public static void CreateService(string serviceName, string exePath)
         {
-
             Process process = new Process();// defineerib uue protsessi
             ProcessStartInfo startInfo = new ProcessStartInfo(); // defineerib protsessi k'ivitamise  andmed
             startInfo.WindowStyle = ProcessWindowStyle.Normal;
@@ -343,35 +338,5 @@ namespace ServiceInstallClient
             //string installerFilePath = System.IO.Path.Combine(installServiceDirectory, "Installer.exe");
             //return installerFilePath;
         }
-
-
-
-        //public static void InstallService(string exeFilename)
-        //{
-        //    //string[] commandLineOptions = new string[1] { "/LogFile=install.log" };
-
-        //    //AssemblyInstaller installer = new AssemblyInstaller(exeFilename, commandLineOptions);
-
-        //    //installer.UseNewContext = true;
-        //    //installer.Install(null);
-        //    //installer.Commit(null);
-        //    //public void InstallWinService(string winServicePath)
-        //    //{
-        //    //ServiceInstaller.
-        //        try
-        //        {
-        //            ManagedInstallerClass.InstallHelper(new string[] { exeFilename });
-        //        }
-        //        catch (Exception)
-        //        {
-
-        //            throw;
-        //        }
-        //    //}
-
-        //}
-
-
-
     }
 }

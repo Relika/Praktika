@@ -10,6 +10,12 @@ namespace CommonLibary.Handlers
 {
     public class ResourceHandler
     {
+        /// <summary>
+        /// Searches files form program resources
+        /// </summary>
+        /// <param name="path">Program location</param>
+        /// <param name="resourceName">File name</param>
+        /// <returns>Returns resources MemoryStream or null</returns>
         public static MemoryStream GetResource(string path, string resourceName)
         {
             var definition =
@@ -33,7 +39,13 @@ namespace CommonLibary.Handlers
             }
             return null;
         }
-
+        /// <summary>
+        /// Adds files to program resources
+        /// </summary>
+        /// <param name="path">Program location</param>
+        /// <param name="resourceName">Resource name</param>
+        /// <param name="resource">Resource in bytes</param>
+        /// <param name="fileName">File name</param>
         public static void AddResource(string path, string resourceName, byte[] resource, string fileName)
         {
             var definition =
