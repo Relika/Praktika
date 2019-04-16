@@ -62,19 +62,20 @@ namespace ServiceInstallClient
                 string zipFile= ConfFileHandler.FindZipFile(temporaryFolder);
                 string temporaryDirectory = FShandler.MakeRandomDirectorytoTemp();
                 ZipFile.ExtractToDirectory(zipFile, temporaryDirectory);
-
-                if (ConfFileHandler.FindZipFile(temporaryDirectory) == ""){// rohkem zip faile ei ole
-                    IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory);
-                    FilterZipFileList(unFilteredFileList);
+                // controls if there are more zip-files
+                if (ConfFileHandler.FindZipFile(temporaryDirectory) == ""){
+                    IEnumerable<string> unFilteredFileList = CreateUnFilteredFileList(temporaryDirectory);
+                    FilterFileList(unFilteredFileList);
                 } else{
                     IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(temporaryDirectory, "*", SearchOption.AllDirectories);
+                    // lists found files
                     ListUnPackedZipFiles.ItemsSource = Files;
                     foreach (object item in ListUnPackedZipFiles.ItemsSource)
                     {
                         string temporaryDirectory2 = FShandler.MakeRandomDirectorytoTemp();
                         ZipFile.ExtractToDirectory(item.ToString(), temporaryDirectory2);
-                        IEnumerable<string> unFilteredFileList = CreateUnFilteredZipFileList(temporaryDirectory2);
-                        FilterZipFileList(unFilteredFileList);
+                        IEnumerable<string> unFilteredFileList = CreateUnFilteredFileList(temporaryDirectory2);
+                        FilterFileList(unFilteredFileList);
                     }
                 }
             }
@@ -87,32 +88,33 @@ namespace ServiceInstallClient
                 BTestSelectZipFile.IsEnabled = false;
             }
         }
-
-         private void FilterZipFileList(IEnumerable<string> unFilteredFileList)
+        /// <summary>
+        /// Filters listed files
+        /// </summary>
+        /// <param name="unFilteredFileList">List of files need to be filtered</param>
+         private void FilterFileList(IEnumerable<string> unFilteredFileList)
         {
-            foreach (var value in unFilteredFileList) //kontrollib, kas failiasukohanimetused vastavad j'rgmistele tingimustele
+            foreach (var value in unFilteredFileList)
             {
-                if (!File.Exists(value)) continue; // kui fail eksisteerib, j'tkab
-
-                bool endsIn = (value.EndsWith(".exe.config")); // kui faili asukohanimetus sisaldab j'rgmis v''rtusi
+                if (!File.Exists(value)) continue;
+                bool endsIn = (value.EndsWith(".exe.config"));
                 if (endsIn)
                 {
                     ListAppSettingsFiles.Items.Add($"{value}");
-                    TbGuide.Text = "Please select conffile from the list to config settings";
-                    //ListFiles.Items.Add($"{value}");                  
+                    TbGuide.Text = "Please select conffile from the list to config settings";                
                 }
             }
         }
         /// <summary>
-        /// 
+        /// Creates list of files found from selected directory and subdirectories
         /// </summary>
-        /// <param name="extractPath"></param>
-        /// <returns></returns>
-        private IEnumerable<string> CreateUnFilteredZipFileList(string extractPath)
+        /// <param name="directoryPath">selected directory</param>
+        /// <returns>Returns list of files</returns>
+        private IEnumerable<string> CreateUnFilteredFileList(string directoryPath)
         {
-            IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(extractPath, "*", SearchOption.AllDirectories); // Otsib ajutisest kaustast ja alamkaustadest faile
-            ListUnPackedZipFiles.ItemsSource = Files; // Paigutab failid faililisti
-            IEnumerable<string> unFilteredZipFileList = (IEnumerable<string>)ListUnPackedZipFiles.ItemsSource; //muudab valitud faili asukohanimetuse tekstiks
+            IEnumerable<string> Files = Directory.EnumerateFileSystemEntries(directoryPath, "*", SearchOption.AllDirectories);
+            ListUnPackedZipFiles.ItemsSource = Files;
+            IEnumerable<string> unFilteredZipFileList = (IEnumerable<string>)ListUnPackedZipFiles.ItemsSource; //changes filenames to string
             return unFilteredZipFileList;
         }
 
@@ -125,15 +127,12 @@ namespace ServiceInstallClient
             if (result == System.Windows.Forms.DialogResult.OK)
             {
                 string selectedPath = FShandler.ChooseFolder(folderBrowserDialog1, selectedFolderLabel: LbExistingAppSettingsFilePath, savebutton: BnSaveDownloadedAppSettingsChanges);
-                //LbTemporaryFolderZipFile.Content = selectedPath;
-                // logfaili loomine
-                //LbLogFilePath.Content = FShandler.CreateLogFile(selectedPath);
-                LbExistingAppSettingsFilePath.Content = selectedPath; // n'itab valitud kausta Seda rida pole vaja, toimub chooseFolderi funktsioonis!!!!
+                LbExistingAppSettingsFilePath.Content = selectedPath;
                 string temporaryFolder = LbTemporary.Content.ToString();
                 string[] folderIsEmpty = Directory.GetFiles(selectedPath);
                 ObservableCollection<AppSettingsConfig> appSettingsCollection = null;
                 ObservableCollection<ConnectionStrings> connectionStringsCollection = null;
-                if (folderIsEmpty.Length == 0)
+                if (folderIsEmpty.Length == 0)//If selected folder is empty
                 {
                     FShandler.DirectoryCopy(temporaryFolder, selectedPath, copySubDirs: true);
                     string confFilePath = ConfFileHandler.FindAppSettingsFile(selectedPath);
@@ -151,23 +150,21 @@ namespace ServiceInstallClient
                     AddRadioButtons(appSettingsCollection);
                     AddRadioButtons(connectionStringsCollection);
                     BnSaveDownloadedAppSettingsChanges.IsEnabled = true;
-                }
-                else
-                {
+                } else {// If selected folder is not empty
                     string existingConfFilePath = ConfFileHandler.FindAppSettingsFile(selectedPath);
                     string downloadedConfFilePath = ConfFileHandler.FindAppSettingsFile(temporaryFolder);
-                    string existingConfFileName = System.IO.Path.GetFileName(path: existingConfFilePath);
-                    string downloadedConfFileName = System.IO.Path.GetFileName(downloadedConfFilePath);
+                    string existingConfFileName = Path.GetFileName(path: existingConfFilePath);
+                    string downloadedConfFileName = Path.GetFileName(downloadedConfFilePath);
                     ObservableCollection<AppSettingsConfig> comparedAppSettingsCollection = null;
                     ObservableCollection<ConnectionStrings> comparedConnectionStringCollection = null;
-                    if (existingConfFileName == downloadedConfFileName)
+                    if (existingConfFileName == downloadedConfFileName)// If confile names match.
                     {
                         LbDownloadedAppSettingsFilePath.Content = downloadedConfFilePath;
                         try
                         {
+                            // compare appSetting and connectionsStrings
                             comparedAppSettingsCollection = ConfFileHandler.CompareAppSettings(existingConfFilePath, downloadedConfFilePath);
                             comparedConnectionStringCollection = ConfFileHandler.CompareConnectionStrings(existingConfFilePath, downloadedConfFilePath);
-                            //compare connectionsStrings
                         }
                         catch (Exception error)
                         {
@@ -188,13 +185,15 @@ namespace ServiceInstallClient
                 LbLogFilePath.Content = FShandler.CreateLogFile(selectedPath);
             }
         }
-
-        private void AddRadioButtons(IEnumerable appSettings)
+        /// <summary>
+        /// Adds radio buttons to listed elements
+        /// </summary>
+        /// <param name="elementsList">List of elements</param>
+        private void AddRadioButtons(IEnumerable elementsList)
         {
-            foreach (var it in appSettings)
+            foreach (var it in elementsList)
             {
-                //if(typeof(ConnectionStrings)== it.GetType()) niimoodi 'ra tee
-                CommonLibary.Poco.SettingsBase item = it as CommonLibary.Poco.SettingsBase;
+                SettingsBase item = it as SettingsBase;
 
                 if (item.IsValueExist)
                 {
@@ -256,16 +255,10 @@ namespace ServiceInstallClient
                         ConfFileHandler.WriteConnectionStringstoConFile(existingConfFilePath, connectionStringsDic: connectionStringsDictionary);
                         string exeFilePath = ConfFileHandler.GetExeFileName(existingConfFilePath);
                         CreateService(serviceName, serviceFilePath);
-                        //InstallService.InstallMyService(serviceName, serviceFilePath);
-                        //MyServiceInstaller.MyInstaller(serviceName);
                         bool exists = FindDoesServiceExists(serviceName);
-                        //var timeout = new TimeSpan(0, 0, 5); // 5seconds
                         service.WaitForStatus(ServiceControllerStatus.Stopped);
                         service.Start();
                         service.WaitForStatus(ServiceControllerStatus.Running);
-                        //InstallService(exeFilePath);
-                        //service.Start();
-                        //if (service.Status == ServiceControllerStatus.Running) { }
                         LogHandler.WriteLogMessage(LbLogFilePath.Content.ToString(), "ServiceStatus: " + service.Status);
                     }
                     LbDownloadedProcessStatus.Content = "Changes saved, service status: " + service.Status;
@@ -289,7 +282,11 @@ namespace ServiceInstallClient
         {
             System.Windows.Application.Current.Shutdown();
         }
-
+        /// <summary>
+        /// Controls does current service exists
+        /// </summary>
+        /// <param name="serviceName">Service name</param>
+        /// <returns>Returns true, if service exists</returns>
         public static bool DoesServiceExist(string serviceName)
         {
             ServiceController[] services = ServiceController.GetServices();
@@ -300,9 +297,13 @@ namespace ServiceInstallClient
                     return true;
                 }
             }
-            return false; //return ServiceController.GetServices().Any(serviceController => serviceController.ServiceName.Equals(serviceName));
+            return false;
         }
-
+        /// <summary>
+        /// Controls that service was downloaded successfully
+        /// </summary>
+        /// <param name="serviceName">Service name</param>
+        /// <returns>Returns true, if service was downloaded successfully</returns>
         public static bool FindDoesServiceExists(string serviceName)
         {
             if (serviceName == null)
@@ -320,23 +321,24 @@ namespace ServiceInstallClient
             }
             var timeout = new TimeSpan(0, 0, 5);
             FindDoesServiceExists(serviceName);
-            return false;//return ServiceController.GetServices().Any(serviceController => serviceController.ServiceName.Equals(serviceName));
+            return false;
         }
-
+        /// <summary>
+        /// Downloads new service
+        /// </summary>
+        /// <param name="serviceName">Service name</param>
+        /// <param name="exePath">Exe -file location</param>
         public static void CreateService(string serviceName, string exePath)
         {
-            Process process = new Process();// defineerib uue protsessi
-            ProcessStartInfo startInfo = new ProcessStartInfo(); // defineerib protsessi k'ivitamise  andmed
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo(); 
             startInfo.WindowStyle = ProcessWindowStyle.Normal;
             startInfo.FileName = "C:\\Windows\\System32\\sc.exe";
-            //sc create TestService binPath = C:\test\TestService.exe
 
             startInfo.Arguments = "create "+serviceName+ " binPath= "+exePath;
             process.StartInfo = startInfo;
-             //process.UseShellExecute = false;
-            process.Start(); // k'ivitab protsessi
-            //string installerFilePath = System.IO.Path.Combine(installServiceDirectory, "Installer.exe");
-            //return installerFilePath;
+            process.Start();
+
         }
     }
 }
